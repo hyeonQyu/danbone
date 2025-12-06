@@ -1,0 +1,12 @@
+@import url('pretendard/dist/web/variable/pretendardvariable.css');
+
+* {
+  font-family:
+    'Pretendard Variable',
+    Pretendard,
+    -apple-system,
+    BlinkMacSystemFont,
+    system-ui,
+    Roboto,
+    sans-serif;
+}
