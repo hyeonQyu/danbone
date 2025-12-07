@@ -1,4 +1,4 @@
-import { DocumentEntity } from '@/data/repositories/entity.types';
+import { DocumentEntity } from '@/data/entity.types';
 
 export interface UserEntity extends DocumentEntity {
   email: string;
@@ -9,4 +9,14 @@ export interface CreateUserData {
   email: string;
   name: string;
   password: string;
+}
+
+export interface LoginData {
+  email: string;
+  password: string;
+}
+
+export interface LoginResult {
+  user: Pick<UserEntity, 'id' | 'email' | 'name'>;
+  idToken: string;
 }
