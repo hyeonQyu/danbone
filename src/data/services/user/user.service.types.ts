@@ -1,4 +1,5 @@
-import { CreateUserData, UserEntity, UsersRepository } from '@/data/repositories';
+import { UsersRepository } from '@/data/repositories';
+import { CreateUserData, UserEntity } from '@/features/users';
 
 export interface UserService {
   register: (data: CreateUserData) => Promise<UserEntity>;
