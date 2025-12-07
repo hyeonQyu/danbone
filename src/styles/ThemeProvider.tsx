@@ -26,6 +26,11 @@ function ThemeProvider({ children }: ThemeProviderProps) {
     () =>
       createTheme({
         palette: paletteByMode[mode],
+        heights: {
+          sm: pxToRem(32),
+          md: pxToRem(48),
+          lg: pxToRem(56),
+        },
         typography: {
           fontFamily: [
             'Pretendard Variable',
