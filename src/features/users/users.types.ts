@@ -19,4 +19,6 @@ export interface LoginData {
 export interface LoginResult {
   user: Pick<UserEntity, 'id' | 'email' | 'name'>;
   idToken: string;
+  refreshToken: string;
+  expiresIn: string;
 }
