@@ -11,7 +11,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 
 function LoginView() {
-  const theme = useTheme();
+  const { palette, spacing, typography, heights } = useTheme();
   const [formData, setFormData] = useState<LoginData>({
     email: '',
     password: '',
@@ -59,7 +59,7 @@ function LoginView() {
           maxWidth: pxToRem(400),
           display: 'flex',
           flexDirection: 'column',
-          gap: theme.spacing(3),
+          gap: spacing(3),
         }}
       >
         <Logo />
@@ -94,8 +94,8 @@ function LoginView() {
           disabled={loading}
           fullWidth
           sx={{
-            ...theme.typography.h6,
-            height: theme.heights.lg,
+            ...typography.h6,
+            height: heights.lg,
           }}
         >
           {loading ? <CircularProgress size={24} /> : '로그인'}
@@ -106,8 +106,8 @@ function LoginView() {
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            gap: theme.spacing(2),
-            marginTop: theme.spacing(1),
+            gap: spacing(2),
+            marginTop: spacing(1),
           }}
         >
           <Typography variant="body2" color="textSecondary">
@@ -118,7 +118,7 @@ function LoginView() {
             <Typography
               variant="body2"
               sx={{
-                color: theme.palette.primary.main,
+                color: palette.primary.main,
                 textDecoration: 'none',
                 fontWeight: 600,
                 cursor: 'pointer',

@@ -9,7 +9,7 @@ interface PageViewContainerProps {
 }
 
 function PageViewContainer({ children, sx }: PageViewContainerProps) {
-  const theme = useTheme();
+  const { palette, spacing } = useTheme();
 
   return (
     <Box
@@ -19,7 +19,8 @@ function PageViewContainer({ children, sx }: PageViewContainerProps) {
         alignItems: 'center',
         justifyContent: 'center',
         minHeight: '100vh',
-        backgroundColor: theme.palette.background.default,
+        backgroundColor: palette.background.default,
+        padding: spacing(3),
         ...sx,
       }}
     >

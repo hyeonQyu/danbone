@@ -6,6 +6,7 @@ import { paletteLight } from '@/styles/palette.light';
 import { usePxToRem } from '@/styles/usePxToRem';
 import { CssBaseline } from '@mui/material';
 import { createTheme, ThemeProvider as MuiThemeProvider, PaletteMode, PaletteOptions } from '@mui/material/styles';
+import { SnackbarProvider } from 'notistack';
 import { ReactNode, useMemo, useState } from 'react';
 
 interface ThemeProviderProps {
@@ -90,7 +91,7 @@ function ThemeProvider({ children }: ThemeProviderProps) {
   return (
     <MuiThemeProvider theme={theme}>
       <CssBaseline />
-      {children}
+      <SnackbarProvider>{children}</SnackbarProvider>
     </MuiThemeProvider>
   );
 }
