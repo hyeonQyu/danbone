@@ -1,6 +1,23 @@
 'use client';
 
 import { TextModel } from '@/openai/model.types';
+import {
+  Alert,
+  Box,
+  Button,
+  Checkbox,
+  CircularProgress,
+  Container,
+  Divider,
+  FormControl,
+  FormControlLabel,
+  InputLabel,
+  MenuItem,
+  Paper,
+  Select,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { useEffect, useState } from 'react';
 import { getSupportedModels, testUsageAction, type AgentName } from './actions';
 
@@ -80,55 +97,52 @@ export default function TestUsagePage() {
   };
 
   return (
-    <div style={{ padding: '40px', maxWidth: '1400px', margin: '0 auto' }}>
-      <h1>Usage 구조 테스트</h1>
+    <Container maxWidth="xl" sx={{ py: 5 }}>
+      <Typography variant="h3" component="h1" gutterBottom>
+        Usage 구조 테스트
+      </Typography>
 
-      <div style={{ marginTop: '20px' }}>
-        <label>
-          <div style={{ marginBottom: '8px', fontWeight: 'bold' }}>에이전트 선택:</div>
-          <select
+      <Box sx={{ mt: 3 }}>
+        <FormControl fullWidth>
+          <InputLabel id="agent-select-label">에이전트 선택</InputLabel>
+          <Select
+            labelId="agent-select-label"
             value={selectedAgent}
+            label="에이전트 선택"
             onChange={(e) => setSelectedAgent(e.target.value as AgentName)}
-            style={{
-              width: '100%',
-              padding: '10px',
-              fontSize: '14px',
-              border: '1px solid #ccc',
-              borderRadius: '4px',
-              backgroundColor: 'white',
-              cursor: 'pointer',
-            }}
           >
             {AGENT_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value}>
+              <MenuItem key={option.value} value={option.value}>
                 {option.label} - {option.description}
-              </option>
+              </MenuItem>
             ))}
-          </select>
-        </label>
-      </div>
+          </Select>
+        </FormControl>
+      </Box>
 
-      <div style={{ marginTop: '20px' }}>
-        <div style={{ marginBottom: '8px', fontWeight: 'bold' }}>
-          모델 선택 ({selectedModels.length}개 선택됨):
+      <Box sx={{ mt: 3 }}>
+        <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+          모델 선택 ({selectedModels.length}개 선택됨)
           {supportedModels.length > 0 && (
-            <span style={{ fontSize: '12px', fontWeight: 'normal', color: '#666', marginLeft: '8px' }}>
+            <Typography component="span" variant="caption" color="text.secondary" sx={{ ml: 1 }}>
               (이 에이전트는 {supportedModels.length}개 모델을 지원합니다)
-            </span>
+            </Typography>
           )}
-        </div>
-        <div
-          style={{
-            border: '1px solid #ccc',
-            borderRadius: '4px',
-            padding: '15px',
-            backgroundColor: '#fafafa',
-            maxHeight: '300px',
+        </Typography>
+        <Paper
+          variant="outlined"
+          sx={{
+            p: 2,
+            backgroundColor: 'action.hover',
+            maxHeight: 300,
             overflowY: 'auto',
           }}
         >
           {supportedModels.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '20px', color: '#999' }}>지원하는 모델 정보를 불러오는 중...</div>
+            <Box sx={{ textAlign: 'center', py: 3, color: 'text.secondary' }}>
+              <CircularProgress size={24} sx={{ mb: 1 }} />
+              <Typography variant="body2">지원하는 모델 정보를 불러오는 중...</Typography>
+            </Box>
           ) : (
             MODEL_OPTIONS.reduce(
               (acc, option) => {
@@ -148,196 +162,240 @@ export default function TestUsagePage() {
               }))
               .filter((group) => group.options.length > 0)
               .map((group) => (
-                <div key={group.category} style={{ marginBottom: '15px' }}>
-                  <div
-                    style={{
-                      fontWeight: 'bold',
-                      fontSize: '13px',
-                      color: '#555',
-                      marginBottom: '8px',
-                      paddingBottom: '4px',
-                      borderBottom: '1px solid #ddd',
+                <Box key={group.category} sx={{ mb: 2 }}>
+                  <Typography
+                    variant="subtitle2"
+                    fontWeight="bold"
+                    color="text.secondary"
+                    sx={{
+                      mb: 1,
+                      pb: 0.5,
+                      borderBottom: 1,
+                      borderColor: 'divider',
                     }}
                   >
                     {group.category}
-                  </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '8px' }}>
+                  </Typography>
+                  <Box
+                    sx={{
+                      display: 'grid',
+                      gridTemplateColumns: {
+                        xs: 'repeat(1, 1fr)',
+                        sm: 'repeat(2, 1fr)',
+                        md: 'repeat(3, 1fr)',
+                        lg: 'repeat(4, 1fr)',
+                      },
+                      gap: 1,
+                    }}
+                  >
                     {group.options.map((option) => (
-                      <label
+                      <FormControlLabel
                         key={option.value}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          cursor: 'pointer',
-                          padding: '6px 8px',
-                          borderRadius: '4px',
-                          backgroundColor: selectedModels.includes(option.value) ? '#e0f2fe' : 'transparent',
+                        control={<Checkbox checked={selectedModels.includes(option.value)} onChange={() => toggleModel(option.value)} />}
+                        label={<Typography variant="body2">{option.label}</Typography>}
+                        sx={{
+                          m: 0,
+                          px: 1,
+                          py: 0.5,
+                          borderRadius: 1,
                           transition: 'background-color 0.2s',
+                          '&:hover': {
+                            backgroundColor: 'action.hover',
+                          },
                         }}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={selectedModels.includes(option.value)}
-                          onChange={() => toggleModel(option.value)}
-                          style={{ marginRight: '8px', cursor: 'pointer' }}
-                        />
-                        <span style={{ fontSize: '13px' }}>{option.label}</span>
-                      </label>
+                      />
                     ))}
-                  </div>
-                </div>
+                  </Box>
+                </Box>
               ))
           )}
-        </div>
-      </div>
+        </Paper>
+      </Box>
 
-      <div style={{ marginTop: '20px' }}>
-        <label>
-          <div style={{ marginBottom: '8px', fontWeight: 'bold' }}>테스트 입력:</div>
-          <textarea
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            rows={3}
-            style={{
-              width: '100%',
-              padding: '10px',
-              fontSize: '14px',
-              border: '1px solid #ccc',
-              borderRadius: '4px',
-            }}
-          />
-        </label>
-      </div>
+      <Box sx={{ mt: 3 }}>
+        <TextField fullWidth multiline rows={3} label="테스트 입력" value={input} onChange={(e) => setInput(e.target.value)} />
+      </Box>
 
-      <button
-        onClick={handleTest}
-        disabled={loading || selectedModels.length === 0}
-        style={{
-          marginTop: '20px',
-          padding: '12px 24px',
-          fontSize: '16px',
-          backgroundColor: loading || selectedModels.length === 0 ? '#ccc' : '#0070f3',
-          color: 'white',
-          border: 'none',
-          borderRadius: '6px',
-          cursor: loading || selectedModels.length === 0 ? 'not-allowed' : 'pointer',
-        }}
-      >
+      <Button variant="contained" size="large" onClick={handleTest} disabled={loading || selectedModels.length === 0} sx={{ mt: 3 }}>
         {loading ? `실행 중... (${selectedModels.length}개 모델)` : `Agent 실행하기 (${selectedModels.length}개 모델)`}
-      </button>
+      </Button>
 
       {results && (
-        <div style={{ marginTop: '30px' }}>
-          <h2>결과 비교 ({results.length}개 모델)</h2>
+        <Box sx={{ mt: 4 }}>
+          <Typography variant="h4" component="h2" gutterBottom>
+            결과 비교 ({results.length}개 모델)
+          </Typography>
 
-          <div style={{ marginTop: '20px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '20px' }}>
+          <Box
+            sx={{
+              mt: 2,
+              display: 'grid',
+              gridTemplateColumns: {
+                xs: '1fr',
+                md: 'repeat(2, 1fr)',
+                lg: 'repeat(3, 1fr)',
+              },
+              gap: 3,
+            }}
+          >
             {results.map((result) => (
-              <div
+              <Paper
                 key={result.model}
-                style={{
-                  border: '2px solid #e5e7eb',
-                  borderRadius: '8px',
-                  padding: '20px',
-                  backgroundColor: '#fff',
+                elevation={2}
+                sx={{
+                  p: 3,
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
                 }}
               >
-                <h3
-                  style={{
-                    margin: '0 0 15px 0',
-                    padding: '10px',
-                    backgroundColor: '#0070f3',
-                    color: 'white',
-                    borderRadius: '6px',
-                    fontSize: '16px',
+                <Box
+                  sx={{
+                    mb: 2,
+                    p: 1.5,
+                    backgroundColor: 'primary.main',
+                    color: 'primary.contrastText',
+                    borderRadius: 1,
                   }}
                 >
-                  📊 {result.model}
-                </h3>
+                  <Typography variant="h6" component="h3">
+                    📊 {result.model}
+                  </Typography>
+                </Box>
 
-                <div style={{ marginTop: '15px' }}>
-                  <h4 style={{ fontSize: '14px', marginBottom: '8px', color: '#374151' }}>Agent 출력:</h4>
-                  <pre
-                    style={{
-                      background: '#f5f5f5',
-                      padding: '12px',
-                      borderRadius: '6px',
-                      overflow: 'auto',
-                      fontSize: '12px',
-                      maxHeight: '200px',
+                <Box sx={{ mt: 2 }}>
+                  <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                    Agent 출력:
+                  </Typography>
+                  <Paper
+                    variant="outlined"
+                    sx={{
+                      p: 1.5,
+                      backgroundColor: 'grey.50',
+                      maxHeight: 200,
+                      overflowY: 'auto',
                     }}
                   >
-                    {JSON.stringify(result.result, null, 2)}
-                  </pre>
-                </div>
+                    <Typography
+                      component="pre"
+                      variant="body2"
+                      sx={{
+                        fontFamily: 'monospace',
+                        fontSize: '0.75rem',
+                        whiteSpace: 'pre-wrap',
+                        wordBreak: 'break-word',
+                        m: 0,
+                      }}
+                    >
+                      {JSON.stringify(result.result, null, 2)}
+                    </Typography>
+                  </Paper>
+                </Box>
 
                 {result.priceBreakdown && (
-                  <div style={{ marginTop: '15px' }}>
-                    <h4 style={{ fontSize: '14px', marginBottom: '8px', color: '#374151' }}>💰 비용 분석:</h4>
-                    <div style={{ background: '#f0f9ff', padding: '15px', borderRadius: '6px' }}>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', fontSize: '13px' }}>
-                        <div>
-                          <p style={{ margin: '3px 0', color: '#666' }}>일반 입력:</p>
-                          <p style={{ margin: '3px 0', fontSize: '15px', fontWeight: 'bold' }}>
+                  <Box sx={{ mt: 2 }}>
+                    <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                      💰 비용 분석:
+                    </Typography>
+                    <Paper
+                      variant="outlined"
+                      sx={{
+                        p: 2,
+                        backgroundColor: 'info.lighter',
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          display: 'grid',
+                          gridTemplateColumns: 'repeat(2, 1fr)',
+                          gap: 1.5,
+                        }}
+                      >
+                        <Box>
+                          <Typography variant="caption" color="text.secondary">
+                            일반 입력:
+                          </Typography>
+                          <Typography variant="body1" fontWeight="bold">
                             {result.priceBreakdown.regularInputTokens.toLocaleString()}
-                          </p>
-                        </div>
-                        <div>
-                          <p style={{ margin: '3px 0', color: '#666' }}>캐시 입력:</p>
-                          <p style={{ margin: '3px 0', fontSize: '15px', fontWeight: 'bold', color: '#10b981' }}>
+                          </Typography>
+                        </Box>
+                        <Box>
+                          <Typography variant="caption" color="text.secondary">
+                            캐시 입력:
+                          </Typography>
+                          <Typography variant="body1" fontWeight="bold" color="success.main">
                             {result.priceBreakdown.cachedInputTokens.toLocaleString()}
-                          </p>
-                        </div>
-                        <div>
-                          <p style={{ margin: '3px 0', color: '#666' }}>출력:</p>
-                          <p style={{ margin: '3px 0', fontSize: '15px', fontWeight: 'bold' }}>
+                          </Typography>
+                        </Box>
+                        <Box>
+                          <Typography variant="caption" color="text.secondary">
+                            출력:
+                          </Typography>
+                          <Typography variant="body1" fontWeight="bold">
                             {result.priceBreakdown.outputTokens.toLocaleString()}
-                          </p>
-                        </div>
-                        <div>
-                          <p style={{ margin: '3px 0', color: '#666' }}>총 비용:</p>
-                          <p style={{ margin: '3px 0', fontSize: '15px', fontWeight: 'bold', color: '#0070f3' }}>
+                          </Typography>
+                        </Box>
+                        <Box>
+                          <Typography variant="caption" color="text.secondary">
+                            총 비용:
+                          </Typography>
+                          <Typography variant="body1" fontWeight="bold" color="primary.main">
                             ${result.priceBreakdown.totalCost.toFixed(6)}
-                          </p>
-                        </div>
-                      </div>
+                          </Typography>
+                        </Box>
+                      </Box>
                       {result.priceBreakdown.savedByCaching > 0 && (
-                        <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid #ddd' }}>
-                          <p style={{ margin: '0', color: '#10b981', fontWeight: 'bold', fontSize: '12px' }}>
+                        <>
+                          <Divider sx={{ my: 1.5 }} />
+                          <Typography variant="caption" color="success.main" fontWeight="bold">
                             💡 캐싱 절약: ${result.priceBreakdown.savedByCaching.toFixed(6)}
-                          </p>
-                        </div>
+                          </Typography>
+                        </>
                       )}
-                    </div>
-                  </div>
+                    </Paper>
+                  </Box>
                 )}
 
-                <div style={{ marginTop: '15px' }}>
-                  <h4 style={{ fontSize: '14px', marginBottom: '8px', color: '#374151' }}>📈 Usage 정보:</h4>
-                  <pre
-                    style={{
-                      background: '#f5f5f5',
-                      padding: '12px',
-                      borderRadius: '6px',
-                      overflow: 'auto',
-                      fontSize: '11px',
-                      maxHeight: '150px',
+                <Box sx={{ mt: 2 }}>
+                  <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                    📈 Usage 정보:
+                  </Typography>
+                  <Paper
+                    variant="outlined"
+                    sx={{
+                      p: 1.5,
+                      backgroundColor: 'grey.50',
+                      maxHeight: 150,
+                      overflowY: 'auto',
                     }}
                   >
-                    {JSON.stringify(result.usage, null, 2)}
-                  </pre>
-                </div>
-              </div>
+                    <Typography
+                      component="pre"
+                      variant="body2"
+                      sx={{
+                        fontFamily: 'monospace',
+                        fontSize: '0.7rem',
+                        whiteSpace: 'pre-wrap',
+                        wordBreak: 'break-word',
+                        m: 0,
+                      }}
+                    >
+                      {JSON.stringify(result.usage, null, 2)}
+                    </Typography>
+                  </Paper>
+                </Box>
+              </Paper>
             ))}
-          </div>
+          </Box>
 
-          <div style={{ marginTop: '20px', padding: '15px', background: '#fffbea', borderRadius: '6px' }}>
-            <p>
-              <strong>💡 서버 콘솔을 확인하세요!</strong>
-            </p>
-            <p>터미널에서 각 모델별 상세한 Usage 구조가 출력됩니다.</p>
-          </div>
-        </div>
+          <Alert severity="info" sx={{ mt: 3 }}>
+            <Typography variant="body2" fontWeight="bold">
+              💡 서버 콘솔을 확인하세요!
+            </Typography>
+            <Typography variant="body2">터미널에서 각 모델별 상세한 Usage 구조가 출력됩니다.</Typography>
+          </Alert>
+        </Box>
       )}
-    </div>
+    </Container>
   );
 }
