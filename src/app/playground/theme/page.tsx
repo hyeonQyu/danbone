@@ -1,10 +1,13 @@
 'use client';
 
+import { useThemeMode } from '@/styles/ThemeModeContext';
 import {
   Add as AddIcon,
+  DarkMode as DarkModeIcon,
   Delete as DeleteIcon,
   FavoriteBorder as FavoriteBorderIcon,
   Favorite as FavoriteIcon,
+  LightMode as LightModeIcon,
   Mail as MailIcon,
 } from '@mui/icons-material';
 import {
@@ -19,8 +22,10 @@ import {
   CircularProgress,
   Container,
   Divider,
+  FormControl,
   FormControlLabel,
   IconButton,
+  InputLabel,
   LinearProgress,
   MenuItem,
   Paper,
@@ -41,12 +46,22 @@ import { useState } from 'react';
 
 export default function DesignSystemPage() {
   const [tabValue, setTabValue] = useState(0);
+  const { mode, setMode } = useThemeMode();
+
+  const toggleTheme = () => {
+    setMode(mode === 'light' ? 'dark' : 'light');
+  };
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Typography variant="h3" gutterBottom sx={{ mb: 4 }}>
-        MUI Design System
-      </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+        <Typography variant="h3">MUI Design System</Typography>
+        <Stack direction="row" spacing={2} alignItems="center">
+          <LightModeIcon sx={{ color: mode === 'light' ? 'primary.main' : 'text.disabled' }} />
+          <Switch checked={mode === 'dark'} onChange={toggleTheme} />
+          <DarkModeIcon sx={{ color: mode === 'dark' ? 'primary.main' : 'text.disabled' }} />
+        </Stack>
+      </Box>
 
       {/* Colors Section */}
       <Section title="Colors (색상)">
@@ -267,7 +282,8 @@ export default function DesignSystemPage() {
           }}
         >
           <Stack spacing={3}>
-            <TextField label="Default" />
+            <TextField label="Default" size="small" />
+            <TextField label="Default" size="medium" />
             <TextField label="Filled" variant="filled" />
             <TextField label="Outlined" variant="outlined" />
             <TextField label="Disabled" disabled value="Disabled text" />
@@ -277,11 +293,14 @@ export default function DesignSystemPage() {
           </Stack>
 
           <Stack spacing={3}>
-            <Select label="Select" defaultValue="option1">
-              <MenuItem value="option1">Option 1</MenuItem>
-              <MenuItem value="option2">Option 2</MenuItem>
-              <MenuItem value="option3">Option 3</MenuItem>
-            </Select>
+            <FormControl fullWidth>
+              <InputLabel id="select-label">Select</InputLabel>
+              <Select labelId="select-label" label="Select" defaultValue="option1">
+                <MenuItem value="option1">Option 1</MenuItem>
+                <MenuItem value="option2">Option 2</MenuItem>
+                <MenuItem value="option3">Option 3</MenuItem>
+              </Select>
+            </FormControl>
 
             <FormControlLabel control={<Checkbox />} label="Checkbox" />
             <FormControlLabel control={<Checkbox defaultChecked />} label="Checked" />
