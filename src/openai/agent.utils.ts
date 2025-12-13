@@ -17,6 +17,7 @@ export const buildAgentFactory = <TContext = UnknownContext, TOutput extends Age
   configByModel: Partial<Record<TextModel, AgentModelOptions<TContext, TOutput>>>,
 ) => {
   return {
+    agentType: config.name,
     createAgent: (model: TextModel) => new Agent({ ...config, ...configByModel[model], model }),
     supportedModels: Object.keys(configByModel),
   };

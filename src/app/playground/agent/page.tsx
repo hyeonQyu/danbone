@@ -6,6 +6,7 @@ import {
   Box,
   Button,
   Checkbox,
+  Chip,
   CircularProgress,
   Container,
   Divider,
@@ -15,11 +16,13 @@ import {
   MenuItem,
   Paper,
   Select,
+  Tab,
+  Tabs,
   TextField,
   Typography,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { getSupportedModels, testUsageAction, type AgentName } from './actions';
+import { evaluateAgentAction, getSupportedModels, getTestCases, testUsageAction, type AgentName } from './actions';
 
 const AGENT_OPTIONS = [
   { value: 'searchInputGuardrail', label: 'Search Input Guardrail', description: '입력 문장 수 검증' },
@@ -50,22 +53,28 @@ const MODEL_OPTIONS: { value: TextModel; label: string; category: string }[] = [
 ];
 
 export default function TestUsagePage() {
+  const [mode, setMode] = useState<'single' | 'evaluate'>('single');
   const [input, setInput] = useState('안녕하세요. 저는 대한민국 사람입니다.');
   const [selectedAgent, setSelectedAgent] = useState<AgentName>('searchInputGuardrail');
   const [selectedModels, setSelectedModels] = useState<TextModel[]>([]);
   const [supportedModels, setSupportedModels] = useState<TextModel[]>([]);
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<Awaited<ReturnType<typeof testUsageAction>> | null>(null);
+  const [evalResults, setEvalResults] = useState<Awaited<ReturnType<typeof evaluateAgentAction>> | null>(null);
+  const [testCases, setTestCases] = useState<unknown[]>([]);
 
-  // 에이전트가 변경되면 지원하는 모델 목록을 가져옴
+  // 에이전트가 변경되면 지원하는 모델 목록과 테스트 케이스를 가져옴
   useEffect(() => {
-    const loadSupportedModels = async () => {
+    const loadData = async () => {
       const models = await getSupportedModels(selectedAgent);
       setSupportedModels(models);
       // 기존 선택된 모델 중 지원하지 않는 모델은 제거
       setSelectedModels((prev) => prev.filter((model) => models.includes(model)));
+
+      const cases = await getTestCases(selectedAgent);
+      setTestCases(cases);
     };
-    loadSupportedModels();
+    loadData();
   }, [selectedAgent]);
 
   const toggleModel = (model: TextModel) => {
@@ -85,6 +94,9 @@ export default function TestUsagePage() {
     }
 
     setLoading(true);
+    setResults(null);
+    setEvalResults(null);
+
     try {
       const res = await testUsageAction(input, selectedAgent, selectedModels);
       setResults(res);
@@ -96,11 +108,39 @@ export default function TestUsagePage() {
     }
   };
 
+  const handleEvaluate = async () => {
+    if (selectedModels.length === 0) {
+      alert('최소 하나의 모델을 선택해주세요.');
+      return;
+    }
+
+    setLoading(true);
+    setResults(null);
+    setEvalResults(null);
+
+    try {
+      const res = await evaluateAgentAction(selectedAgent, selectedModels);
+      setEvalResults(res);
+      console.log('평가 결과:', res);
+    } catch (error) {
+      console.error('에러:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Container maxWidth="xl" sx={{ py: 5 }}>
       <Typography variant="h3" component="h1" gutterBottom>
-        Usage 구조 테스트
+        Agent 테스트 & 평가
       </Typography>
+
+      <Box sx={{ mt: 3, mb: 3 }}>
+        <Tabs value={mode} onChange={(_, value) => setMode(value)}>
+          <Tab label="단일 입력 테스트" value="single" />
+          <Tab label="전체 평가" value="evaluate" />
+        </Tabs>
+      </Box>
 
       <Box sx={{ mt: 3 }}>
         <FormControl fullWidth>
@@ -212,13 +252,40 @@ export default function TestUsagePage() {
         </Paper>
       </Box>
 
-      <Box sx={{ mt: 3 }}>
-        <TextField fullWidth multiline rows={3} label="테스트 입력" value={input} onChange={(e) => setInput(e.target.value)} />
-      </Box>
+      {mode === 'single' && (
+        <>
+          <Box sx={{ mt: 3 }}>
+            <TextField fullWidth multiline rows={3} label="테스트 입력" value={input} onChange={(e) => setInput(e.target.value)} />
+          </Box>
 
-      <Button variant="contained" size="large" onClick={handleTest} disabled={loading || selectedModels.length === 0} sx={{ mt: 3 }}>
-        {loading ? `실행 중... (${selectedModels.length}개 모델)` : `Agent 실행하기 (${selectedModels.length}개 모델)`}
-      </Button>
+          <Button variant="contained" size="large" onClick={handleTest} disabled={loading || selectedModels.length === 0} sx={{ mt: 3 }}>
+            {loading ? `실행 중... (${selectedModels.length}개 모델)` : `Agent 실행하기 (${selectedModels.length}개 모델)`}
+          </Button>
+        </>
+      )}
+
+      {mode === 'evaluate' && (
+        <>
+          <Alert severity="info" sx={{ mt: 3 }}>
+            <Typography variant="body2" fontWeight="bold">
+              전체 평가 모드
+            </Typography>
+            <Typography variant="body2">
+              {testCases.length}개의 테스트 케이스로 선택한 모델들을 평가합니다. 정확도, 토큰 사용량, 비용을 확인할 수 있습니다.
+            </Typography>
+          </Alert>
+
+          <Button
+            variant="contained"
+            size="large"
+            onClick={handleEvaluate}
+            disabled={loading || selectedModels.length === 0}
+            sx={{ mt: 3 }}
+          >
+            {loading ? `평가 중... (${selectedModels.length}개 모델)` : `평가 시작 (${testCases.length}개 케이스)`}
+          </Button>
+        </>
+      )}
 
       {results && (
         <Box sx={{ mt: 4 }}>
@@ -393,6 +460,208 @@ export default function TestUsagePage() {
               💡 서버 콘솔을 확인하세요!
             </Typography>
             <Typography variant="body2">터미널에서 각 모델별 상세한 Usage 구조가 출력됩니다.</Typography>
+          </Alert>
+        </Box>
+      )}
+
+      {evalResults && (
+        <Box sx={{ mt: 4 }}>
+          <Typography variant="h4" component="h2" gutterBottom>
+            평가 결과 ({evalResults.length}개 모델)
+          </Typography>
+
+          {/* 모델별 요약 */}
+          <Box
+            sx={{
+              mt: 3,
+              display: 'grid',
+              gridTemplateColumns: {
+                xs: '1fr',
+                md: 'repeat(2, 1fr)',
+                lg: 'repeat(3, 1fr)',
+              },
+              gap: 3,
+            }}
+          >
+            {evalResults.map((result) => (
+              <Paper
+                key={result.model}
+                elevation={3}
+                sx={{
+                  p: 3,
+                  borderLeft: 4,
+                  borderColor: result.accuracy >= 80 ? 'success.main' : result.accuracy >= 60 ? 'warning.main' : 'error.main',
+                }}
+              >
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                  <Typography variant="h6" component="h3">
+                    {result.model}
+                  </Typography>
+                  <Chip
+                    label={`${result.accuracy.toFixed(1)}%`}
+                    color={result.accuracy >= 80 ? 'success' : result.accuracy >= 60 ? 'warning' : 'error'}
+                    sx={{ fontWeight: 'bold', fontSize: '0.9rem' }}
+                  />
+                </Box>
+
+                <Divider sx={{ my: 2 }} />
+
+                <Box sx={{ mb: 2 }}>
+                  <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                    📊 정확도
+                  </Typography>
+                  <Typography variant="h5" fontWeight="bold" color={result.accuracy >= 80 ? 'success.main' : 'text.primary'}>
+                    {result.passedCount} / {result.totalCount}
+                  </Typography>
+                </Box>
+
+                {result.priceBreakdown && (
+                  <Box sx={{ mb: 2 }}>
+                    <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                      💰 예상 비용 (케이스당)
+                    </Typography>
+                    <Typography variant="body1" fontWeight="bold" color="primary.main">
+                      ${result.priceBreakdown.totalCost.toFixed(6)}
+                    </Typography>
+                  </Box>
+                )}
+
+                <Box>
+                  <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                    🔢 토큰 사용량 (평균)
+                  </Typography>
+                  <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                    <Box>
+                      <Typography variant="caption" color="text.secondary">
+                        입력
+                      </Typography>
+                      <Typography variant="body2" fontWeight="bold">
+                        {result.usage.inputTokens}
+                      </Typography>
+                    </Box>
+                    <Box>
+                      <Typography variant="caption" color="text.secondary">
+                        출력
+                      </Typography>
+                      <Typography variant="body2" fontWeight="bold">
+                        {result.usage.outputTokens}
+                      </Typography>
+                    </Box>
+                    <Box>
+                      <Typography variant="caption" color="text.secondary">
+                        총
+                      </Typography>
+                      <Typography variant="body2" fontWeight="bold">
+                        {result.usage.totalTokens}
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Box>
+              </Paper>
+            ))}
+          </Box>
+
+          {/* 상세 결과 */}
+          {evalResults.map((result) => (
+            <Box key={`detail-${result.model}`} sx={{ mt: 4 }}>
+              <Typography variant="h5" component="h3" gutterBottom>
+                {result.model} - 상세 결과
+              </Typography>
+
+              <Box sx={{ mt: 2 }}>
+                {result.evaluations.map((evaluation, idx) => (
+                  <Paper
+                    key={idx}
+                    variant="outlined"
+                    sx={{
+                      p: 2,
+                      mb: 2,
+                      borderLeft: 4,
+                      borderColor: evaluation.passed ? 'success.main' : 'error.main',
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                      <Typography variant="subtitle1" fontWeight="bold">
+                        {evaluation.passed ? '✅' : '❌'} {evaluation.description || `테스트 ${idx + 1}`}
+                      </Typography>
+                      <Chip label={evaluation.passed ? '통과' : '실패'} size="small" color={evaluation.passed ? 'success' : 'error'} />
+                    </Box>
+
+                    <Box sx={{ mt: 2 }}>
+                      <Typography variant="caption" color="text.secondary" display="block" gutterBottom>
+                        입력:
+                      </Typography>
+                      <Paper variant="outlined" sx={{ p: 1.5, backgroundColor: 'grey.50', mb: 2 }}>
+                        <Typography variant="body2">{evaluation.input}</Typography>
+                      </Paper>
+
+                      <Box
+                        sx={{
+                          display: 'grid',
+                          gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+                          gap: 2,
+                        }}
+                      >
+                        <Box>
+                          <Typography variant="caption" color="text.secondary" display="block" gutterBottom>
+                            기대 출력:
+                          </Typography>
+                          <Paper variant="outlined" sx={{ p: 1.5, backgroundColor: 'success.lighter' }}>
+                            <Typography
+                              component="pre"
+                              variant="body2"
+                              sx={{
+                                fontFamily: 'monospace',
+                                fontSize: '0.75rem',
+                                whiteSpace: 'pre-wrap',
+                                wordBreak: 'break-word',
+                                m: 0,
+                              }}
+                            >
+                              {JSON.stringify(evaluation.expectedOutput, null, 2)}
+                            </Typography>
+                          </Paper>
+                        </Box>
+
+                        <Box>
+                          <Typography variant="caption" color="text.secondary" display="block" gutterBottom>
+                            실제 출력:
+                          </Typography>
+                          <Paper
+                            variant="outlined"
+                            sx={{
+                              p: 1.5,
+                              backgroundColor: evaluation.passed ? 'success.lighter' : 'error.lighter',
+                            }}
+                          >
+                            <Typography
+                              component="pre"
+                              variant="body2"
+                              sx={{
+                                fontFamily: 'monospace',
+                                fontSize: '0.75rem',
+                                whiteSpace: 'pre-wrap',
+                                wordBreak: 'break-word',
+                                m: 0,
+                              }}
+                            >
+                              {evaluation.actualOutput ? JSON.stringify(evaluation.actualOutput, null, 2) : evaluation.error || 'null'}
+                            </Typography>
+                          </Paper>
+                        </Box>
+                      </Box>
+                    </Box>
+                  </Paper>
+                ))}
+              </Box>
+            </Box>
+          ))}
+
+          <Alert severity="info" sx={{ mt: 3 }}>
+            <Typography variant="body2" fontWeight="bold">
+              💡 서버 콘솔을 확인하세요!
+            </Typography>
+            <Typography variant="body2">터미널에서 각 모델별 평가 요약 정보가 출력됩니다.</Typography>
           </Alert>
         </Box>
       )}
