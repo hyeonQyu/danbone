@@ -3,6 +3,7 @@
 import '@/styles/globals.css';
 import { paletteDark } from '@/styles/palette.dark';
 import { paletteLight } from '@/styles/palette.light';
+import { ThemeModeContext } from '@/styles/ThemeModeContext';
 import { usePxToRem } from '@/styles/usePxToRem';
 import { CssBaseline } from '@mui/material';
 import { createTheme, ThemeProvider as MuiThemeProvider, PaletteMode, PaletteOptions } from '@mui/material/styles';
@@ -19,7 +20,7 @@ const paletteByMode: Record<PaletteMode, PaletteOptions> = {
 };
 
 function ThemeProvider({ children }: ThemeProviderProps) {
-  const [mode] = useState<PaletteMode>('light');
+  const [mode, setMode] = useState<PaletteMode>('light');
 
   const pxToRem = usePxToRem();
 
@@ -89,10 +90,12 @@ function ThemeProvider({ children }: ThemeProviderProps) {
   );
 
   return (
-    <MuiThemeProvider theme={theme}>
-      <CssBaseline />
-      <SnackbarProvider>{children}</SnackbarProvider>
-    </MuiThemeProvider>
+    <ThemeModeContext.Provider value={{ mode, setMode }}>
+      <MuiThemeProvider theme={theme}>
+        <CssBaseline />
+        <SnackbarProvider>{children}</SnackbarProvider>
+      </MuiThemeProvider>
+    </ThemeModeContext.Provider>
   );
 }
 
