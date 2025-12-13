@@ -106,8 +106,8 @@ export async function evaluateAgentAction(agentName: AgentName, models: TextMode
     models.map(async (model) => {
       const agent = agentCreator.createAgent(model);
 
-      // 모든 테스트 케이스 실행
-      const evaluations = await Promise.all(
+      // 모든 테스트 케이스 실행 및 토큰 사용량/비용 수집
+      const evaluationsWithMetrics = await Promise.all(
         cases.map(async (testCase) => {
           try {
             const result = await runner.run(agent, testCase.input);
@@ -117,41 +117,70 @@ export async function evaluateAgentAction(agentName: AgentName, models: TextMode
             const passed = compareOutputs(testCase.expectedOutput, actualOutput, agentName);
 
             return {
-              input: testCase.input,
-              expectedOutput: testCase.expectedOutput,
-              actualOutput,
-              passed,
-              description: testCase.description,
-            } as EvaluationResult<unknown>;
+              evaluation: {
+                input: testCase.input,
+                expectedOutput: testCase.expectedOutput,
+                actualOutput,
+                passed,
+                description: testCase.description,
+              } as EvaluationResult<unknown>,
+              usage: result.state.usage,
+              priceBreakdown: result.priceBreakdown,
+            };
           } catch (error) {
             return {
-              input: testCase.input,
-              expectedOutput: testCase.expectedOutput,
-              actualOutput: null,
-              passed: false,
-              description: testCase.description,
-              error: error instanceof Error ? error.message : String(error),
-            } as EvaluationResult<unknown>;
+              evaluation: {
+                input: testCase.input,
+                expectedOutput: testCase.expectedOutput,
+                actualOutput: null,
+                passed: false,
+                description: testCase.description,
+                error: error instanceof Error ? error.message : String(error),
+              } as EvaluationResult<unknown>,
+              usage: null,
+              priceBreakdown: null,
+            };
           }
         }),
       );
+
+      const evaluations = evaluationsWithMetrics.map((e) => e.evaluation);
 
       // 정확도 계산
       const passedCount = evaluations.filter((e) => e.passed).length;
       const totalCount = evaluations.length;
       const accuracy = totalCount > 0 ? (passedCount / totalCount) * 100 : 0;
 
-      // 토큰 사용량 및 비용 계산 (첫 번째 테스트 케이스로 샘플링)
-      const sampleResult = await runner.run(agent, cases[0].input);
-      const usage = sampleResult.state.usage;
+      // 토큰 사용량 및 비용 계산 (평균과 총합)
+      const validMetrics = evaluationsWithMetrics.filter((e) => e.usage && e.priceBreakdown);
+      const totalInputTokens = validMetrics.reduce((sum, e) => sum + (e.usage?.inputTokens || 0), 0);
+      const totalOutputTokens = validMetrics.reduce((sum, e) => sum + (e.usage?.outputTokens || 0), 0);
+      const totalAllTokens = validMetrics.reduce((sum, e) => sum + (e.usage?.totalTokens || 0), 0);
+      const totalCost = validMetrics.reduce((sum, e) => sum + (e.priceBreakdown?.totalCost || 0), 0);
+      const totalRegularInputTokens = validMetrics.reduce((sum, e) => sum + (e.priceBreakdown?.regularInputTokens || 0), 0);
+      const totalCachedInputTokens = validMetrics.reduce((sum, e) => sum + (e.priceBreakdown?.cachedInputTokens || 0), 0);
+      const totalOutputTokensForPrice = validMetrics.reduce((sum, e) => sum + (e.priceBreakdown?.outputTokens || 0), 0);
+      const totalSavedByCaching = validMetrics.reduce((sum, e) => sum + (e.priceBreakdown?.savedByCaching || 0), 0);
+
+      const avgInputTokens = validMetrics.length > 0 ? Math.round(totalInputTokens / validMetrics.length) : 0;
+      const avgOutputTokens = validMetrics.length > 0 ? Math.round(totalOutputTokens / validMetrics.length) : 0;
+      const avgTotalTokens = validMetrics.length > 0 ? Math.round(totalAllTokens / validMetrics.length) : 0;
+      const avgCost = validMetrics.length > 0 ? totalCost / validMetrics.length : 0;
 
       console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
       console.log(`📊 [${model}] 평가 결과:`);
       console.log(`정확도: ${accuracy.toFixed(1)}% (${passedCount}/${totalCount})`);
-      console.log(`평균 토큰 사용량 (샘플 기준):`);
-      console.log(`  - 입력: ${usage.inputTokens}`);
-      console.log(`  - 출력: ${usage.outputTokens}`);
-      console.log(`  - 총: ${usage.totalTokens}`);
+      console.log(`토큰 사용량 평균:`);
+      console.log(`  - 입력: ${avgInputTokens}`);
+      console.log(`  - 출력: ${avgOutputTokens}`);
+      console.log(`  - 총: ${avgTotalTokens}`);
+      console.log(`토큰 사용량 총합:`);
+      console.log(`  - 입력: ${totalInputTokens}`);
+      console.log(`  - 출력: ${totalOutputTokens}`);
+      console.log(`  - 총: ${totalAllTokens}`);
+      console.log(`비용:`);
+      console.log(`  - 평균: $${avgCost.toFixed(6)}`);
+      console.log(`  - 총합: $${totalCost.toFixed(6)}`);
 
       return {
         model,
@@ -160,14 +189,34 @@ export async function evaluateAgentAction(agentName: AgentName, models: TextMode
         totalCount,
         evaluations,
         usage: {
-          requests: usage.requests,
-          inputTokens: usage.inputTokens,
-          outputTokens: usage.outputTokens,
-          totalTokens: usage.totalTokens,
-          inputTokensDetails: usage.inputTokensDetails,
-          outputTokensDetails: usage.outputTokensDetails,
+          avg: {
+            requests: validMetrics[0]?.usage?.requests || 0,
+            inputTokens: avgInputTokens,
+            outputTokens: avgOutputTokens,
+            totalTokens: avgTotalTokens,
+          },
+          total: {
+            inputTokens: totalInputTokens,
+            outputTokens: totalOutputTokens,
+            totalTokens: totalAllTokens,
+          },
         },
-        priceBreakdown: sampleResult.priceBreakdown,
+        priceBreakdown: {
+          avg: {
+            regularInputTokens: validMetrics.length > 0 ? Math.round(totalRegularInputTokens / validMetrics.length) : 0,
+            cachedInputTokens: validMetrics.length > 0 ? Math.round(totalCachedInputTokens / validMetrics.length) : 0,
+            outputTokens: validMetrics.length > 0 ? Math.round(totalOutputTokensForPrice / validMetrics.length) : 0,
+            totalCost: avgCost,
+            savedByCaching: validMetrics.length > 0 ? totalSavedByCaching / validMetrics.length : 0,
+          },
+          total: {
+            regularInputTokens: totalRegularInputTokens,
+            cachedInputTokens: totalCachedInputTokens,
+            outputTokens: totalOutputTokensForPrice,
+            totalCost: totalCost,
+            savedByCaching: totalSavedByCaching,
+          },
+        },
       };
     }),
   );
