@@ -12,14 +12,12 @@ type AgentModelOptions<TContext = UnknownContext, TOutput extends AgentOutputTyp
   'instructions'
 >;
 
-export const getAgentCreator =
-  <TContext = UnknownContext, TOutput extends AgentOutputType = TextOutput>(
-    config: AgentCommonOptions<TContext, TOutput>,
-    configByModel: Partial<Record<TextModel, AgentModelOptions<TContext, TOutput>>>,
-  ) =>
-  (model: TextModel) => {
-    return {
-      agent: new Agent({ ...config, ...configByModel[model], model }),
-      supportedModels: Object.keys(configByModel),
-    };
+export const buildAgentFactory = <TContext = UnknownContext, TOutput extends AgentOutputType = TextOutput>(
+  config: AgentCommonOptions<TContext, TOutput>,
+  configByModel: Partial<Record<TextModel, AgentModelOptions<TContext, TOutput>>>,
+) => {
+  return {
+    createAgent: (model: TextModel) => new Agent({ ...config, ...configByModel[model], model }),
+    supportedModels: Object.keys(configByModel),
   };
+};

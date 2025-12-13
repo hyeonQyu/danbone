@@ -1,12 +1,12 @@
 'use server';
 
-import { createAgentQueryClassifier, createAgentSearchInputGuardrail } from '@/openai/agents';
+import { queryClassifierAgentFactory, searchInputGuardrailAgentFactory } from '@/openai/agents';
 import { TextModel } from '@/openai/model.types';
 import { createRunner } from '@/openai/runner.utils';
 
 const agentCreators = {
-  searchInputGuardrail: createAgentSearchInputGuardrail,
-  queryClassifier: createAgentQueryClassifier,
+  searchInputGuardrail: searchInputGuardrailAgentFactory,
+  queryClassifier: queryClassifierAgentFactory,
 } as const;
 
 export type AgentName = keyof typeof agentCreators;
@@ -14,10 +14,7 @@ export type AgentName = keyof typeof agentCreators;
 // 각 에이전트가 지원하는 모델 정보를 추출
 export async function getSupportedModels(agentName: AgentName): Promise<TextModel[]> {
   const agentCreator = agentCreators[agentName];
-  // 임의의 모델로 한 번 호출해서 supportedModels를 얻음
-  const dummyModel = 'gpt-5-nano' as TextModel;
-  const { supportedModels } = agentCreator(dummyModel);
-  return supportedModels as TextModel[];
+  return agentCreator.supportedModels as TextModel[];
 }
 
 export async function testUsageAction(input: string, agentName: AgentName, models: TextModel[]) {
@@ -27,7 +24,7 @@ export async function testUsageAction(input: string, agentName: AgentName, model
   // 모든 모델에 대해 병렬로 실행
   const results = await Promise.all(
     models.map(async (model) => {
-      const { agent } = agentCreator(model);
+      const agent = agentCreator.createAgent(model);
       const result = await runner.run(agent, input);
       const usage = result.state.usage;
 

@@ -1,7 +1,7 @@
-import { getAgentCreator } from '@/openai/agent.utils';
+import { buildAgentFactory } from '@/openai/agent.utils';
 import z from 'zod';
 
-export const createAgentSearchInputGuardrail = getAgentCreator(
+export const searchInputGuardrailAgentFactory = buildAgentFactory(
   {
     name: 'Search input guardrail',
     outputType: z.object({ valid: z.boolean(), message: z.string() }),
