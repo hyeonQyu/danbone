@@ -224,43 +224,118 @@ export async function evaluateAgentAction(agentName: AgentName, models: TextMode
   return results;
 }
 
-// 타입 가드
-function isGuardrailOutput(obj: unknown): obj is { valid: boolean; message: string } {
-  return typeof obj === 'object' && obj !== null && 'valid' in obj && typeof (obj as { valid: unknown }).valid === 'boolean';
-}
+// 커스텀 비교 함수 타입
+// path: 현재 비교 중인 필드의 경로 (예: ['category', 'items', '0'])
+// 반환값: true/false로 비교 결과를 반환하거나, undefined를 반환하면 기본 로직 사용
+type CustomComparator = (expected: unknown, actual: unknown, path: string[]) => boolean | undefined;
 
-function isQueryClassifierOutput(obj: unknown): obj is { unit: string; lang: string; text: string } {
-  return (
-    typeof obj === 'object' &&
-    obj !== null &&
-    'unit' in obj &&
-    'lang' in obj &&
-    'text' in obj &&
-    typeof (obj as { text: unknown }).text === 'string'
-  );
-}
+// 에이전트별 커스텀 비교 함수 (필요시 여기에 추가)
+const customComparators: Partial<Record<AgentName, CustomComparator>> = {
+  // 예시: searchInputGuardrail의 경우 특정 필드를 다르게 비교
+  // searchInputGuardrail: (expected, actual, path) => {
+  //   // 예: 'tags' 필드는 배열 순서 무시하고 비교
+  //   if (path[path.length - 1] === 'tags') {
+  //     if (Array.isArray(expected) && Array.isArray(actual)) {
+  //       return JSON.stringify([...expected].sort()) === JSON.stringify([...actual].sort());
+  //     }
+  //   }
+  //   // undefined 반환 시 기본 로직 사용
+  //   return undefined;
+  // },
+};
 
-// 출력 비교 함수 (에이전트별로 다른 로직)
+// 출력 비교 함수 (통일된 로직: JSON 객체의 모든 필드를 비교)
 function compareOutputs(expected: unknown, actual: unknown, agentName: AgentName): boolean {
   if (!actual) return false;
 
-  if (agentName === 'searchInputGuardrail') {
-    // valid 필드만 비교 (message는 유연하게)
-    if (isGuardrailOutput(expected) && isGuardrailOutput(actual)) {
-      return expected.valid === actual.valid;
-    }
-    return false;
-  }
+  const customComparator = customComparators[agentName];
 
-  if (agentName === 'queryClassifier') {
-    // unit과 lang은 정확히 일치해야 함
-    // text는 여러 정답이 있을 수 있으므로 유연하게 (비어있지 않으면 OK)
-    if (isQueryClassifierOutput(expected) && isQueryClassifierOutput(actual)) {
-      return expected.unit === actual.unit && expected.lang === actual.lang && Boolean(actual.text && actual.text.length > 0);
+  // 재귀적으로 비교하는 내부 함수
+  const compareWithPath = (exp: unknown, act: unknown, path: string[]): boolean => {
+    // 커스텀 비교 함수가 있으면 먼저 시도
+    if (customComparator) {
+      const customResult = customComparator(exp, act, path);
+      if (customResult !== undefined) {
+        return customResult;
+      }
     }
-    return false;
-  }
 
-  // 기본: JSON 문자열 비교
-  return JSON.stringify(expected) === JSON.stringify(actual);
+    // 기본 비교 로직
+    if (exp === act) return true;
+    if (exp === null || act === null) return false;
+    if (exp === undefined || act === undefined) return false;
+
+    const expType = typeof exp;
+    const actType = typeof act;
+
+    // 타입이 다르면 false
+    if (expType !== actType) return false;
+
+    // 객체가 아닌 경우 직접 비교
+    if (expType !== 'object') {
+      return exp === act;
+    }
+
+    // 배열인 경우
+    if (Array.isArray(exp) && Array.isArray(act)) {
+      if (exp.length !== act.length) return false;
+
+      // 배열을 정렬해서 비교 (순서 무시)
+      const sortedExp = sortArray(exp);
+      const sortedAct = sortArray(act);
+
+      return sortedExp.every((item, index) => compareWithPath(item, sortedAct[index], [...path, String(index)]));
+    }
+
+    // 한쪽만 배열이면 false
+    if (Array.isArray(exp) || Array.isArray(act)) return false;
+
+    // 객체인 경우
+    const expObj = exp as Record<string, unknown>;
+    const actObj = act as Record<string, unknown>;
+
+    const expKeys = Object.keys(expObj).sort();
+    const actKeys = Object.keys(actObj).sort();
+
+    // 키 개수가 다르면 false
+    if (expKeys.length !== actKeys.length) return false;
+
+    // 키가 다르면 false
+    if (expKeys.some((key, i) => key !== actKeys[i])) return false;
+
+    // 모든 키에 대해 재귀적으로 비교
+    return expKeys.every((key) => compareWithPath(expObj[key], actObj[key], [...path, key]));
+  };
+
+  return compareWithPath(expected, actual, []);
+}
+
+// 배열을 정렬하는 헬퍼 함수 (순서를 무시하고 비교하기 위해)
+function sortArray(arr: unknown[]): unknown[] {
+  return [...arr].sort((a, b) => {
+    // null/undefined 처리
+    if (a == null && b == null) return 0;
+    if (a == null) return -1;
+    if (b == null) return 1;
+
+    const aType = typeof a;
+    const bType = typeof b;
+
+    // 타입이 다르면 타입 이름으로 정렬
+    if (aType !== bType) {
+      return aType.localeCompare(bType);
+    }
+
+    // 원시 타입은 직접 비교
+    if (aType === 'string') return (a as string).localeCompare(b as string);
+    if (aType === 'number') return (a as number) - (b as number);
+    if (aType === 'boolean') return Number(a) - Number(b);
+
+    // 객체/배열은 JSON 문자열로 변환해서 비교
+    try {
+      return JSON.stringify(a).localeCompare(JSON.stringify(b));
+    } catch {
+      return 0;
+    }
+  });
 }
