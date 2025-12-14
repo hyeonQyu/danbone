@@ -1,4 +1,4 @@
-import { ReactHookFormTextField, ReactHookFormTextFieldProps } from '@/react-hook-form/TextField';
+import { ReactHookFormTextField, ReactHookFormTextFieldProps } from '@/react-hook-form/components';
 import { JSXElementConstructor } from 'react';
 import { FieldValues } from 'react-hook-form';
 
