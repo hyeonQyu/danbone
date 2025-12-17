@@ -25,8 +25,7 @@ import { useEffect, useState } from 'react';
 import { evaluateAgentAction, getSupportedModels, getTestCases, testUsageAction, type AgentName } from './actions';
 
 const AGENT_OPTIONS = [
-  { value: 'searchInputGuardrail', label: 'Search Input Guardrail', description: '입력 문장 수 검증' },
-  { value: 'queryClassifier', label: 'Query Classifier', description: '쿼리 타입 분류' },
+  { value: 'queryNormalizer', label: 'Query Normalizer', description: '쿼리 정규화' },
   { value: 'inputValidator', label: 'Input Validator', description: '입력 검증' },
 ] as const;
 
@@ -56,7 +55,7 @@ const MODEL_OPTIONS: { value: TextModel; label: string; category: string }[] = [
 export default function TestUsagePage() {
   const [mode, setMode] = useState<'single' | 'evaluate'>('single');
   const [input, setInput] = useState('안녕하세요. 저는 대한민국 사람입니다.');
-  const [selectedAgent, setSelectedAgent] = useState<AgentName>('searchInputGuardrail');
+  const [selectedAgent, setSelectedAgent] = useState<AgentName>('queryNormalizer');
   const [selectedModels, setSelectedModels] = useState<TextModel[]>([]);
   const [supportedModels, setSupportedModels] = useState<TextModel[]>([]);
   const [loading, setLoading] = useState(false);

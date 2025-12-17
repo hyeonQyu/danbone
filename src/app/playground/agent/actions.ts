@@ -1,24 +1,17 @@
 'use server';
 
-import {
-  inputValidatorTestCases,
-  queryClassifierTestCases,
-  searchInputGuardrailTestCases,
-  type EvaluationResult,
-} from '@/openai/agent-test';
-import { inputValidatorAgentFactory, queryClassifierAgentFactory, searchInputGuardrailAgentFactory } from '@/openai/agents';
+import { inputValidatorTestCases, queryNormalizerTestCases, type EvaluationResult } from '@/openai/agent-test';
+import { inputValidatorAgentFactory, queryNormalizerAgentFactory } from '@/openai/agents';
 import { TextModel } from '@/openai/model.types';
 import { createRunner } from '@/openai/runner.utils';
 
 const agentCreators = {
-  searchInputGuardrail: searchInputGuardrailAgentFactory,
-  queryClassifier: queryClassifierAgentFactory,
+  queryNormalizer: queryNormalizerAgentFactory,
   inputValidator: inputValidatorAgentFactory,
 } as const;
 
 const testCases = {
-  searchInputGuardrail: searchInputGuardrailTestCases,
-  queryClassifier: queryClassifierTestCases,
+  queryNormalizer: queryNormalizerTestCases,
   inputValidator: inputValidatorTestCases,
 } as const;
 
