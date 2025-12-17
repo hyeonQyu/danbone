@@ -1,5 +1,6 @@
 'use client';
 
+import '@/styles/globals.css';
 import { paletteDark } from '@/styles/palette.dark';
 import { paletteLight } from '@/styles/palette.light';
 import { usePxToRem } from '@/styles/usePxToRem';
@@ -26,6 +27,15 @@ function ThemeProvider({ children }: ThemeProviderProps) {
       createTheme({
         palette: paletteByMode[mode],
         typography: {
+          fontFamily: [
+            'Pretendard Variable',
+            'Pretendard',
+            'Roboto',
+            '-apple-system',
+            'BlinkMacSystemFont',
+            'system-ui',
+            'sans-serif',
+          ].join(','),
           h1: {
             fontSize: pxToRem(40),
             fontWeight: 600,
