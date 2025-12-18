@@ -1,22 +1,18 @@
 import { LANGUAGES } from '@/language';
 import z from 'zod';
 
-export const validatorSchema = z.object({
-  valid: z.boolean(),
-});
-
-export const localizedTextSchema = z.object({
+export const LocalizedTextSchema = z.object({
   language: z.enum(LANGUAGES),
   text: z.string(),
 });
 
-export const translationSourceSchema = z.object({
+export const TranslationSourceSchema = z.object({
   text: z.string(),
   sourceLanguage: z.enum(LANGUAGES),
   targetLanguage: z.enum(LANGUAGES),
 });
 
-export const localizedTextsSchema = z.object({
+export const LocalizedTextsSchema = z.object({
   language: z.enum(LANGUAGES),
   texts: z.array(z.string()),
 });

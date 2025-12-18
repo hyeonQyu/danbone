@@ -1,10 +1,10 @@
 import { buildAgentFactory } from '@/openai/agent.utils';
-import { localizedTextsSchema } from '@/openai/schemes';
+import { LocalizedTextsSchema } from '@/openai/schemes';
 
 export const translatorAgentFactory = buildAgentFactory(
   {
     name: 'Translator',
-    outputType: localizedTextsSchema,
+    outputType: LocalizedTextsSchema,
   },
   {
     'gpt-5-mini': {

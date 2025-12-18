@@ -1,10 +1,10 @@
 import { buildAgentFactory } from '@/openai/agent.utils';
-import { localizedTextSchema } from '@/openai/schemes';
+import { LocalizedTextSchema } from '@/openai/schemes';
 
 export const queryNormalizerAgentFactory = buildAgentFactory(
   {
     name: 'Query normalizer',
-    outputType: localizedTextSchema,
+    outputType: LocalizedTextSchema,
   },
   {
     'gpt-5-nano': {

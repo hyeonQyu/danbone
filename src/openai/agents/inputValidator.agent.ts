@@ -1,10 +1,10 @@
 import { buildAgentFactory } from '@/openai/agent.utils';
-import { validatorSchema } from '@/openai/schemes';
+import { ValidatorSchema } from '@/openai/schemes';
 
 export const inputValidatorAgentFactory = buildAgentFactory(
   {
     name: 'Input validator',
-    outputType: validatorSchema,
+    outputType: ValidatorSchema,
   },
   {
     'gpt-5-nano': {
