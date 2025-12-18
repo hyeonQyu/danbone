@@ -1,18 +1,20 @@
 'use server';
 
-import { inputValidatorTestCases, queryNormalizerTestCases, type EvaluationResult } from '@/openai/agent-test';
-import { inputValidatorAgentFactory, queryNormalizerAgentFactory } from '@/openai/agents';
+import { inputValidatorTestCases, queryNormalizerTestCases, translatorTestCases, type EvaluationResult } from '@/openai/agent-test';
+import { inputValidatorAgentFactory, queryNormalizerAgentFactory, translatorAgentFactory } from '@/openai/agents';
 import { TextModel } from '@/openai/model.types';
 import { createRunner } from '@/openai/runner.utils';
 
 const agentCreators = {
   queryNormalizer: queryNormalizerAgentFactory,
   inputValidator: inputValidatorAgentFactory,
+  translator: translatorAgentFactory,
 } as const;
 
 const testCases = {
   queryNormalizer: queryNormalizerTestCases,
   inputValidator: inputValidatorTestCases,
+  translator: translatorTestCases,
 } as const;
 
 export type AgentName = keyof typeof agentCreators;
