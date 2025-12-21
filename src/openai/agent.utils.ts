@@ -4,12 +4,12 @@ import { TextOutput } from '@openai/agents-core';
 
 type AgentCommonOptions<TContext = UnknownContext, TOutput extends AgentOutputType = TextOutput> = Omit<
   AgentOptions<TContext, TOutput>,
-  'model' | 'instructions'
+  'model' | 'instructions' | 'modelSettings'
 >;
 
 type AgentModelOptions<TContext = UnknownContext, TOutput extends AgentOutputType = TextOutput> = Pick<
   AgentOptions<TContext, TOutput>,
-  'instructions'
+  'instructions' | 'modelSettings'
 >;
 
 export const buildAgentFactory = <TContext = UnknownContext, TOutput extends AgentOutputType = TextOutput>(
