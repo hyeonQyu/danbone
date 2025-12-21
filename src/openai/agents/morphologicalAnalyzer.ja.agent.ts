@@ -1,7 +1,7 @@
 import { buildAgentFactory } from '@/openai/agent.utils';
 import { MorphologicalAnalysisResultSchema } from '@/openai/schemes';
 
-export const jaMorphAnalyzerAgentFactory = buildAgentFactory(
+export const jaMorphologicalAnalyzerAgentFactory = buildAgentFactory(
   {
     name: 'Japanese morphological analyzer',
     outputType: MorphologicalAnalysisResultSchema,

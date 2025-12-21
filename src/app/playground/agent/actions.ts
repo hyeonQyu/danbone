@@ -9,7 +9,7 @@ import {
 } from '@/openai/agent-test';
 import {
   inputValidatorAgentFactory,
-  jaMorphAnalyzerAgentFactory,
+  jaMorphologicalAnalyzerAgentFactory,
   queryNormalizerAgentFactory,
   translatorAgentFactory,
 } from '@/openai/agents';
@@ -20,7 +20,7 @@ const agentCreators = {
   queryNormalizer: queryNormalizerAgentFactory,
   inputValidator: inputValidatorAgentFactory,
   translator: translatorAgentFactory,
-  morphAnalyzer: jaMorphAnalyzerAgentFactory,
+  morphAnalyzer: jaMorphologicalAnalyzerAgentFactory,
 } as const;
 
 const testCases = {
