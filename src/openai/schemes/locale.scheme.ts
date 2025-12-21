@@ -1,18 +1,20 @@
 import { LANGUAGES } from '@/language';
 import z from 'zod';
 
+export const LanguageSchema = z.enum(LANGUAGES);
+
 export const LocalizedTextSchema = z.object({
-  language: z.enum(LANGUAGES),
+  language: LanguageSchema,
   text: z.string(),
 });
 
 export const TranslationSourceSchema = z.object({
   text: z.string(),
-  sourceLanguage: z.enum(LANGUAGES),
-  targetLanguage: z.enum(LANGUAGES),
+  sourceLanguage: LanguageSchema,
+  targetLanguage: LanguageSchema,
 });
 
 export const LocalizedTextsSchema = z.object({
-  language: z.enum(LANGUAGES),
+  language: LanguageSchema,
   texts: z.array(z.string()),
 });

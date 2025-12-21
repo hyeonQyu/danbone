@@ -1,3 +1,4 @@
+export * from './dictionary.ja.agent';
 export * from './inputValidator.agent';
 export * from './morphologicalAnalyzer.ja.agent';
 export * from './queryNormalizer.agent';
