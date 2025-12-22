@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "type": "tsc --noEmit"
+    "type": "tsc --noEmit",
+    "resources": "node scripts/resources.js"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
