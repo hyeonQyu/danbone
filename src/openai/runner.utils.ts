@@ -1,6 +1,6 @@
 import { TextModel } from '@/openai/model.types';
 import { TEXT_STANDARD_USD_PRICE, TEXT_TOKEN_UNIT } from '@/openai/pricing.constants';
-import { Runner, Usage } from '@openai/agents';
+import { Agent, AgentOutputType, Runner, Usage } from '@openai/agents';
 
 interface PriceBreakdown {
   regularInputTokens: number;
@@ -39,12 +39,12 @@ const calculatePrice = (usage: Usage, model: TextModel): PriceBreakdown => {
   };
 };
 
-export const createRunner = () => {
+const createRunner = () => {
   const runner = new Runner();
 
-  const run = async <TAgent extends Parameters<typeof runner.run>[0]>(
-    agent: TAgent,
-    input: Parameters<typeof runner.run>[1],
+  const run = async <TContext, TOutput extends AgentOutputType>(
+    agent: Agent<TContext, TOutput>,
+    input: string,
     options?: Parameters<typeof runner.run>[2],
   ) => {
     const result = await runner.run(agent, input, options);
@@ -64,3 +64,7 @@ export const createRunner = () => {
     run,
   };
 };
+
+const runner = createRunner();
+
+export const getRunner = () => runner;
