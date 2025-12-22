@@ -2,7 +2,7 @@ import { Language } from '@/language';
 import { LanguageSchema } from '@/openai/schemes';
 import z from 'zod';
 
-export const PartOfSpeechSchemaByLanguage: Record<Language, z.ZodEnum<[string, ...string[]]>> = {
+export const PartOfSpeechSchemaByLanguage = {
   ko: z.enum(['verb', 'noun', 'adjective', 'adverb', 'preposition', 'conjunction', 'article', 'interjection']),
   ja: z.enum([
     'godanVerb',
@@ -16,9 +16,9 @@ export const PartOfSpeechSchemaByLanguage: Record<Language, z.ZodEnum<[string, .
     'conjunction',
     'interjection',
   ]),
-};
+} as const;
 
-export const DictionaryFormatSchemaByLanguage: Record<Language, z.AnyZodObject> = {
+export const DictionaryFormatSchemaByLanguage = {
   ko: z.object({
     notation: z.string(),
     pronunciation: z.string(),
@@ -33,32 +33,56 @@ export const DictionaryFormatSchemaByLanguage: Record<Language, z.AnyZodObject> 
     pos: PartOfSpeechSchemaByLanguage['ja'],
     examples: z.array(z.string()).min(1).max(2),
   }),
-};
+} as const;
 
 export const DictionaryInputSchema = z.object({
   sourceLanguage: LanguageSchema,
   words: z.array(z.string()),
 });
 
-// 단일 키워드 결과 스키마 (언어별) - 코드로 자동 생성
-export const DictionaryResultSchemaByLanguage: Record<Language, z.AnyZodObject> = Object.entries(DictionaryFormatSchemaByLanguage).reduce(
-  (acc, [language, schema]) => {
-    acc[language as Language] = z.object({
-      keyword: z.string(),
-      results: z.array(schema),
-    });
-    return acc;
-  },
-  {} as Record<Language, z.AnyZodObject>,
-);
+const createDictionarySchemasForLanguage = <T extends Record<string, z.ZodTypeAny>>(formatSchemas: T) => {
+  type ResultSchemas = {
+    [K in keyof T]: z.ZodObject<{
+      keyword: z.ZodString;
+      results: z.ZodArray<T[K]>;
+    }>;
+  };
 
-// 전체 출력 스키마 (언어별) - 키워드 결과들의 배열을 담은 객체
-export const DictionaryOutputSchemaByLanguage: Record<Language, z.AnyZodObject> = Object.entries(DictionaryResultSchemaByLanguage).reduce(
-  (acc, [language, schema]) => {
-    acc[language as Language] = z.object({
-      entries: z.array(schema),
-    });
-    return acc;
-  },
-  {} as Record<Language, z.AnyZodObject>,
-);
+  type OutputSchemas = {
+    [K in keyof ResultSchemas]: z.ZodObject<{
+      entries: z.ZodArray<ResultSchemas[K]>;
+    }>;
+  };
+
+  const resultSchemas = Object.fromEntries(
+    Object.entries(formatSchemas).map(([lang, schema]) => [
+      lang,
+      z.object({
+        keyword: z.string(),
+        results: z.array(schema),
+      }),
+    ]),
+  ) as ResultSchemas;
+
+  const outputSchemas = Object.fromEntries(
+    Object.entries(resultSchemas).map(([lang, schema]) => [
+      lang,
+      z.object({
+        entries: z.array(schema),
+      }),
+    ]),
+  ) as OutputSchemas;
+
+  return { resultSchemas, outputSchemas };
+};
+
+const { resultSchemas, outputSchemas } = createDictionarySchemasForLanguage(DictionaryFormatSchemaByLanguage);
+
+export const DictionaryResultSchemaByLanguage = resultSchemas;
+export const DictionaryOutputSchemaByLanguage = outputSchemas;
+
+export type DictionaryOutput = z.infer<(typeof DictionaryOutputSchemaByLanguage)[Language]>;
+export type DictionaryResult = z.infer<(typeof DictionaryResultSchemaByLanguage)[Language]>;
+export type DictionaryInput = z.infer<typeof DictionaryInputSchema>;
+export type DictionaryFormat = z.infer<(typeof DictionaryFormatSchemaByLanguage)[Language]>;
+export type PartOfSpeech = z.infer<(typeof PartOfSpeechSchemaByLanguage)[Language]>;

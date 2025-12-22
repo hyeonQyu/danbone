@@ -16,7 +16,7 @@ import {
   translatorAgentFactory,
 } from '@/openai/agents';
 import { TextModel } from '@/openai/model.types';
-import { createRunner } from '@/openai/runner.utils';
+import { getRunner } from '@/openai/runner.utils';
 
 const agentCreators = {
   queryNormalizer: queryNormalizerAgentFactory,
@@ -43,7 +43,7 @@ export async function getSupportedModels(agentName: AgentName): Promise<TextMode
 }
 
 export async function testUsageAction(input: string, agentName: AgentName, models: TextModel[]) {
-  const runner = createRunner();
+  const runner = getRunner();
   const agentCreator = agentCreators[agentName];
 
   // 모든 모델에 대해 병렬로 실행
@@ -116,7 +116,7 @@ export async function getTestCases(agentName: AgentName) {
 
 // 테스트 평가 실행
 export async function evaluateAgentAction(agentName: AgentName, models: TextModel[]) {
-  const runner = createRunner();
+  const runner = getRunner();
   const agentCreator = agentCreators[agentName];
   const cases = testCases[agentName];
 
