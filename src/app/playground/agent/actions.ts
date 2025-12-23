@@ -50,7 +50,8 @@ export async function testUsageAction(input: string, agentName: AgentName, model
   const results = await Promise.all(
     models.map(async (model) => {
       const agent = agentCreator.createAgent(model);
-      const result = await runner.run(agent, input);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const result = await runner.run(agent as any, input);
       const usage = result.state.usage;
 
       // 콘솔에 출력
@@ -131,7 +132,8 @@ export async function evaluateAgentAction(agentName: AgentName, models: TextMode
           try {
             // input이 객체인 경우 JSON 문자열로 변환
             const inputStr = typeof testCase.input === 'string' ? testCase.input : JSON.stringify(testCase.input);
-            const result = await runner.run(agent, inputStr);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const result = await runner.run(agent as any, inputStr);
             const actualOutput = result.finalOutput;
 
             // 출력 비교 (유연한 비교)
