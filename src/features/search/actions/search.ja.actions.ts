@@ -4,6 +4,7 @@ import { InvalidValueError } from '@/errors';
 import { Language, SourceLanguage, TargetLanguage } from '@/language';
 import {
   DictionaryInput,
+  DictionaryResultSchemaByLanguage,
   getRunner,
   inputValidatorAgentFactory,
   jaDictionaryAgentFactory,
@@ -12,6 +13,10 @@ import {
   queryNormalizerAgentFactory,
   translatorAgentFactory,
 } from '@/openai';
+import z from 'zod';
+
+type DictionaryJAFormat = z.infer<typeof DictionaryResultSchemaByLanguage.ja>;
+type SearchJAResult = { text: string; entries: DictionaryJAFormat[] };
 
 const MAX_QUERY_LENGTH = 50;
 
@@ -47,10 +52,10 @@ const getDictionaryEntriesJA = async (input: DictionaryInput) => {
   return runner.run(jaDictionaryAgent, JSON.stringify(input));
 };
 
-export const getFindJAWords = (sourceLanguage: SourceLanguage) => {
+export const getSearchJA = (sourceLanguage: SourceLanguage) => {
   const TARGET_LANGUAGE: TargetLanguage = 'ja' as const;
 
-  return async (query: string, queryLanguage: Language) => {
+  const searchJA = async (query: string, queryLanguage: Language): Promise<Array<SearchJAResult>> => {
     const getTranslatedTexts = async (normalizedQuery: string) => {
       if (queryLanguage === TARGET_LANGUAGE) {
         return [normalizedQuery];
@@ -104,5 +109,18 @@ export const getFindJAWords = (sourceLanguage: SourceLanguage) => {
 
       return entries;
     };
+
+    const normalizedJATexts = await getNormalizedJATexts();
+
+    const dictionaryEntriesByNormalizedJAText = await Promise.all(
+      normalizedJATexts.map(async (text) => {
+        const entries = await getDictionaryEntries(text);
+        return { text, entries };
+      }),
+    );
+
+    return dictionaryEntriesByNormalizedJAText;
   };
+
+  return searchJA;
 };

@@ -1,4 +1,3 @@
-import { Language } from '@/language';
 import { LanguageSchema } from '@/openai/schemes';
 import z from 'zod';
 
@@ -81,8 +80,4 @@ const { resultSchemas, outputSchemas } = createDictionarySchemasForLanguage(Dict
 export const DictionaryResultSchemaByLanguage = resultSchemas;
 export const DictionaryOutputSchemaByLanguage = outputSchemas;
 
-export type DictionaryOutput = z.infer<(typeof DictionaryOutputSchemaByLanguage)[Language]>;
-export type DictionaryResult = z.infer<(typeof DictionaryResultSchemaByLanguage)[Language]>;
 export type DictionaryInput = z.infer<typeof DictionaryInputSchema>;
-export type DictionaryFormat = z.infer<(typeof DictionaryFormatSchemaByLanguage)[Language]>;
-export type PartOfSpeech = z.infer<(typeof PartOfSpeechSchemaByLanguage)[Language]>;
