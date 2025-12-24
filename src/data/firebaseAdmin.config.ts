@@ -32,8 +32,10 @@ const initializeFirebaseAdmin = () => {
   }
 };
 
-export const adminApp = initializeFirebaseAdmin();
+const app = initializeFirebaseAdmin();
 
-export const adminAuth = getAuth(adminApp);
-export const adminDb = getFirestore(adminApp);
-export const adminStorage = getStorage(adminApp);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const storage = getStorage(app);
+
+export const firebaseAdmin = { auth, db, storage };
