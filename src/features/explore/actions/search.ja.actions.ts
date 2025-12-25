@@ -52,7 +52,7 @@ const getDictionaryEntriesJA = async (input: DictionaryInput) => {
   return runner.run(jaDictionaryAgent, JSON.stringify(input));
 };
 
-export const getSearchJA = (sourceLanguage: SourceLanguage) => {
+export const getSearchJA = async (sourceLanguage: SourceLanguage) => {
   const TARGET_LANGUAGE: TargetLanguage = 'ja' as const;
 
   const searchJA = async (query: string, queryLanguage: Language): Promise<Array<SearchJAResult>> => {

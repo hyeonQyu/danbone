@@ -8,7 +8,7 @@ const { AppRoutesProvider, TypedLink, useAppRoutes, useCurrentRouteNode, useType
   login: {
     _metadata: {},
   },
-  search: {
+  explore: {
     _metadata: {},
   },
 });

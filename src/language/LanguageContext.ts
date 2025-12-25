@@ -13,7 +13,7 @@ export const LanguageContext = createContext<
   | undefined
 >(undefined);
 
-export const useLanguageContext = () => {
+const useLanguageContext = () => {
   const context = useContext(LanguageContext);
   if (!context) {
     throw new Error('LanguageContext를 사용하기 전에 LanguageProvider로 감싸주세요.');
