@@ -13,6 +13,7 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
+    "@hyeonqyu/typed-router-next": "^0.2.10",
     "@mui/icons-material": "^7.3.6",
     "@mui/material": "^7.3.6",
     "@openai/agents": "^0.3.4",
