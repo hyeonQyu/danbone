@@ -13,7 +13,7 @@ function ExploreHomeView() {
   const targetLanguage = useTargetLanguage();
   const getLanguageLabel = useGetLanguageLabel();
 
-  const { palette, spacing, typography, shadows } = useTheme();
+  const { palette, spacing, shadows } = useTheme();
   const pxToRem = usePxToRem();
 
   const queryLanguage = useExploreStore((store) => store.queryLanguage);
@@ -42,11 +42,18 @@ function ExploreHomeView() {
         variant="h4"
         sx={{
           color: palette.text.primary,
-          fontWeight: typography.fontWeightBold,
-          marginBottom: spacing(4),
         }}
       >
-        단어 탐색하기
+        단어 & 문장 탐색
+      </Typography>
+      <Typography
+        variant="body1"
+        sx={{
+          color: palette.text.secondary,
+          marginTop: spacing(1),
+        }}
+      >
+        궁금한 단어나 문장을 찾아보세요
       </Typography>
 
       <Box
@@ -60,6 +67,7 @@ function ExploreHomeView() {
           padding: `${spacing(3)} ${spacing(2)}`,
           borderRadius: pxToRem(16),
           boxShadow: shadows[4],
+          marginTop: spacing(4),
         }}
       >
         <FormControl fullWidth>
@@ -67,7 +75,6 @@ function ExploreHomeView() {
             variant="body2"
             sx={{
               color: palette.text.secondary,
-              marginBottom: spacing(1),
             }}
           >
             입력 언어
@@ -77,6 +84,7 @@ function ExploreHomeView() {
             onChange={handleLanguageChange}
             sx={{
               backgroundColor: palette.background.paper,
+              marginTop: spacing(1),
             }}
           >
             {[sourceLanguage, targetLanguage].map((language) => (
@@ -87,7 +95,7 @@ function ExploreHomeView() {
           </Select>
         </FormControl>
 
-        <SearchInputField placeholder="검색어를 입력하세요" onClick={handleSearchClick} />
+        <SearchInputField placeholder={`${getLanguageLabel(queryLanguage)} 단어 및 문장`} onClick={handleSearchClick} />
       </Box>
     </Box>
   );
