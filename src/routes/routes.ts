@@ -1,5 +1,6 @@
 import { BaseMetadata, createAppRoutes } from '@hyeonqyu/typed-router-next';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const { AppRoutesProvider, TypedLink, useAppRoutes, useCurrentRouteNode, useTypedPathname, useTypedRouter, _types } = createAppRoutes<
   BaseMetadata,
   null
