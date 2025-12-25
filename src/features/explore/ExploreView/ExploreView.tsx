@@ -4,8 +4,9 @@ import { PageViewContainer } from '@/components/PageViewContainer';
 import ExploreHomeView from '@/features/explore/ExploreView/ExploreHomeView';
 import ExploreSearchView from '@/features/explore/ExploreView/ExploreSearchView';
 import { ExploreViewType, useExploreStore } from '@/features/explore/stores';
+import { ComponentType } from 'react';
 
-const viewByType: Record<ExploreViewType, React.ComponentType> = {
+const viewByType: Record<ExploreViewType, ComponentType> = {
   home: ExploreHomeView,
   search: ExploreSearchView,
 };
