@@ -97,7 +97,7 @@ function ExploreView() {
           </Select>
         </FormControl>
 
-        <SearchInputField placeholder={`${getLanguageLabel(queryLanguage)} 단어 및 문장`} onClick={handleSearchClick} />
+        <SearchInputField placeholder={`${getLanguageLabel(queryLanguage)} 단어 및 문장`} onClick={handleSearchClick} readOnly />
       </Box>
     </Box>
   );
