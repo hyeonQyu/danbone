@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "type": "tsc --noEmit",
-    "resources": "node scripts/resources.js"
+    "resources": "node scripts/resources.js",
+    "chrome:debug": "/Applications/Google\\ Chrome.app/Contents/MacOS/Google\\ Chrome --remote-debugging-port=9222 --user-data-dir=/tmp/chrome-debugging"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -19,6 +20,7 @@
     "@openai/agents": "^0.3.4",
     "firebase": "^12.6.0",
     "firebase-admin": "^13.6.0",
+    "framer-motion": "^12.23.26",
     "next": "16.0.7",
     "notistack": "^3.0.2",
     "openai": "^6.10.0",

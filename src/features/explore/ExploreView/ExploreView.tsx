@@ -8,6 +8,7 @@ import { useSourceLanguage, useTargetLanguage } from '@/language/LanguageContext
 import { useTypedRouter } from '@/routes/routes';
 import { usePxToRem } from '@/styles';
 import { Box, FormControl, MenuItem, Select, SelectChangeEvent, Typography, useTheme } from '@mui/material';
+import { motion } from 'framer-motion';
 
 function ExploreView() {
   const sourceLanguage = useSourceLanguage();
@@ -32,12 +33,21 @@ function ExploreView() {
 
   return (
     <Box
+      component={motion.div}
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{
+        duration: 0.1,
+        ease: 'easeOut',
+      }}
       sx={{
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
         width: '100%',
+        opacity: 0,
+        transform: 'scale(0.95)',
       }}
     >
       <Typography
