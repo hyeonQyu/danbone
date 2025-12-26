@@ -3,37 +3,64 @@
 import { usePxToRem } from '@/styles';
 import { Search } from '@mui/icons-material';
 import { InputAdornment, OutlinedInput, useTheme } from '@mui/material';
-import { ChangeEvent, MouseEvent } from 'react';
+import { ChangeEvent, KeyboardEvent, MouseEvent } from 'react';
 
 interface SearchInputFieldProps {
   value?: string;
   placeholder?: string;
   onClick?: (event: MouseEvent<HTMLInputElement>) => void;
   onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
+  onSearch?: (query: string) => void;
   readOnly?: boolean;
   autoFocus?: boolean;
+  blurOnSearch?: boolean;
+  disabled?: boolean;
 }
 
 function SearchInputField({
-  value = '',
+  value,
   placeholder = '검색어를 입력하세요',
   onClick,
   onChange,
+  onSearch,
   readOnly = false,
   autoFocus = false,
+  blurOnSearch = false,
+  disabled = false,
 }: SearchInputFieldProps) {
   const { palette } = useTheme();
   const pxToRem = usePxToRem();
 
+  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.nativeEvent.isComposing) return;
+
+    if (event.key === 'Enter') {
+      const target = event.target as HTMLInputElement;
+      onSearch?.(target.value);
+
+      if (blurOnSearch) {
+        event.currentTarget.blur();
+      }
+    }
+  };
+
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    onChange?.(event);
+  };
+
   return (
     <OutlinedInput
       value={value}
+      defaultValue={value ? undefined : ''}
       placeholder={placeholder}
       onClick={onClick}
-      onChange={onChange}
+      onChange={handleChange}
+      onKeyDown={handleKeyDown}
       readOnly={readOnly}
       autoFocus={autoFocus}
+      disabled={disabled}
       fullWidth
+      type="search"
       startAdornment={
         <InputAdornment position="start">
           <Search sx={{ color: palette.text.secondary }} />
@@ -41,7 +68,7 @@ function SearchInputField({
       }
       inputProps={{
         sx: {
-          padding: 0,
+          paddingLeft: 0,
         },
       }}
       sx={{

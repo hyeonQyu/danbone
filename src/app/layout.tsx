@@ -1,4 +1,5 @@
 import { LanguageProvider } from '@/language';
+import { ReactQueryClientProvider } from '@/react-query';
 import ThemeProvider from '@/styles/ThemeProvider';
 import type { Metadata } from 'next';
 import { ReactNode } from 'react';
@@ -17,7 +18,9 @@ export default function RootLayout({
     <html lang="ko">
       <body>
         <ThemeProvider>
-          <LanguageProvider>{children}</LanguageProvider>
+          <LanguageProvider>
+            <ReactQueryClientProvider>{children}</ReactQueryClientProvider>
+          </LanguageProvider>
         </ThemeProvider>
       </body>
     </html>

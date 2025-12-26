@@ -1,29 +1,28 @@
 'use client';
 
 import { SearchInputField } from '@/components/SearchInputField';
+import { useMutationSearch } from '@/features/explore/hooks/useMutationSearch';
 import { useExploreStore } from '@/features/explore/stores';
 import { useGetLanguageLabel } from '@/language';
 import { useTypedRouter } from '@/routes/routes';
 import { ArrowBack } from '@mui/icons-material';
 import { Box, IconButton, useTheme } from '@mui/material';
 import { motion } from 'framer-motion';
-import { ChangeEvent } from 'react';
 
 function ExploreSearchView() {
   const { palette, spacing } = useTheme();
   const router = useTypedRouter();
+
   const getLanguageLabel = useGetLanguageLabel();
-
   const queryLanguage = useExploreStore((store) => store.queryLanguage);
-  const searchQuery = useExploreStore((store) => store.searchQuery);
-  const setSearchQuery = useExploreStore((store) => store.setSearchQuery);
 
-  const handleBackClick = () => {
-    router.push('/explore');
-  };
+  const handleToExplore = () => router.push('/explore');
 
-  const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(event.target.value);
+  const { mutateAsync: exploreSearch, isPending: isSearching } = useMutationSearch(queryLanguage);
+
+  const handleSearch = (query: string) => {
+    console.log(query);
+    // exploreSearch(query);
   };
 
   return (
@@ -59,16 +58,17 @@ function ExploreSearchView() {
           borderBottom: `1px solid ${palette.divider}`,
         }}
       >
-        <IconButton onClick={handleBackClick} sx={{ padding: spacing(1) }}>
+        <IconButton onClick={handleToExplore} sx={{ padding: spacing(1) }}>
           <ArrowBack sx={{ color: palette.text.primary }} />
         </IconButton>
 
         <Box sx={{ flex: 1 }}>
           <SearchInputField
-            value={searchQuery}
-            onChange={handleSearchChange}
+            onSearch={handleSearch}
             placeholder={`${getLanguageLabel(queryLanguage)} 단어 및 문장`}
             autoFocus
+            blurOnSearch
+            disabled={isSearching}
           />
         </Box>
       </Box>
