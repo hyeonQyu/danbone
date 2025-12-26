@@ -8,13 +8,22 @@ const searchHandlerGeneratorsByTargetLanguage = {
   ja: searchJA,
 } as const satisfies Record<TargetLanguage, ExploreSearchHandler<object>>;
 
-export const useQueryExploreSearch = (req: ExploreSearchOption, queryOptions: Omit<UseQueryOptions, 'queryKey' | 'queryFn'>) => {
+type SearchResultJA = Awaited<ReturnType<typeof searchJA>>;
+
+type SearchResultByLanguage = {
+  ja: SearchResultJA;
+};
+
+export const useQueryExploreSearch = <TLang extends TargetLanguage = TargetLanguage>(
+  req: ExploreSearchOption,
+  queryOptions?: Omit<UseQueryOptions<SearchResultByLanguage[TLang]>, 'queryKey' | 'queryFn'>,
+) => {
   const targetLanguage = useTargetLanguage();
   const search = searchHandlerGeneratorsByTargetLanguage[targetLanguage];
 
-  return useQuery({
+  return useQuery<SearchResultByLanguage[TLang]>({
     queryKey: EXPLORE_QUERY_KEY.search.get(req),
-    queryFn: () => search(req),
+    queryFn: () => search(req) as Promise<SearchResultByLanguage[TLang]>,
     ...queryOptions,
   });
 };

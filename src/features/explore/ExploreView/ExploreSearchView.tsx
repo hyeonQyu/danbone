@@ -22,7 +22,7 @@ function ExploreSearchView() {
 
   const handleToExplore = () => router.push('/explore');
 
-  const { isFetching: isSearching } = useQueryExploreSearch({ query, queryLanguage, sourceLanguage }, { enabled: Boolean(query) });
+  const { data, isFetching: isSearching } = useQueryExploreSearch({ query, queryLanguage, sourceLanguage }, { enabled: Boolean(query) });
 
   const handleSearch = (value: string) => {
     // setQuery(value);
