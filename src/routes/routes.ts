@@ -10,6 +10,9 @@ const { AppRoutesProvider, TypedLink, useAppRoutes, useCurrentRouteNode, useType
   },
   explore: {
     _metadata: {},
+    search: {
+      _metadata: {},
+    },
   },
 });
 

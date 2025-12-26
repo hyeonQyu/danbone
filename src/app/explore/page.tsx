@@ -1,3 +1,5 @@
+'use client';
+
 import { ExploreView } from '@/features/explore';
 
 function ExplorePage() {

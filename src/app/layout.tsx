@@ -1,3 +1,4 @@
+import { PageViewContainer } from '@/components/PageViewContainer';
 import { LanguageProvider } from '@/language';
 import ThemeProvider from '@/styles/ThemeProvider';
 import type { Metadata } from 'next';
@@ -17,7 +18,9 @@ export default function RootLayout({
     <html lang="ko">
       <body>
         <ThemeProvider>
-          <LanguageProvider>{children}</LanguageProvider>
+          <LanguageProvider>
+            <PageViewContainer>{children}</PageViewContainer>
+          </LanguageProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -1,7 +1,6 @@
 'use client';
 
 import { Logo } from '@/components/Logo';
-import { PageViewContainer } from '@/components/PageViewContainer';
 import { login } from '@/features/users';
 import type { LoginData } from '@/features/users/users.types';
 import { usePxToRem } from '@/styles';
@@ -50,89 +49,87 @@ function LoginView() {
   };
 
   return (
-    <PageViewContainer>
-      <Box
-        component="form"
-        onSubmit={handleSubmit}
+    <Box
+      component="form"
+      onSubmit={handleSubmit}
+      sx={{
+        width: '100%',
+        maxWidth: pxToRem(400),
+        display: 'flex',
+        flexDirection: 'column',
+        gap: spacing(3),
+      }}
+    >
+      <Logo />
+
+      {error && <Alert severity="error">{error}</Alert>}
+
+      <TextField
+        label="이메일"
+        type="email"
+        value={formData.email}
+        onChange={handleInputChange('email')}
+        disabled={loading}
+        fullWidth
+        required
+        autoComplete="email"
+      />
+
+      <TextField
+        label="비밀번호"
+        type="password"
+        value={formData.password}
+        onChange={handleInputChange('password')}
+        disabled={loading}
+        fullWidth
+        required
+        autoComplete="current-password"
+      />
+
+      <Button
+        type="submit"
+        variant="contained"
+        disabled={loading}
+        fullWidth
         sx={{
-          width: '100%',
-          maxWidth: pxToRem(400),
-          display: 'flex',
-          flexDirection: 'column',
-          gap: spacing(3),
+          ...typography.h6,
+          height: heights.lg,
         }}
       >
-        <Logo />
+        {loading ? <CircularProgress size={24} /> : '로그인'}
+      </Button>
 
-        {error && <Alert severity="error">{error}</Alert>}
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          gap: spacing(2),
+          marginTop: spacing(1),
+        }}
+      >
+        <Typography variant="body2" color="textSecondary">
+          계정이 없으신가요?
+        </Typography>
 
-        <TextField
-          label="이메일"
-          type="email"
-          value={formData.email}
-          onChange={handleInputChange('email')}
-          disabled={loading}
-          fullWidth
-          required
-          autoComplete="email"
-        />
-
-        <TextField
-          label="비밀번호"
-          type="password"
-          value={formData.password}
-          onChange={handleInputChange('password')}
-          disabled={loading}
-          fullWidth
-          required
-          autoComplete="current-password"
-        />
-
-        <Button
-          type="submit"
-          variant="contained"
-          disabled={loading}
-          fullWidth
-          sx={{
-            ...typography.h6,
-            height: heights.lg,
-          }}
-        >
-          {loading ? <CircularProgress size={24} /> : '로그인'}
-        </Button>
-
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: spacing(2),
-            marginTop: spacing(1),
-          }}
-        >
-          <Typography variant="body2" color="textSecondary">
-            계정이 없으신가요?
+        <Link href="/register" passHref>
+          <Typography
+            variant="body2"
+            sx={{
+              color: palette.primary.main,
+              textDecoration: 'none',
+              fontWeight: 600,
+              cursor: 'pointer',
+              '&:hover': {
+                textDecoration: 'underline',
+              },
+            }}
+          >
+            회원가입
           </Typography>
-
-          <Link href="/register" passHref>
-            <Typography
-              variant="body2"
-              sx={{
-                color: palette.primary.main,
-                textDecoration: 'none',
-                fontWeight: 600,
-                cursor: 'pointer',
-                '&:hover': {
-                  textDecoration: 'underline',
-                },
-              }}
-            >
-              회원가입
-            </Typography>
-          </Link>
-        </Box>
+        </Link>
       </Box>
-    </PageViewContainer>
+    </Box>
   );
 }
 
