@@ -1,28 +1,31 @@
 'use client';
 
 import { SearchInputField } from '@/components/SearchInputField';
-import { useMutationSearch } from '@/features/explore/hooks/useMutationSearch';
+import { useQueryExploreSearch } from '@/features/explore/hooks';
 import { useExploreStore } from '@/features/explore/stores';
-import { useGetLanguageLabel } from '@/language';
+import { useGetLanguageLabel, useSourceLanguage } from '@/language';
 import { useTypedRouter } from '@/routes/routes';
 import { ArrowBack } from '@mui/icons-material';
 import { Box, IconButton, useTheme } from '@mui/material';
 import { motion } from 'framer-motion';
+import { useState } from 'react';
 
 function ExploreSearchView() {
   const { palette, spacing } = useTheme();
   const router = useTypedRouter();
 
+  const sourceLanguage = useSourceLanguage();
   const getLanguageLabel = useGetLanguageLabel();
   const queryLanguage = useExploreStore((store) => store.queryLanguage);
 
+  const [query, setQuery] = useState('');
+
   const handleToExplore = () => router.push('/explore');
 
-  const { mutateAsync: exploreSearch, isPending: isSearching } = useMutationSearch(queryLanguage);
+  const { isFetching: isSearching } = useQueryExploreSearch({ query, queryLanguage, sourceLanguage }, { enabled: Boolean(query) });
 
-  const handleSearch = (query: string) => {
-    console.log(query);
-    // exploreSearch(query);
+  const handleSearch = (value: string) => {
+    // setQuery(value);
   };
 
   return (
