@@ -1,14 +1,14 @@
 import { useGetJAPartOfSpeechLabel } from '@/features/dictionary';
-import { DictionaryEntryByLanguage } from '@/openai';
+import { DictionaryWordByLanguage } from '@/openai';
 import { usePxToRem } from '@/styles';
 import { Box, Chip, Typography, useTheme } from '@mui/material';
 
-interface DictionaryJAEntryResultCardProps {
-  result: DictionaryEntryByLanguage['ja']['results'][number];
+interface DictionaryJAEntryCardProps {
+  entry: DictionaryWordByLanguage['ja']['entries'][number];
 }
 
-function DictionaryJAEntryResultCard({ result }: DictionaryJAEntryResultCardProps) {
-  const { notation, pronunciation, meanings, pos } = result;
+function DictionaryJAEntryCard({ entry }: DictionaryJAEntryCardProps) {
+  const { notation, pronunciation, meanings, pos } = entry;
 
   const { spacing, palette, transitions, shadows } = useTheme();
   const pxToRem = usePxToRem();
@@ -66,4 +66,4 @@ function DictionaryJAEntryResultCard({ result }: DictionaryJAEntryResultCardProp
   );
 }
 
-export default DictionaryJAEntryResultCard;
+export default DictionaryJAEntryCard;

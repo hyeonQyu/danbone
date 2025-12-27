@@ -4,8 +4,8 @@ import { InvalidValueError } from '@/errors';
 import { ExploreSearchHandler } from '@/features/explore/types';
 import { TargetLanguage } from '@/language';
 import {
-  DictionaryEntryByLanguage,
   DictionaryInput,
+  DictionaryWordByLanguage,
   getRunner,
   inputValidatorAgentFactory,
   jaDictionaryAgentFactory,
@@ -45,11 +45,11 @@ const morphologicalAnalysisJA = async (input: string) => {
   return runner.run(jaMorphologicalAnalyzerAgent, input);
 };
 
-const getDictionaryEntriesJA = async (input: DictionaryInput) => {
+const getDictionaryWordsJA = async (input: DictionaryInput) => {
   return runner.run(jaDictionaryAgent, JSON.stringify(input));
 };
 
-export const searchJA: ExploreSearchHandler<DictionaryEntryByLanguage['ja']> = async ({ query, queryLanguage, sourceLanguage }) => {
+export const searchJA: ExploreSearchHandler<DictionaryWordByLanguage['ja']> = async ({ query, queryLanguage, sourceLanguage }) => {
   const TARGET_LANGUAGE: TargetLanguage = 'ja' as const;
 
   const getTranslatedTexts = async (normalizedQuery: string) => {
@@ -88,7 +88,7 @@ export const searchJA: ExploreSearchHandler<DictionaryEntryByLanguage['ja']> = a
     return translatedTexts;
   };
 
-  const getDictionaryEntries = async (normalizedJAText: string) => {
+  const getDictionaryWords = async (normalizedJAText: string) => {
     const morphologicalAnalysisResult = await morphologicalAnalysisJA(normalizedJAText);
     const tokens = morphologicalAnalysisResult.finalOutput?.tokens;
 
@@ -96,24 +96,24 @@ export const searchJA: ExploreSearchHandler<DictionaryEntryByLanguage['ja']> = a
       throw new InvalidValueError('형태소 분석에 실패했습니다. 다시 입력해주세요.');
     }
 
-    const dictionaryEntries = await getDictionaryEntriesJA({ sourceLanguage, words: tokens.map(({ base }) => base) });
-    const entries = dictionaryEntries.finalOutput?.entries;
+    const dictionaryWords = await getDictionaryWordsJA({ sourceLanguage, words: tokens.map(({ base }) => base) });
+    const words = dictionaryWords.finalOutput?.words;
 
-    if (!entries?.length) {
+    if (!words?.length) {
       throw new InvalidValueError('사전 검색에 실패했습니다. 다시 입력해주세요.');
     }
 
-    return entries;
+    return words;
   };
 
   const normalizedJATexts = await getNormalizedJATexts();
 
-  const dictionaryEntriesByNormalizedJAText = await Promise.all(
+  const dictionaryWordsByNormalizedJAText = await Promise.all(
     normalizedJATexts.map(async (text) => {
-      const entries = await getDictionaryEntries(text);
-      return { text, entries };
+      const words = await getDictionaryWords(text);
+      return { text, words };
     }),
   );
 
-  return dictionaryEntriesByNormalizedJAText;
+  return dictionaryWordsByNormalizedJAText;
 };

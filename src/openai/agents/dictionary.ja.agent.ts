@@ -33,14 +33,14 @@ export const jaDictionaryAgentFactory = buildAgentFactory(
               * For words with multiple contexts: "넓다"
               * For figurative/extended meanings: "切る; (물건을) 자르다 / (전화·전원을) 끊다"
             - Don't add encyclopedic descriptions (NO: "고양이; 포유류 동물로...", YES: "고양이")
-            - If same POS has COMPLETELY different meanings, separate into different result entries
+            - If same POS has COMPLETELY different meanings, separate into different entries within that word
             - If meanings are similar/related variations, keep in one entry as an array
 
         4. pos: Choose from: godanVerb, ichidanVerb, irregularVerb, noun, naAdjective, iAdjective, adverb, preposition, conjunction, interjection
 
         5. examples: 1-2 natural, commonly used sentences in Japanese that clearly demonstrate the meaning
 
-        6. If a word has multiple parts of speech, create separate result entries for each POS with appropriate explanations
+        6. If a word has multiple parts of speech, create separate entries for each POS with appropriate explanations
 
         IMPORTANT: 
         - This is a WORD DICTIONARY, not an encyclopedia
@@ -48,7 +48,7 @@ export const jaDictionaryAgentFactory = buildAgentFactory(
         - Add brief context ONLY for words with nuance/ambiguity (e.g., 넓다; 범위가 큰, 切る; 끊다)
         - Keep meanings at dictionary-level, not encyclopedic descriptions
 
-        Process ALL words in the input array and return results for each in the entries array.`,
+        Process ALL words in the input array and return results for each in the words array.`,
     },
     'gpt-5-nano': {
       modelSettings: {
@@ -76,14 +76,14 @@ export const jaDictionaryAgentFactory = buildAgentFactory(
               * For words with multiple contexts: "넓다"
               * For figurative/extended meanings: "切る; (물건을) 자르다 / (전화·전원을) 끊다"
             - Don't add encyclopedic descriptions (NO: "고양이; 포유류 동물로...", YES: "고양이")
-            - If same POS has COMPLETELY different meanings, separate into different result entries
+            - If same POS has COMPLETELY different meanings, separate into different entries within that word
             - If meanings are similar/related variations, keep in one entry as an array
 
         4. pos: Choose from: godanVerb, ichidanVerb, irregularVerb, noun, naAdjective, iAdjective, adverb, preposition, conjunction, interjection
 
         5. examples: 1-2 natural, commonly used sentences in Japanese that clearly demonstrate the meaning
 
-        6. If a word has multiple parts of speech, create separate result entries for each POS with appropriate explanations
+        6. If a word has multiple parts of speech, create separate entries for each POS with appropriate explanations
 
         IMPORTANT: 
         - This is a WORD DICTIONARY, not an encyclopedia
@@ -91,7 +91,7 @@ export const jaDictionaryAgentFactory = buildAgentFactory(
         - Add brief context ONLY for words with nuance/ambiguity (e.g., 넓다; 범위가 큰, 切る; 끊다)
         - Keep meanings at dictionary-level, not encyclopedic descriptions
 
-        Process ALL words in the input array and return results for each in the entries array.`,
+        Process ALL words in the input array and return results for each in the words array.`,
     },
     'gpt-4.1-mini': {
       instructions: `
@@ -114,14 +114,14 @@ export const jaDictionaryAgentFactory = buildAgentFactory(
               * For words with multiple contexts: "넓다"
               * For figurative/extended meanings: "切る; (물건을) 자르다 / (전화·전원을) 끊다"
             - Don't add encyclopedic descriptions (NO: "고양이; 포유류 동물로...", YES: "고양이")
-            - If same POS has COMPLETELY different meanings, separate into different result entries
+            - If same POS has COMPLETELY different meanings, separate into different entries within that word
             - If meanings are similar/related variations, keep in one entry as an array
 
         4. pos: Choose from: godanVerb, ichidanVerb, irregularVerb, noun, naAdjective, iAdjective, adverb, preposition, conjunction, interjection
 
         5. examples: 1-2 natural, commonly used sentences in Japanese that clearly demonstrate the meaning
 
-        6. If a word has multiple parts of speech, create separate result entries for each POS with appropriate explanations
+        6. If a word has multiple parts of speech, create separate entries for each POS with appropriate explanations
 
         IMPORTANT: 
         - This is a WORD DICTIONARY, not an encyclopedia
@@ -129,7 +129,7 @@ export const jaDictionaryAgentFactory = buildAgentFactory(
         - Add brief context ONLY for words with nuance/ambiguity (e.g., 넓다; 범위가 큰, 切る; 끊다)
         - Keep meanings at dictionary-level, not encyclopedic descriptions
 
-        Process ALL words in the input array and return results for each in the entries array.`,
+        Process ALL words in the input array and return results for each in the words array.`,
     },
     'gpt-4.1-nano': {
       instructions: `
@@ -152,14 +152,14 @@ export const jaDictionaryAgentFactory = buildAgentFactory(
               * For words with multiple contexts: "넓다"
               * For figurative/extended meanings: "切る; (물건을) 자르다 / (전화·전원을) 끊다"
             - Don't add encyclopedic descriptions (NO: "고양이; 포유류 동물로...", YES: "고양이")
-            - If same POS has COMPLETELY different meanings, separate into different result entries
+            - If same POS has COMPLETELY different meanings, separate into different entries within that word
             - If meanings are similar/related variations, keep in one entry as an array
 
         4. pos: Choose from: godanVerb, ichidanVerb, irregularVerb, noun, naAdjective, iAdjective, adverb, preposition, conjunction, interjection
 
         5. examples: 1-2 natural, commonly used sentences in Japanese that clearly demonstrate the meaning
 
-        6. If a word has multiple parts of speech, create separate result entries for each POS with appropriate explanations
+        6. If a word has multiple parts of speech, create separate entries for each POS with appropriate explanations
 
         IMPORTANT: 
         - This is a WORD DICTIONARY, not an encyclopedia
@@ -167,7 +167,7 @@ export const jaDictionaryAgentFactory = buildAgentFactory(
         - Add brief context ONLY for words with nuance/ambiguity (e.g., 넓다; 범위가 큰, 切る; 끊다)
         - Keep meanings at dictionary-level, not encyclopedic descriptions
 
-        Process ALL words in the input array and return results for each in the entries array.`,
+        Process ALL words in the input array and return results for each in the words array.`,
     },
   },
 );
