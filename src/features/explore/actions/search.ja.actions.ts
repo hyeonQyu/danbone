@@ -4,8 +4,8 @@ import { InvalidValueError } from '@/errors';
 import { ExploreSearchHandler } from '@/features/explore/types';
 import { TargetLanguage } from '@/language';
 import {
+  DictionaryEntryByLanguage,
   DictionaryInput,
-  DictionaryResultSchemaByLanguage,
   getRunner,
   inputValidatorAgentFactory,
   jaDictionaryAgentFactory,
@@ -14,9 +14,6 @@ import {
   queryNormalizerAgentFactory,
   translatorAgentFactory,
 } from '@/openai';
-import z from 'zod';
-
-type DictionaryJAFormat = z.infer<typeof DictionaryResultSchemaByLanguage.ja>;
 
 const MAX_QUERY_LENGTH = 50;
 
@@ -52,7 +49,7 @@ const getDictionaryEntriesJA = async (input: DictionaryInput) => {
   return runner.run(jaDictionaryAgent, JSON.stringify(input));
 };
 
-export const searchJA: ExploreSearchHandler<DictionaryJAFormat> = async ({ query, queryLanguage, sourceLanguage }) => {
+export const searchJA: ExploreSearchHandler<DictionaryEntryByLanguage['ja']> = async ({ query, queryLanguage, sourceLanguage }) => {
   const TARGET_LANGUAGE: TargetLanguage = 'ja' as const;
 
   const getTranslatedTexts = async (normalizedQuery: string) => {

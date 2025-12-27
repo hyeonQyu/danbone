@@ -5,7 +5,7 @@ import { Search } from '@mui/icons-material';
 import { InputAdornment, OutlinedInput, useTheme } from '@mui/material';
 import { ChangeEvent, KeyboardEvent, MouseEvent } from 'react';
 
-interface SearchInputFieldProps {
+export interface SearchInputFieldProps {
   value?: string;
   placeholder?: string;
   onClick?: (event: MouseEvent<HTMLInputElement>) => void;

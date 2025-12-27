@@ -1,6 +1,6 @@
 'use client';
 
-import { SearchInputField } from '@/components/SearchInputField';
+import { ExploreSearchInputField } from '@/features/explore/components/ExploreSearchInputField';
 import { useExploreStore } from '@/features/explore/stores';
 import { useGetLanguageLabel } from '@/language';
 import { Language } from '@/language/language.types';
@@ -107,7 +107,7 @@ function ExploreView() {
           </Select>
         </FormControl>
 
-        <SearchInputField placeholder={`${getLanguageLabel(queryLanguage)} 단어 및 문장`} onClick={handleSearchClick} readOnly />
+        <ExploreSearchInputField queryLanguage={queryLanguage} onClick={handleSearchClick} readOnly />
       </Box>
     </Box>
   );

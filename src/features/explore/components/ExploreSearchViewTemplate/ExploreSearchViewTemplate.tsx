@@ -1,32 +1,25 @@
-'use client';
-
-import { SearchInputField } from '@/components/SearchInputField';
-import { useQueryExploreSearch } from '@/features/explore/hooks';
-import { useExploreStore } from '@/features/explore/stores';
-import { useGetLanguageLabel, useSourceLanguage } from '@/language';
+import { Loading } from '@/components/Loading';
+import { ExploreSearchInputField } from '@/features/explore/components/ExploreSearchInputField';
+import { Language } from '@/language';
 import { useTypedRouter } from '@/routes/routes';
 import { ArrowBack } from '@mui/icons-material';
 import { Box, IconButton, useTheme } from '@mui/material';
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { ReactNode } from 'react';
 
-function ExploreSearchView() {
+interface ExploreSearchViewTemplateProps {
+  queryLanguage: Language;
+  isSearching: boolean;
+  query: string;
+  onSearch: (value: string) => void;
+  renderResults: () => ReactNode;
+}
+
+function ExploreSearchViewTemplate({ queryLanguage, isSearching, query, onSearch, renderResults }: ExploreSearchViewTemplateProps) {
   const { palette, spacing } = useTheme();
   const router = useTypedRouter();
 
-  const sourceLanguage = useSourceLanguage();
-  const getLanguageLabel = useGetLanguageLabel();
-  const queryLanguage = useExploreStore((store) => store.queryLanguage);
-
-  const [query, setQuery] = useState('');
-
   const handleToExplore = () => router.push('/explore');
-
-  const { data, isFetching: isSearching } = useQueryExploreSearch({ query, queryLanguage, sourceLanguage }, { enabled: Boolean(query) });
-
-  const handleSearch = (value: string) => {
-    // setQuery(value);
-  };
 
   return (
     <Box
@@ -66,17 +59,10 @@ function ExploreSearchView() {
         </IconButton>
 
         <Box sx={{ flex: 1 }}>
-          <SearchInputField
-            onSearch={handleSearch}
-            placeholder={`${getLanguageLabel(queryLanguage)} 단어 및 문장`}
-            autoFocus
-            blurOnSearch
-            disabled={isSearching}
-          />
+          <ExploreSearchInputField queryLanguage={queryLanguage} onSearch={onSearch} autoFocus blurOnSearch disabled={isSearching} />
         </Box>
       </Box>
 
-      {/* 검색 결과 영역 (추후 구현) */}
       <Box
         sx={{
           flex: 1,
@@ -84,10 +70,10 @@ function ExploreSearchView() {
           overflowY: 'auto',
         }}
       >
-        {/* 검색 결과가 여기에 표시될 예정 */}
+        {isSearching ? <Loading messages={[`${query} 검색 중...`, '잠시만 기다려 주세요...', '처리 중입니다...']} /> : renderResults()}
       </Box>
     </Box>
   );
 }
 
-export default ExploreSearchView;
+export default ExploreSearchViewTemplate;
