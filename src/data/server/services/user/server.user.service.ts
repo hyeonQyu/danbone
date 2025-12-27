@@ -1,6 +1,6 @@
 import { getServerServiceCreator } from '@/data/server/services/server.service.utils';
 import { UserServerService, UserServerServiceDependencies } from '@/data/server/services/user/server.user.service.types';
-import { DuplicateError } from '@/errors';
+import { DuplicateError, NotFoundError } from '@/errors';
 
 export const createUserServerService = getServerServiceCreator<UserServerService, UserServerServiceDependencies>(({ usersRepository }) => {
   return {
@@ -10,6 +10,16 @@ export const createUserServerService = getServerServiceCreator<UserServerService
       }
 
       return usersRepository.createUser(data);
+    },
+
+    getUserProfile: async (userId) => {
+      const user = await usersRepository.getUserById(userId);
+
+      if (!user) {
+        throw new NotFoundError('사용자를 찾을 수 없습니다.');
+      }
+
+      return user;
     },
   };
 });

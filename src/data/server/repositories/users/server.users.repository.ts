@@ -1,4 +1,4 @@
-import { getFirebaseServerRepositoryCreator } from '@/data/server/repositories/server.repository.utils';
+import { getFirebaseServerRepositoryCreator, serializeEntity } from '@/data/server/repositories/server.repository.utils';
 import { UsersServerRepository } from '@/data/server/repositories/users/server.users.repository.types';
 import { UserEntity } from '@/features/users';
 import { Timestamp } from 'firebase-admin/firestore';
@@ -34,7 +34,17 @@ export const usersServerRepository = getFirebaseServerRepositoryCreator('users')
         return null;
       }
 
-      return querySnapshot.docs[0].data() as UserEntity;
+      return serializeEntity<UserEntity>(querySnapshot.docs[0].data());
+    },
+
+    getUserById: async (id) => {
+      const doc = await db.collection(collectionName).doc(id).get();
+
+      if (!doc.exists || !doc.data()) {
+        return null;
+      }
+
+      return serializeEntity<UserEntity>(doc.data()!);
     },
   };
 });
