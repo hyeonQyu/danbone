@@ -1,5 +1,6 @@
 'use client';
 
+import ExploreSearchErrorResult from '@/features/explore/components/ExploreSearchErrorResult/ExploreSearchErrorResult';
 import { ExploreSearchJAResults } from '@/features/explore/components/ExploreSearchResult';
 import { ExploreSearchViewTemplate } from '@/features/explore/components/ExploreSearchViewTemplate';
 import { useQueryExploreSearchJA } from '@/features/explore/hooks';
@@ -93,9 +94,16 @@ function ExploreSearchView() {
 
   const request: ExploreSearchOption = { query, queryLanguage, sourceLanguage };
 
-  const { data: jaResults, isFetching: isSearchingJA } = useQueryExploreSearchJA(request, { enabled: getEnabled('ja') });
+  const {
+    data: jaResults,
+    isFetching: isSearchingJA,
+    error: jaError,
+    isError: isJAError,
+  } = useQueryExploreSearchJA(request, { enabled: getEnabled('ja') });
 
   const isSearching = isSearchingJA;
+  const error = jaError;
+  const isError = isJAError;
 
   const handleSearch = (value: string) => {
     // setQuery(value);
@@ -108,13 +116,17 @@ function ExploreSearchView() {
       isSearching={isSearching}
       onSearch={handleSearch}
       renderResults={() => {
-        const resultsToDisplay = jaResults ?? DUMMY_JA_RESULTS;
-
-        if (resultsToDisplay) {
-          return <ExploreSearchJAResults results={resultsToDisplay} />;
+        if (isError && error) {
+          return <ExploreSearchErrorResult error={error} />;
         }
 
-        return '데이터 없음';
+        const results = jaResults ?? DUMMY_JA_RESULTS;
+
+        if (results) {
+          return <ExploreSearchJAResults results={results} />;
+        }
+
+        return null;
       }}
     />
   );

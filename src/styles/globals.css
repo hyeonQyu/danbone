@@ -9,6 +9,7 @@
     system-ui,
     Roboto,
     sans-serif;
+  white-space: pre-line;
 }
 
 a {
