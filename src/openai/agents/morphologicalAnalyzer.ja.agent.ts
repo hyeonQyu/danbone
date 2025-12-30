@@ -6,8 +6,11 @@ export const jaMorphologicalAnalyzerAgentFactory = buildAgentFactory(
     name: 'Japanese morphological analyzer',
     outputType: MorphologicalAnalysisResultSchema,
   },
-  {
-    'gpt-5-mini': {
+  [
+    {
+      id: 'gpt-5-mini',
+      label: 'gpt-5-mini',
+      model: 'gpt-5-mini',
       instructions: `
       Analyze Japanese text and extract morphemes with their base forms.
       
@@ -20,5 +23,5 @@ export const jaMorphologicalAnalyzerAgentFactory = buildAgentFactory(
       - surface: exact form in input
       - base: dictionary form (食べた→食べる, 高かった→高い, 歩きます→歩く)`,
     },
-  },
+  ] as const,
 );

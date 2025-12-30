@@ -6,8 +6,11 @@ export const translatorAgentFactory = buildAgentFactory(
     name: 'Translator',
     outputType: LocalizedTextsSchema,
   },
-  {
-    'gpt-5-mini': {
+  [
+    {
+      id: 'gpt-5-mini',
+      label: 'gpt-5-mini',
+      model: 'gpt-5-mini',
       instructions: `
       Translate text from source language to target language naturally.
       
@@ -25,7 +28,10 @@ export const translatorAgentFactory = buildAgentFactory(
       
       Output: { "language": "<targetLanguage>", "texts": ["translation1", "translation2", ...] }`,
     },
-    'gpt-5-nano': {
+    {
+      id: 'gpt-5-nano',
+      label: 'gpt-5-nano',
+      model: 'gpt-5-nano',
       instructions: `
       Translate text from source language to target language naturally.
       
@@ -43,5 +49,5 @@ export const translatorAgentFactory = buildAgentFactory(
       
       Output: { "language": "<targetLanguage>", "texts": ["translation1", "translation2", ...] }`,
     },
-  },
+  ] as const,
 );

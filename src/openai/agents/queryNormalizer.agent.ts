@@ -6,8 +6,11 @@ export const queryNormalizerAgentFactory = buildAgentFactory(
     name: 'Query normalizer',
     outputType: LocalizedTextSchema,
   },
-  {
-    'gpt-5-nano': {
+  [
+    {
+      id: 'gpt-5-nano',
+      label: 'gpt-5-nano',
+      model: 'gpt-5-nano',
       instructions: `
       Normalize the input text to standard form in the specified language.
       
@@ -21,5 +24,5 @@ export const queryNormalizerAgentFactory = buildAgentFactory(
       
       Output: { "language": "<same_language_code>", "text": "<normalized_text>" }`,
     },
-  },
+  ] as const,
 );
