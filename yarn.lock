@@ -1134,24 +1134,28 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hyeonqyu/typed-router-core@npm:^0.2.10":
-  version: 0.2.10
-  resolution: "@hyeonqyu/typed-router-core@npm:0.2.10"
+"@hyeonqyu/typed-router-core@npm:^1.0.3":
+  version: 1.0.3
+  resolution: "@hyeonqyu/typed-router-core@npm:1.0.3"
   peerDependencies:
     react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
-  checksum: 10c0/664e0c64ec98e0e29eb5e23901abd03b100f24202f05547a110a1beb3ff8d550823411b80a9bd29c448b8ea6e798cee379363282f775b6e5c59665282b61cf29
+    zod: ^3.0.0
+  peerDependenciesMeta:
+    zod:
+      optional: true
+  checksum: 10c0/10cb4b013590ace8c509a9b91ed91cd653b50a470dcf1538f92e78b8d8014911d623b43c5cacc9d4d64628612126c63d18b131cc82ed354e3220d0f9cfdaeefd
   languageName: node
   linkType: hard
 
-"@hyeonqyu/typed-router-next@npm:^0.2.10":
-  version: 0.2.10
-  resolution: "@hyeonqyu/typed-router-next@npm:0.2.10"
+"@hyeonqyu/typed-router-next@npm:^1.0.3":
+  version: 1.0.3
+  resolution: "@hyeonqyu/typed-router-next@npm:1.0.3"
   dependencies:
-    "@hyeonqyu/typed-router-core": "npm:^0.2.10"
+    "@hyeonqyu/typed-router-core": "npm:^1.0.3"
   peerDependencies:
-    next: ^13.0.0 || ^14.0.0 || ^15.0.0
+    next: ^13.0.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
     react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
-  checksum: 10c0/bca05b59ff4f0c94269492dd323d6bbc77e80a633ebaea4cee5e81a56043ffe7140c6ac1b6c32b22b00d3482d371799e9bbd5c3aee6c872e383fee03356bf4d1
+  checksum: 10c0/cd90db93777eaeb7baec3b63c0369575ec44f4abba052210d67fb19539244d764bbf7c199ea0099f0c47bb44386d01b8c4cc21bef2a0164c354a6cd56a13b5d8
   languageName: node
   linkType: hard
 
@@ -3113,7 +3117,7 @@ __metadata:
   dependencies:
     "@emotion/react": "npm:^11.14.0"
     "@emotion/styled": "npm:^11.14.1"
-    "@hyeonqyu/typed-router-next": "npm:^0.2.10"
+    "@hyeonqyu/typed-router-next": "npm:^1.0.3"
     "@mui/icons-material": "npm:^7.3.6"
     "@mui/material": "npm:^7.3.6"
     "@openai/agents": "npm:^0.3.4"
