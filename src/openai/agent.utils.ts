@@ -7,18 +7,39 @@ type AgentCommonOptions<TContext = UnknownContext, TOutput extends AgentOutputTy
   'model' | 'instructions' | 'modelSettings'
 >;
 
-type AgentModelOptions<TContext = UnknownContext, TOutput extends AgentOutputType = TextOutput> = Pick<
-  AgentOptions<TContext, TOutput>,
-  'instructions' | 'modelSettings'
->;
+export type AgentConfiguration<
+  TConfigId extends string = string,
+  TContext = UnknownContext,
+  TOutput extends AgentOutputType = TextOutput,
+> = {
+  id: TConfigId;
+  label?: string;
+  model: TextModel;
+  instructions: string;
+  modelSettings?: AgentOptions<TContext, TOutput>['modelSettings'];
+};
 
-export const buildAgentFactory = <TContext = UnknownContext, TOutput extends AgentOutputType = TextOutput>(
-  config: AgentCommonOptions<TContext, TOutput>,
-  configByModel: Partial<Record<TextModel, AgentModelOptions<TContext, TOutput>>>,
+export const buildAgentFactory = <
+  TConfig extends AgentConfiguration<string, TContext, TOutput>,
+  TContext = UnknownContext,
+  TOutput extends AgentOutputType = TextOutput,
+>(
+  agentConfig: AgentCommonOptions<TContext, TOutput>,
+  modelConfigs: readonly TConfig[],
 ) => {
+  const modelConfigMap = new Map(modelConfigs.map((c) => [c.id, c]));
+
   return {
-    agentType: config.name,
-    createAgent: (model: TextModel) => new Agent({ ...config, ...configByModel[model], model }),
-    supportedModels: Object.keys(configByModel),
+    agentType: agentConfig.name,
+    supportedConfigurations: modelConfigs.map(({ id, label, model }) => ({ id, label, model })),
+    createAgent: (configId: TConfig['id']) => {
+      const modelConfig = modelConfigMap.get(configId);
+
+      if (!modelConfig) {
+        throw new Error(`Configuration not found: ${configId}`);
+      }
+
+      return new Agent({ ...agentConfig, ...modelConfig });
+    },
   };
 };

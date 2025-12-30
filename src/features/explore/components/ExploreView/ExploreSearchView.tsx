@@ -14,7 +14,7 @@ function ExploreSearchView() {
   const { jaResults, isSearching, error, isError } = useQueryExploreSearch();
 
   const handleSearch = (value: string) => {
-    // setQuery(value);
+    setQuery(value);
   };
 
   return (

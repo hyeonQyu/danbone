@@ -22,7 +22,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { evaluateAgentAction, getSupportedModels, getTestCases, testUsageAction, type AgentName } from './actions';
+import { evaluateAgentAction, getSupportedConfigurations, getTestCases, testUsageAction, type AgentName } from './actions';
 
 const AGENT_OPTIONS = [
   { value: 'queryNormalizer', label: 'Query Normalizer', description: '쿼리 정규화' },
@@ -59,8 +59,8 @@ export default function TestUsagePage() {
   const [mode, setMode] = useState<'single' | 'evaluate'>('single');
   const [input, setInput] = useState('안녕하세요. 저는 대한민국 사람입니다.');
   const [selectedAgent, setSelectedAgent] = useState<AgentName>('queryNormalizer');
-  const [selectedModels, setSelectedModels] = useState<TextModel[]>([]);
-  const [supportedModels, setSupportedModels] = useState<TextModel[]>([]);
+  const [selectedConfigs, setSelectedConfigs] = useState<string[]>([]);
+  const [supportedConfigurations, setSupportedConfigurations] = useState<Array<{ id: string; label?: string; model: TextModel }>>([]);
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<Awaited<ReturnType<typeof testUsageAction>> | null>(null);
   const [evalResults, setEvalResults] = useState<Awaited<ReturnType<typeof evaluateAgentAction>> | null>(null);
@@ -70,13 +70,14 @@ export default function TestUsagePage() {
   const [filterModels, setFilterModels] = useState<TextModel[]>([]);
   const [filterResult, setFilterResult] = useState<'all' | 'passed' | 'failed'>('all');
 
-  // 에이전트가 변경되면 지원하는 모델 목록과 테스트 케이스를 가져옴
+  // 에이전트가 변경되면 지원하는 configuration 목록과 테스트 케이스를 가져옴
   useEffect(() => {
     const loadData = async () => {
-      const models = await getSupportedModels(selectedAgent);
-      setSupportedModels(models);
-      // 기존 선택된 모델 중 지원하지 않는 모델은 제거
-      setSelectedModels((prev) => prev.filter((model) => models.includes(model)));
+      const configs = await getSupportedConfigurations(selectedAgent);
+      setSupportedConfigurations(configs);
+      // 기존 선택된 configuration 중 지원하지 않는 것은 제거
+      const configIds = configs.map((c) => c.id);
+      setSelectedConfigs((prev) => prev.filter((id) => configIds.includes(id)));
 
       const cases = await getTestCases(selectedAgent);
       setTestCases(cases);
@@ -84,19 +85,19 @@ export default function TestUsagePage() {
     loadData();
   }, [selectedAgent]);
 
-  const toggleModel = (model: TextModel) => {
-    setSelectedModels((prev) => {
-      if (prev.includes(model)) {
-        return prev.filter((m) => m !== model);
+  const toggleConfig = (configId: string) => {
+    setSelectedConfigs((prev) => {
+      if (prev.includes(configId)) {
+        return prev.filter((id) => id !== configId);
       } else {
-        return [...prev, model];
+        return [...prev, configId];
       }
     });
   };
 
   const handleTest = async () => {
-    if (selectedModels.length === 0) {
-      alert('최소 하나의 모델을 선택해주세요.');
+    if (selectedConfigs.length === 0) {
+      alert('최소 하나의 configuration을 선택해주세요.');
       return;
     }
 
@@ -105,7 +106,8 @@ export default function TestUsagePage() {
     setEvalResults(null);
 
     try {
-      const res = await testUsageAction(input, selectedAgent, selectedModels);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const res = await testUsageAction(input, selectedAgent, selectedConfigs as any);
       setResults(res);
       console.log('클라이언트 결과:', res);
     } catch (error) {
@@ -116,8 +118,8 @@ export default function TestUsagePage() {
   };
 
   const handleEvaluate = async () => {
-    if (selectedModels.length === 0) {
-      alert('최소 하나의 모델을 선택해주세요.');
+    if (selectedConfigs.length === 0) {
+      alert('최소 하나의 configuration을 선택해주세요.');
       return;
     }
 
@@ -126,7 +128,8 @@ export default function TestUsagePage() {
     setEvalResults(null);
 
     try {
-      const res = await evaluateAgentAction(selectedAgent, selectedModels);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const res = await evaluateAgentAction(selectedAgent, selectedConfigs as any);
       setEvalResults(res);
       console.log('평가 결과:', res);
     } catch (error) {
@@ -169,10 +172,10 @@ export default function TestUsagePage() {
 
       <Box sx={{ mt: 3 }}>
         <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-          모델 선택 ({selectedModels.length}개 선택됨)
-          {supportedModels.length > 0 && (
+          Configuration 선택 ({selectedConfigs.length}개 선택됨)
+          {supportedConfigurations.length > 0 && (
             <Typography component="span" variant="caption" color="text.secondary" sx={{ ml: 1 }}>
-              (이 에이전트는 {supportedModels.length}개 모델을 지원합니다)
+              (이 에이전트는 {supportedConfigurations.length}개 configuration을 지원합니다)
             </Typography>
           )}
         </Typography>
@@ -181,35 +184,32 @@ export default function TestUsagePage() {
           sx={{
             p: 2,
             backgroundColor: 'action.hover',
-            maxHeight: 300,
+            maxHeight: 400,
             overflowY: 'auto',
           }}
         >
-          {supportedModels.length === 0 ? (
+          {supportedConfigurations.length === 0 ? (
             <Box sx={{ textAlign: 'center', py: 3, color: 'text.secondary' }}>
               <CircularProgress size={24} sx={{ mb: 1 }} />
-              <Typography variant="body2">지원하는 모델 정보를 불러오는 중...</Typography>
+              <Typography variant="body2">지원하는 configuration 정보를 불러오는 중...</Typography>
             </Box>
           ) : (
-            MODEL_OPTIONS.reduce(
-              (acc, option) => {
-                const lastCategory = acc[acc.length - 1];
-                if (!lastCategory || lastCategory.category !== option.category) {
-                  acc.push({ category: option.category, options: [option] });
-                } else {
-                  lastCategory.options.push(option);
-                }
-                return acc;
-              },
-              [] as { category: string; options: typeof MODEL_OPTIONS }[],
-            )
-              .map((group) => ({
-                ...group,
-                options: group.options.filter((option) => supportedModels.includes(option.value)),
-              }))
-              .filter((group) => group.options.length > 0)
-              .map((group) => (
-                <Box key={group.category} sx={{ mb: 2 }}>
+            // Configuration을 모델별로 그룹화
+            Object.entries(
+              supportedConfigurations.reduce(
+                (acc, config) => {
+                  if (!acc[config.model]) {
+                    acc[config.model] = [];
+                  }
+                  acc[config.model].push(config);
+                  return acc;
+                },
+                {} as Record<TextModel, typeof supportedConfigurations>,
+              ),
+            ).map(([model, configs]) => {
+              const modelOption = MODEL_OPTIONS.find((opt) => opt.value === model);
+              return (
+                <Box key={model} sx={{ mb: 3 }}>
                   <Typography
                     variant="subtitle2"
                     fontWeight="bold"
@@ -221,25 +221,20 @@ export default function TestUsagePage() {
                       borderColor: 'divider',
                     }}
                   >
-                    {group.category}
+                    {modelOption?.label || model} ({configs.length}개)
                   </Typography>
                   <Box
                     sx={{
-                      display: 'grid',
-                      gridTemplateColumns: {
-                        xs: 'repeat(1, 1fr)',
-                        sm: 'repeat(2, 1fr)',
-                        md: 'repeat(3, 1fr)',
-                        lg: 'repeat(4, 1fr)',
-                      },
-                      gap: 1,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 0.5,
                     }}
                   >
-                    {group.options.map((option) => (
+                    {configs.map((config) => (
                       <FormControlLabel
-                        key={option.value}
-                        control={<Checkbox checked={selectedModels.includes(option.value)} onChange={() => toggleModel(option.value)} />}
-                        label={<Typography variant="body2">{option.label}</Typography>}
+                        key={config.id}
+                        control={<Checkbox checked={selectedConfigs.includes(config.id)} onChange={() => toggleConfig(config.id)} />}
+                        label={<Typography variant="body2">{config.label}</Typography>}
                         sx={{
                           m: 0,
                           px: 1,
@@ -254,7 +249,8 @@ export default function TestUsagePage() {
                     ))}
                   </Box>
                 </Box>
-              ))
+              );
+            })
           )}
         </Paper>
       </Box>
@@ -285,8 +281,8 @@ export default function TestUsagePage() {
             )}
           </Box>
 
-          <Button variant="contained" size="large" onClick={handleTest} disabled={loading || selectedModels.length === 0} sx={{ mt: 3 }}>
-            {loading ? `실행 중... (${selectedModels.length}개 모델)` : `Agent 실행하기 (${selectedModels.length}개 모델)`}
+          <Button variant="contained" size="large" onClick={handleTest} disabled={loading || selectedConfigs.length === 0} sx={{ mt: 3 }}>
+            {loading ? `실행 중... (${selectedConfigs.length}개 config)` : `Agent 실행하기 (${selectedConfigs.length}개 config)`}
           </Button>
         </>
       )}
@@ -306,10 +302,10 @@ export default function TestUsagePage() {
             variant="contained"
             size="large"
             onClick={handleEvaluate}
-            disabled={loading || selectedModels.length === 0}
+            disabled={loading || selectedConfigs.length === 0}
             sx={{ mt: 3 }}
           >
-            {loading ? `평가 중... (${selectedModels.length}개 모델)` : `평가 시작 (${testCases.length}개 케이스)`}
+            {loading ? `평가 중... (${selectedConfigs.length}개 config)` : `평가 시작 (${testCases.length}개 케이스)`}
           </Button>
         </>
       )}
@@ -317,7 +313,7 @@ export default function TestUsagePage() {
       {results && (
         <Box sx={{ mt: 4 }}>
           <Typography variant="h4" component="h2" gutterBottom>
-            결과 비교 ({results.length}개 모델)
+            결과 비교 ({results.length}개 configuration)
           </Typography>
 
           <Box
@@ -332,9 +328,10 @@ export default function TestUsagePage() {
               gap: 3,
             }}
           >
-            {results.map((result) => (
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+            {results.map((result: any) => (
               <Paper
-                key={result.model}
+                key={result.configId}
                 elevation={2}
                 sx={{
                   p: 3,
@@ -353,7 +350,16 @@ export default function TestUsagePage() {
                   }}
                 >
                   <Typography variant="h6" component="h3">
-                    📊 {result.model}
+                    📊 {result.label}
+                  </Typography>
+                </Box>
+
+                <Box sx={{ mt: 2 }}>
+                  <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                    ⏱️ 실행 시간:
+                  </Typography>
+                  <Typography variant="h6" fontWeight="bold" color="info.main">
+                    {result.executionTimeMs}ms ({(result.executionTimeMs / 1000).toFixed(2)}초)
                   </Typography>
                 </Box>
 
@@ -494,7 +500,7 @@ export default function TestUsagePage() {
       {evalResults && (
         <Box sx={{ mt: 4 }}>
           <Typography variant="h4" component="h2" gutterBottom>
-            평가 결과 ({evalResults.length}개 모델)
+            평가 결과 ({evalResults.length}개 configuration)
           </Typography>
 
           {/* 필터 영역 */}
@@ -503,23 +509,25 @@ export default function TestUsagePage() {
               🔍 필터
             </Typography>
 
-            {/* 모델 선택 필터 */}
+            {/* Configuration 필터 */}
             <Box sx={{ mb: 3 }}>
               <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
-                모델 필터 {filterModels.length > 0 && `(${filterModels.length}개 선택됨)`}
+                Configuration 필터 {filterModels.length > 0 && `(${filterModels.length}개 모델 선택됨)`}
               </Typography>
               <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mt: 1 }}>
-                {evalResults.map((result) => (
+                {/* 실제 모델별로 필터링 */}
+                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                {([...new Set(evalResults.map((r: any) => r.model))] as TextModel[]).map((model: TextModel) => (
                   <Chip
-                    key={result.model}
-                    label={result.model}
+                    key={model}
+                    label={MODEL_OPTIONS.find((opt) => opt.value === model)?.label || model}
                     onClick={() => {
-                      setFilterModels((prev) =>
-                        prev.includes(result.model) ? prev.filter((m) => m !== result.model) : [...prev, result.model],
+                      setFilterModels((prev: TextModel[]) =>
+                        prev.includes(model) ? prev.filter((m: TextModel) => m !== model) : [...prev, model],
                       );
                     }}
-                    color={filterModels.includes(result.model) ? 'primary' : 'default'}
-                    variant={filterModels.includes(result.model) ? 'filled' : 'outlined'}
+                    color={filterModels.includes(model) ? 'primary' : 'default'}
+                    variant={filterModels.includes(model) ? 'filled' : 'outlined'}
                     sx={{ cursor: 'pointer' }}
                   />
                 ))}
@@ -567,9 +575,10 @@ export default function TestUsagePage() {
             </Box>
           </Paper>
 
-          {/* 모델별 요약 */}
+          {/* Configuration별 요약 */}
           {(() => {
-            const filteredResults = evalResults.filter((result) => filterModels.length === 0 || filterModels.includes(result.model));
+            /* eslint-disable @typescript-eslint/no-explicit-any */
+            const filteredResults = evalResults.filter((result: any) => filterModels.length === 0 || filterModels.includes(result.model));
 
             if (filteredResults.length === 0) {
               return (
@@ -592,9 +601,9 @@ export default function TestUsagePage() {
                   gap: 3,
                 }}
               >
-                {filteredResults.map((result) => (
+                {filteredResults.map((result: any) => (
                   <Paper
-                    key={result.model}
+                    key={result.configId}
                     elevation={3}
                     sx={{
                       p: 3,
@@ -604,7 +613,7 @@ export default function TestUsagePage() {
                   >
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                       <Typography variant="h6" component="h3">
-                        {result.model}
+                        {result.label}
                       </Typography>
                       <Chip
                         label={`${result.accuracy.toFixed(1)}%`}
@@ -623,6 +632,32 @@ export default function TestUsagePage() {
                         {result.passedCount} / {result.totalCount}
                       </Typography>
                     </Box>
+
+                    {result.executionTime && (
+                      <Box sx={{ mb: 2 }}>
+                        <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                          ⏱️ 실행 시간
+                        </Typography>
+                        <Box sx={{ display: 'flex', gap: 3 }}>
+                          <Box>
+                            <Typography variant="caption" color="text.secondary">
+                              케이스당 (평균)
+                            </Typography>
+                            <Typography variant="body1" fontWeight="bold" color="info.main">
+                              {result.executionTime.avg}ms
+                            </Typography>
+                          </Box>
+                          <Box>
+                            <Typography variant="caption" color="text.secondary">
+                              전체 총합
+                            </Typography>
+                            <Typography variant="body1" fontWeight="bold" color="info.dark">
+                              {(result.executionTime.total / 1000).toFixed(2)}초
+                            </Typography>
+                          </Box>
+                        </Box>
+                      </Box>
+                    )}
 
                     {result.priceBreakdown && (
                       <Box sx={{ mb: 2 }}>
@@ -724,30 +759,31 @@ export default function TestUsagePage() {
           })()}
 
           {/* 상세 결과 */}
+          {/* eslint-disable @typescript-eslint/no-explicit-any */}
           {evalResults
-            .filter((result) => filterModels.length === 0 || filterModels.includes(result.model))
-            .map((result) => {
+            .filter((result: any) => filterModels.length === 0 || filterModels.includes(result.model))
+            .map((result: any) => {
               // 정답 여부 필터링
-              const filteredEvaluations = result.evaluations.filter((evaluation) => {
+              const filteredEvaluations = result.evaluations.filter((evaluation: any) => {
                 if (filterResult === 'passed') return evaluation.passed;
                 if (filterResult === 'failed') return !evaluation.passed;
                 return true; // 'all'
               });
 
-              // 필터링 결과가 없으면 모델 자체를 표시하지 않음
+              // 필터링 결과가 없으면 configuration 자체를 표시하지 않음
               if (filteredEvaluations.length === 0) return null;
 
               return (
-                <Box key={`detail-${result.model}`} sx={{ mt: 4 }}>
+                <Box key={`detail-${result.configId}`} sx={{ mt: 4 }}>
                   <Typography variant="h5" component="h3" gutterBottom>
-                    {result.model} - 상세 결과
+                    {result.label} - 상세 결과
                     {filterResult !== 'all' && (
                       <Chip label={`${filteredEvaluations.length}개 표시 중`} size="small" color="primary" sx={{ ml: 2 }} />
                     )}
                   </Typography>
 
                   <Box sx={{ mt: 2 }}>
-                    {filteredEvaluations.map((evaluation, idx) => (
+                    {filteredEvaluations.map((evaluation: any, idx: number) => (
                       <Paper
                         key={idx}
                         variant="outlined"
