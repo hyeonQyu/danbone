@@ -3,107 +3,15 @@
 import ExploreSearchErrorResult from '@/features/explore/components/ExploreSearchErrorResult/ExploreSearchErrorResult';
 import { ExploreSearchJAResults } from '@/features/explore/components/ExploreSearchResult';
 import { ExploreSearchViewTemplate } from '@/features/explore/components/ExploreSearchViewTemplate';
-import { useQueryExploreSearchJA } from '@/features/explore/hooks';
+import { useQueryExploreSearch } from '@/features/explore/hooks';
 import { useExploreStore } from '@/features/explore/stores';
-import { ExploreSearchOption, ExploreSearchResult } from '@/features/explore/types';
-import { Language, useSourceLanguage, useTargetLanguage } from '@/language';
-import { DictionaryWordByLanguage } from '@/openai';
-import { useState } from 'react';
-
-// 더미 데이터
-const DUMMY_JA_RESULTS: Array<ExploreSearchResult<DictionaryWordByLanguage['ja']>> = [
-  {
-    text: '上手 元気',
-    words: [
-      {
-        keyword: '上手',
-        entries: [
-          {
-            notation: '上手',
-            pronunciation: 'じょうず',
-            meanings: ['능숙한', '잘하는'],
-            pos: 'naAdjective',
-            examples: ['日本語が上手です', '料理が上手だ'],
-          },
-          {
-            notation: '上手',
-            pronunciation: 'じょうず',
-            meanings: ['고수', '능숙한 사람'],
-            pos: 'noun',
-            examples: ['彼はピアノの上手だ'],
-          },
-        ],
-      },
-      {
-        keyword: '元気',
-        entries: [
-          {
-            notation: '元気',
-            pronunciation: 'げんき',
-            meanings: ['건강한', '활기찬'],
-            pos: 'naAdjective',
-            examples: ['元気な子供', '元気に過ごす'],
-          },
-          {
-            notation: '元気',
-            pronunciation: 'げんき',
-            meanings: ['건강', '활기'],
-            pos: 'noun',
-            examples: ['元気がない', '元気をもらう'],
-          },
-        ],
-      },
-    ],
-  },
-  {
-    text: '元気',
-    words: [
-      {
-        keyword: '元気',
-        entries: [
-          {
-            notation: '元気',
-            pronunciation: 'げんき',
-            meanings: ['건강한', '활기찬'],
-            pos: 'naAdjective',
-            examples: ['元気な子供', '元気に過ごす'],
-          },
-          {
-            notation: '元気',
-            pronunciation: 'げんき',
-            meanings: ['건강', '활기'],
-            pos: 'noun',
-            examples: ['元気がない', '元気をもらう'],
-          },
-        ],
-      },
-    ],
-  },
-];
 
 function ExploreSearchView() {
-  const [query, setQuery] = useState('');
-
-  const sourceLanguage = useSourceLanguage();
-  const targetLanguage = useTargetLanguage();
+  const query = useExploreStore((store) => store.query);
+  const setQuery = useExploreStore((store) => store.setQuery);
   const queryLanguage = useExploreStore((store) => store.queryLanguage);
 
-  const getEnabled = (language: Language) => {
-    return Boolean(query) && targetLanguage === language;
-  };
-
-  const request: ExploreSearchOption = { query, queryLanguage, sourceLanguage };
-
-  const {
-    data: jaResults,
-    isFetching: isSearchingJA,
-    error: jaError,
-    isError: isJAError,
-  } = useQueryExploreSearchJA(request, { enabled: getEnabled('ja') });
-
-  const isSearching = isSearchingJA;
-  const error = jaError;
-  const isError = isJAError;
+  const { jaResults, isSearching, error, isError } = useQueryExploreSearch();
 
   const handleSearch = (value: string) => {
     // setQuery(value);
@@ -120,10 +28,8 @@ function ExploreSearchView() {
           return <ExploreSearchErrorResult error={error} />;
         }
 
-        const results = jaResults ?? DUMMY_JA_RESULTS;
-
-        if (results) {
-          return <ExploreSearchJAResults results={results} />;
+        if (jaResults) {
+          return <ExploreSearchJAResults results={jaResults} />;
         }
 
         return null;

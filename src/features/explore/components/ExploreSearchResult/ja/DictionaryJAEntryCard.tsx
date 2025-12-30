@@ -1,5 +1,6 @@
 import { useGetJAPartOfSpeechLabel } from '@/features/dictionary';
 import { DictionaryWordByLanguage } from '@/openai';
+import { useTypedRouter } from '@/routes';
 import { usePxToRem } from '@/styles';
 import { Box, Chip, Typography, useTheme } from '@mui/material';
 
@@ -13,10 +14,23 @@ function DictionaryJAEntryCard({ entry }: DictionaryJAEntryCardProps) {
   const { spacing, palette, transitions, shadows } = useTheme();
   const pxToRem = usePxToRem();
 
+  const router = useTypedRouter();
+
   const getPartOfSpeechLabel = useGetJAPartOfSpeechLabel();
+
+  const handleClick = () => {
+    console.log(entry);
+    router.push('/explore/search/detail', {
+      searchParams: {
+        language: 'ja',
+        ...entry,
+      },
+    });
+  };
 
   return (
     <Box
+      onClick={handleClick}
       sx={{
         p: spacing(2),
         borderRadius: spacing(1),
