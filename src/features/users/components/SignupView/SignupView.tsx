@@ -1,7 +1,7 @@
 'use client';
 
 import { PageViewContainer } from '@/components/PageViewContainer';
-import { StepByStepForm } from '@/components/StepByStepForm';
+import { StepForm } from '@/components/StepForm';
 import { checkEmailExists, CreateUserData } from '@/features/users';
 import { getEmailValidateRule, getMinLengthRule, getReactHookFormComponents } from '@/react-hook-form';
 import { useForm } from 'react-hook-form';
@@ -48,19 +48,19 @@ function SignupView() {
         paddingTop: 12,
       }}
     >
-      <StepByStepForm methods={methods} onSubmit={handleSubmit}>
-        <StepByStepForm.Step description="이메일을 입력해주세요" onValidate={handleEmailCheck}>
+      <StepForm methods={methods} onSubmit={handleSubmit}>
+        <StepForm.Step description="이메일을 입력해주세요" onValidate={handleEmailCheck}>
           <TextField formName="email" label="이메일" type="email" required fullWidth autoFocus rules={getEmailValidateRule()} />
-        </StepByStepForm.Step>
+        </StepForm.Step>
 
-        <StepByStepForm.Step description="비밀번호를 설정해주세요">
+        <StepForm.Step description="비밀번호를 설정해주세요">
           <PasswordField formName="password" label="비밀번호" required fullWidth autoFocus rules={getMinLengthRule(8)} />
-        </StepByStepForm.Step>
+        </StepForm.Step>
 
-        <StepByStepForm.Step description="이름을 알려주세요">
+        <StepForm.Step description="이름을 알려주세요">
           <TextField formName="name" label="이름" required fullWidth autoFocus />
-        </StepByStepForm.Step>
-      </StepByStepForm>
+        </StepForm.Step>
+      </StepForm>
     </PageViewContainer>
   );
 }
