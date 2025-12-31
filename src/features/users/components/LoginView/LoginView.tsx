@@ -3,10 +3,10 @@
 import { Logo } from '@/components/Logo';
 import { login } from '@/features/users';
 import type { LoginData } from '@/features/users/users.types';
+import { TypedLink } from '@/routes';
 import { usePxToRem } from '@/styles';
 import { Alert, Box, Button, CircularProgress, TextField, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import Link from 'next/link';
 import { useState } from 'react';
 
 function LoginView() {
@@ -112,7 +112,7 @@ function LoginView() {
           계정이 없으신가요?
         </Typography>
 
-        <Link href="/register" passHref>
+        <TypedLink href="/signup" passHref>
           <Typography
             variant="body2"
             sx={{
@@ -127,7 +127,7 @@ function LoginView() {
           >
             회원가입
           </Typography>
-        </Link>
+        </TypedLink>
       </Box>
     </Box>
   );

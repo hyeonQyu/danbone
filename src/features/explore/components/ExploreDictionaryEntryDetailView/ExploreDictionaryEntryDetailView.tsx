@@ -1,14 +1,14 @@
+import { BackButton } from '@/components/BackButton';
 import { PageViewContainer } from '@/components/PageViewContainer';
 import { SlideInContainer } from '@/components/SlideInContainer';
 import { DictionaryEntryByLanguage } from '@/features/dictionary';
 import { DictionaryJAEntryDetail } from '@/features/dictionary/components/DictionaryEntryDetail';
 import { useTypedRouter, useTypedSearchParams } from '@/routes';
 import { Z_INDEX } from '@/styles/zIndex.constants';
-import { ArrowBack } from '@mui/icons-material';
-import { Box, IconButton, useTheme } from '@mui/material';
+import { Box, useTheme } from '@mui/material';
 
 function ExploreDictionaryEntryDetailView() {
-  const { palette, spacing } = useTheme();
+  const { spacing } = useTheme();
 
   const searchParams = useTypedSearchParams('/explore/search/detail');
   const { language, ...entry } = searchParams;
@@ -46,9 +46,7 @@ function ExploreDictionaryEntryDetailView() {
           zIndex: Z_INDEX.backward,
         }}
       >
-        <IconButton onClick={handleBack} sx={{ padding: spacing(1) }}>
-          <ArrowBack sx={{ color: palette.text.primary }} />
-        </IconButton>
+        <BackButton onBack={handleBack} />
       </Box>
 
       <PageViewContainer>{renderContent()}</PageViewContainer>

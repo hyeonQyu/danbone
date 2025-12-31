@@ -1,8 +1,7 @@
-import { getObjectAtPath } from '@/lib';
 import { getRequiredErrorMessage } from '@/react-hook-form/form.rules.utils';
 import { ReactHookFormProps } from '@/react-hook-form/form.types';
 import { ChangeEventHandler } from 'react';
-import { FieldError, FieldValues, useController, useFormContext } from 'react-hook-form';
+import { FieldValues, useController } from 'react-hook-form';
 
 export type UseReactHookFormControlParams<
   TFieldValues extends FieldValues,
@@ -17,15 +16,11 @@ export const useReactHookFormControl = <
 ) => {
   const { formName, rules, validator = () => true, label: originLabel, required, hideErrorMessage, ...restProps } = params;
 
-  const {
-    formState: { errors },
-  } = useFormContext<TFieldValues>();
-
-  const { field } = useController({
+  const { field, fieldState } = useController({
     name: formName,
     rules: {
       ...rules,
-      required: required ? getRequiredErrorMessage() : false,
+      required: rules?.required ? rules.required : required ? getRequiredErrorMessage() : false,
     },
   });
 
@@ -34,7 +29,7 @@ export const useReactHookFormControl = <
     field.onChange(e);
   };
 
-  const error = getObjectAtPath(errors, formName) as FieldError | undefined;
+  const error = fieldState.error;
   const errorMessage = hideErrorMessage ? '' : ((error?.message as string) ?? ' ');
 
   const label = originLabel ? `${originLabel}${required ? ' *' : ''}` : originLabel;

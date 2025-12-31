@@ -1,10 +1,10 @@
+import { BackButton } from '@/components/BackButton';
 import { Loading } from '@/components/Loading';
 import { SlideInContainer } from '@/components/SlideInContainer';
 import { ExploreSearchInputField } from '@/features/explore/components/ExploreSearchInputField';
 import { Language } from '@/language';
 import { useTypedRouter } from '@/routes/routes';
-import { ArrowBack } from '@mui/icons-material';
-import { Box, IconButton, useTheme } from '@mui/material';
+import { Box, useTheme } from '@mui/material';
 import { ReactNode } from 'react';
 
 interface ExploreSearchViewTemplateProps {
@@ -33,9 +33,7 @@ function ExploreSearchViewTemplate({ queryLanguage, isSearching, query, onSearch
           borderBottom: `1px solid ${palette.divider}`,
         }}
       >
-        <IconButton onClick={handleToExplore} sx={{ padding: spacing(1) }}>
-          <ArrowBack sx={{ color: palette.text.primary }} />
-        </IconButton>
+        <BackButton onBack={handleToExplore} />
 
         <Box sx={{ flex: 1 }}>
           <ExploreSearchInputField queryLanguage={queryLanguage} onSearch={onSearch} autoFocus blurOnSearch disabled={isSearching} />
