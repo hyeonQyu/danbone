@@ -2,7 +2,7 @@
 
 import { usePxToRem } from '@/styles';
 import { ArrowBack } from '@mui/icons-material';
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Button, LinearProgress, Typography } from '@mui/material';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Children, cloneElement, isValidElement, KeyboardEvent, ReactElement, ReactNode, useState } from 'react';
 import { FieldPath, FieldValues, FormProvider, UseFormReturn } from 'react-hook-form';
@@ -60,6 +60,8 @@ function StepByStepForm<TFieldValues extends FieldValues>({ methods, onSubmit, c
   };
 
   const handleKeyDown = (e: KeyboardEvent) => {
+    if (e.nativeEvent.isComposing) return;
+
     if (e.key === 'Enter') {
       e.preventDefault();
       handleNext();
@@ -81,6 +83,7 @@ function StepByStepForm<TFieldValues extends FieldValues>({ methods, onSubmit, c
 
   const isFirstStep = currentStep === 0;
   const isLastStep = currentStep === totalSteps - 1;
+  const progress = ((currentStep + 1) / totalSteps) * 100;
 
   return (
     <FormProvider {...methods}>
@@ -98,6 +101,21 @@ function StepByStepForm<TFieldValues extends FieldValues>({ methods, onSubmit, c
           gap: 2,
         }}
       >
+        <LinearProgress
+          variant="determinate"
+          value={progress}
+          color="primary"
+          sx={{
+            height: pxToRem(4),
+            borderRadius: 2,
+            backgroundColor: 'action.hover',
+            '& .MuiLinearProgress-bar': {
+              borderRadius: 2,
+            },
+            mb: 1,
+          }}
+        />
+
         <AnimatePresence mode="wait">
           <motion.div
             key={currentStep}
