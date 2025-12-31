@@ -16,6 +16,7 @@ interface StepByStepFormProps<TFieldValues extends FieldValues> {
 interface StepProps {
   description?: string;
   children: ReactNode;
+  onValidate?: () => Promise<boolean> | boolean;
 }
 
 function Step({ children }: StepProps) {
@@ -24,6 +25,7 @@ function Step({ children }: StepProps) {
 
 function StepByStepForm<TFieldValues extends FieldValues>({ methods, onSubmit, children }: StepByStepFormProps<TFieldValues>) {
   const [currentStep, setCurrentStep] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
   const childrenArray = Children.toArray(children);
   const totalSteps = childrenArray.length;
 
@@ -38,24 +40,38 @@ function StepByStepForm<TFieldValues extends FieldValues>({ methods, onSubmit, c
   };
 
   const handleNext = async () => {
-    const currentChild = childrenArray[currentStep];
-    if (!isValidElement(currentChild)) return;
+    if (isLoading) return;
 
-    const actualChild = currentChild.type === Step ? (currentChild.props as StepProps).children : currentChild;
+    setIsLoading(true);
 
-    if (!isValidElement(actualChild)) return;
+    try {
+      const currentChild = childrenArray[currentStep];
+      if (!isValidElement(currentChild)) return;
 
-    const props = actualChild.props as { formName?: FieldPath<TFieldValues> };
-    if (!props.formName) return;
+      const isStepChild = currentChild.type === Step;
+      const stepProps = isStepChild ? (currentChild.props as StepProps) : undefined;
+      const actualChild = isStepChild ? stepProps?.children : currentChild;
 
-    const isValid = await methods.trigger(props.formName);
+      if (!isValidElement(actualChild)) return;
 
-    if (isValid) {
+      const props = actualChild.props as { formName?: FieldPath<TFieldValues> };
+      if (!props.formName) return;
+
+      const isValid = await methods.trigger(props.formName);
+      if (!isValid) return;
+
+      if (stepProps?.onValidate) {
+        const canProceed = await stepProps.onValidate();
+        if (!canProceed) return;
+      }
+
       if (currentStep < totalSteps - 1) {
         setCurrentStep((prev) => prev + 1);
       } else {
         handleSubmit();
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -136,11 +152,17 @@ function StepByStepForm<TFieldValues extends FieldValues>({ methods, onSubmit, c
 
         <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
           {!isFirstStep && (
-            <Button onClick={handlePrevious} variant="outlined" startIcon={<ArrowBack />} sx={{ minWidth: pxToRem(100) }}>
+            <Button
+              onClick={handlePrevious}
+              variant="outlined"
+              startIcon={<ArrowBack />}
+              sx={{ minWidth: pxToRem(100) }}
+              disabled={isLoading}
+            >
               이전
             </Button>
           )}
-          <Button onClick={handleNext} variant="contained" fullWidth>
+          <Button onClick={handleNext} variant="contained" fullWidth loading={isLoading}>
             {!isLastStep ? '다음' : '완료'}
           </Button>
         </Box>

@@ -2,7 +2,7 @@
 
 import { PageViewContainer } from '@/components/PageViewContainer';
 import { StepByStepForm } from '@/components/StepByStepForm';
-import { CreateUserData } from '@/features/users';
+import { checkEmailExists, CreateUserData } from '@/features/users';
 import { getEmailValidateRule, getMinLengthRule, getReactHookFormComponents } from '@/react-hook-form';
 import { useForm } from 'react-hook-form';
 
@@ -23,6 +23,24 @@ function SignupView() {
     console.log('회원가입 데이터:', data);
   };
 
+  const handleEmailCheck = async () => {
+    const email = methods.getValues('email');
+
+    if (!email) return true;
+
+    const exists = await checkEmailExists(email);
+
+    if (exists) {
+      methods.setError('email', {
+        type: 'duplicate',
+        message: '이미 사용 중인 이메일입니다.',
+      });
+      return false;
+    }
+
+    return true;
+  };
+
   return (
     <PageViewContainer
       sx={{
@@ -31,7 +49,7 @@ function SignupView() {
       }}
     >
       <StepByStepForm methods={methods} onSubmit={handleSubmit}>
-        <StepByStepForm.Step description="이메일을 입력해주세요">
+        <StepByStepForm.Step description="이메일을 입력해주세요" onValidate={handleEmailCheck}>
           <TextField formName="email" label="이메일" type="email" required fullWidth autoFocus rules={getEmailValidateRule()} />
         </StepByStepForm.Step>
 
