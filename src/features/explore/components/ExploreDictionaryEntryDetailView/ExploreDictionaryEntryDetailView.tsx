@@ -12,15 +12,19 @@ function ExploreDictionaryEntryDetailView() {
     examples: Array.isArray(entry.examples) ? entry.examples : [entry.examples],
   };
 
-  if (language === 'ja') {
-    return <DictionaryJAEntryDetail entry={normalizedEntry as DictionaryEntryByLanguage['ja']} />;
-  }
+  const renderContent = () => {
+    if (language === 'ja') {
+      return <DictionaryJAEntryDetail entry={normalizedEntry as DictionaryEntryByLanguage['ja']} />;
+    }
 
-  if (language === 'ko') {
-    return <div>한국어 사전은 아직 지원하지 않습니다.</div>;
-  }
+    if (language === 'ko') {
+      return <div>한국어 사전은 아직 지원하지 않습니다.</div>;
+    }
 
-  return <div>지원하지 않는 언어입니다.</div>;
+    return <div>지원하지 않는 언어입니다.</div>;
+  };
+
+  return <>{renderContent()}</>;
 }
 
 export default ExploreDictionaryEntryDetailView;
