@@ -61,7 +61,7 @@ function StepFormProvider<TFieldValues extends FieldValues>({ onSubmit, steps, c
       if (currentStep < totalSteps - 1) {
         setCurrentStep((prev) => prev + 1);
       } else {
-        handleSubmit();
+        await handleSubmit();
       }
     } finally {
       setIsLoading(false);

@@ -12,7 +12,7 @@ import StepFormStep, { StepFormStepProps } from './StepFormStep';
 
 interface StepFormProps<TFieldValues extends FieldValues> {
   methods: UseFormReturn<TFieldValues>;
-  onSubmit: (data: TFieldValues) => void;
+  onSubmit: (data: TFieldValues) => void | Promise<void>;
   children: ReactElement<StepFormStepProps> | ReactElement<StepFormStepProps>[];
 }
 

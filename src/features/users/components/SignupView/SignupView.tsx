@@ -2,12 +2,15 @@
 
 import { PageViewContainer } from '@/components/PageViewContainer';
 import { StepForm } from '@/components/StepForm';
-import { checkEmailExists, CreateUserData } from '@/features/users';
+import { checkEmailExists, registerUser } from '@/features/users';
+import { SignupForm } from '@/features/users/components/SignupView/signup.types';
 import { getEmailValidateRule, getMinLengthRule, getReactHookFormComponents } from '@/react-hook-form';
+import { useTypedRouter } from '@/routes';
+import { enqueueClosableSnackbar } from '@/styles';
 import { useForm } from 'react-hook-form';
 
 function SignupView() {
-  const methods = useForm<CreateUserData>({
+  const methods = useForm<SignupForm>({
     defaultValues: {
       email: '',
       password: '',
@@ -16,11 +19,37 @@ function SignupView() {
     mode: 'onTouched',
   });
 
-  const { TextField, PasswordField } = getReactHookFormComponents<CreateUserData>();
+  const { TextField, PasswordField } = getReactHookFormComponents<SignupForm>();
 
-  const handleSubmit = (data: CreateUserData) => {
-    // TODO: 회원가입 로직 구현
-    console.log('회원가입 데이터:', data);
+  const router = useTypedRouter();
+
+  const handleSubmit = async (data: SignupForm) => {
+    try {
+      await registerUser(data);
+
+      enqueueClosableSnackbar({
+        message: '회원가입이 완료되었습니다.',
+        variant: 'success',
+      });
+
+      router.push('/login', {
+        searchParams: {
+          email: data.email,
+        },
+      });
+    } catch (e) {
+      if (e instanceof Error) {
+        enqueueClosableSnackbar({
+          message: e.message,
+          variant: 'error',
+        });
+      } else {
+        enqueueClosableSnackbar({
+          message: '회원가입에 실패했습니다. 잠시 후 다시 시도해주세요.',
+          variant: 'error',
+        });
+      }
+    }
   };
 
   const handleEmailCheck = async () => {
