@@ -1,13 +1,18 @@
 import { firebaseAdmin } from '@/data/server/firebaseAdmin.config';
-import { AuthError } from '@/errors';
+import { AuthError, ExpiredTokenError } from '@/errors';
 import { cookies } from 'next/headers';
 
-export const verifyAuth = async () => {
+export interface AuthData {
+  uid: string;
+  email: string | undefined;
+}
+
+export const verifyAuth = async (): Promise<AuthData> => {
   const cookieStore = await cookies();
   const idToken = cookieStore.get('idToken')?.value;
 
   if (!idToken) {
-    throw new AuthError('인증되지 않은 요청입니다. 로그인이 필요합니다.');
+    throw new ExpiredTokenError('토큰이 존재하지 않습니다.');
   }
 
   try {
@@ -17,12 +22,18 @@ export const verifyAuth = async () => {
       uid: decodedToken.uid,
       email: decodedToken.email,
     };
-  } catch {
+  } catch (err: unknown) {
+    const firebaseError = err as { code?: string };
+    if (firebaseError.code === 'auth/id-token-expired') {
+      throw new ExpiredTokenError('토큰이 만료되었습니다.');
+    } else if (firebaseError.code === 'auth/argument-error') {
+      throw new AuthError('유효하지 않은 토큰 형식입니다. 다시 로그인해주세요.');
+    }
     throw new AuthError('유효하지 않은 토큰입니다. 다시 로그인해주세요.');
   }
 };
 
 export const withAuth = async <T>(handler: (userId: string) => Promise<T>): Promise<T> => {
-  const { uid } = await verifyAuth();
-  return handler(uid);
+  const authData = await verifyAuth();
+  return handler(authData.uid);
 };

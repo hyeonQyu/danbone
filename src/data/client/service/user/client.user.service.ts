@@ -1,10 +1,9 @@
 'use client';
 
+import { deleteIdTokenCookie, setIdTokenCookie } from '@/auth';
 import { getClientServiceCreator } from '@/data/client/service/client.service.utils';
 import { UserClientService, UserClientServiceDependencies } from '@/data/client/service/user/client.user.service.types';
 import { InvalidValueError, NotFoundError } from '@/errors';
-import { TIME_UNIT } from '@/lib';
-import { deleteCookie, setCookie } from '@/lib/cookie.utils';
 import { AuthError, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 
 export const createUserClientService = getClientServiceCreator<UserClientService, UserClientServiceDependencies>(
@@ -26,12 +25,7 @@ export const createUserClientService = getClientServiceCreator<UserClientService
             expiresIn: idTokenResult.expirationTime,
           };
 
-          const expiresAt = new Date(idTokenResult.expirationTime).getTime();
-          const now = Date.now();
-          const maxAgeInSeconds = Math.floor((expiresAt - now) / TIME_UNIT.unitOfMs.asSecond);
-
-          setCookie('idToken', idToken, { maxAge: maxAgeInSeconds });
-          setCookie('refreshToken', userCredential.user.refreshToken, { maxAge: maxAgeInSeconds });
+          await setIdTokenCookie(userCredential.user);
 
           return result;
         } catch (error: unknown) {
@@ -54,8 +48,7 @@ export const createUserClientService = getClientServiceCreator<UserClientService
 
       logout: async () => {
         await signOut(auth);
-        deleteCookie('idToken');
-        deleteCookie('refreshToken');
+        deleteIdTokenCookie();
       },
 
       getCurrentUser: () => usersRepository.getCurrentUser(),

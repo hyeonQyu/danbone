@@ -1,5 +1,7 @@
+import { TokenRefresher } from '@/auth/TokenRefresher';
 import { LanguageProvider } from '@/language';
 import { ReactQueryClientProvider } from '@/react-query';
+import { AppRoutesProvider } from '@/routes';
 import ThemeProvider from '@/styles/ThemeProvider';
 import type { Metadata } from 'next';
 import { ReactNode } from 'react';
@@ -17,11 +19,15 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body>
-        <ThemeProvider>
-          <LanguageProvider>
-            <ReactQueryClientProvider>{children}</ReactQueryClientProvider>
-          </LanguageProvider>
-        </ThemeProvider>
+        <AppRoutesProvider>
+          <ThemeProvider>
+            <LanguageProvider>
+              <ReactQueryClientProvider>
+                <TokenRefresher>{children}</TokenRefresher>
+              </ReactQueryClientProvider>
+            </LanguageProvider>
+          </ThemeProvider>
+        </AppRoutesProvider>
       </body>
     </html>
   );
