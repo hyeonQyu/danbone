@@ -1134,28 +1134,28 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hyeonqyu/typed-router-core@npm:^1.0.5":
-  version: 1.0.5
-  resolution: "@hyeonqyu/typed-router-core@npm:1.0.5"
+"@hyeonqyu/typed-router-core@npm:^1.2.2":
+  version: 1.2.2
+  resolution: "@hyeonqyu/typed-router-core@npm:1.2.2"
   peerDependencies:
     react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
     zod: ^3.0.0
   peerDependenciesMeta:
     zod:
       optional: true
-  checksum: 10c0/55fbc8ce56b70cc0c19b1f7fd0c7fe842d716355bff96fd7d5b54f19a24da4d6372976422a0e4a9183857c46041418c0163816c92b84048339b19d6cccd51b3e
+  checksum: 10c0/3403911b8c8c3210f123b6a3489f0069adf7586897b54337f9f2bc08c7f760a59675ab68bc89fb55290d5f6c504e28cc19c29e986ba5fec36fc4af8492480905
   languageName: node
   linkType: hard
 
-"@hyeonqyu/typed-router-next@npm:^1.0.9":
-  version: 1.0.9
-  resolution: "@hyeonqyu/typed-router-next@npm:1.0.9"
+"@hyeonqyu/typed-router-next@npm:^1.2.2":
+  version: 1.2.2
+  resolution: "@hyeonqyu/typed-router-next@npm:1.2.2"
   dependencies:
-    "@hyeonqyu/typed-router-core": "npm:^1.0.5"
+    "@hyeonqyu/typed-router-core": "npm:^1.2.2"
   peerDependencies:
     next: ^13.0.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
     react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
-  checksum: 10c0/bc3a652eacdb9093c9e58fa04a15c83e7377cf0973d0801b89c62645e18ccd1d5c6b92184889e10b4988794b36061938ba14431e9387c466cac3a12a98f5221c
+  checksum: 10c0/6f12ce9a6056b34653ac7c09aff7406fee884a36032813fe5dc0f49cf79aab218237ce1b29af59260a1ebc1c5f5bca0d2591649f8fc68a17ac6d2adade8e196f
   languageName: node
   linkType: hard
 
@@ -3117,7 +3117,7 @@ __metadata:
   dependencies:
     "@emotion/react": "npm:^11.14.0"
     "@emotion/styled": "npm:^11.14.1"
-    "@hyeonqyu/typed-router-next": "npm:^1.0.9"
+    "@hyeonqyu/typed-router-next": "npm:^1.2.2"
     "@mui/icons-material": "npm:^7.3.6"
     "@mui/material": "npm:^7.3.6"
     "@openai/agents": "npm:^0.3.4"
@@ -3127,11 +3127,13 @@ __metadata:
     "@types/react": "npm:^19"
     "@types/react-dom": "npm:^19"
     babel-plugin-react-compiler: "npm:1.0.0"
+    es-toolkit: "npm:^1.43.0"
     eslint: "npm:^9"
     eslint-config-next: "npm:16.0.7"
     firebase: "npm:^12.6.0"
     firebase-admin: "npm:^13.6.0"
     framer-motion: "npm:^12.23.26"
+    jwt-decode: "npm:^4.0.0"
     next: "npm:16.0.7"
     notistack: "npm:^3.0.2"
     openai: "npm:^6.10.0"
@@ -3493,6 +3495,18 @@ __metadata:
     is-date-object: "npm:^1.0.5"
     is-symbol: "npm:^1.0.4"
   checksum: 10c0/c7e87467abb0b438639baa8139f701a06537d2b9bc758f23e8622c3b42fd0fdb5bde0f535686119e446dd9d5e4c0f238af4e14960f4771877cf818d023f6730b
+  languageName: node
+  linkType: hard
+
+"es-toolkit@npm:^1.43.0":
+  version: 1.43.0
+  resolution: "es-toolkit@npm:1.43.0"
+  dependenciesMeta:
+    "@trivago/prettier-plugin-sort-imports@4.3.0":
+      unplugged: true
+    prettier-plugin-sort-re-exports@0.0.1:
+      unplugged: true
+  checksum: 10c0/bbff0b591fd01be9f37a34dad7964b590e4952fc594c1230140771687f05136caa6ab21962a6e9cde7c4b529a149171ed5179d6379d4a8e656dbf7e8d126999c
   languageName: node
   linkType: hard
 
@@ -5082,6 +5096,13 @@ __metadata:
     jwa: "npm:^2.0.1"
     safe-buffer: "npm:^5.0.1"
   checksum: 10c0/6be1ed93023aef570ccc5ea8d162b065840f3ef12f0d1bb3114cade844de7a357d5dc558201d9a65101e70885a6fa56b17462f520e6b0d426195510618a154d0
+  languageName: node
+  linkType: hard
+
+"jwt-decode@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "jwt-decode@npm:4.0.0"
+  checksum: 10c0/de75bbf89220746c388cf6a7b71e56080437b77d2edb29bae1c2155048b02c6b8c59a3e5e8d6ccdfd54f0b8bda25226e491a4f1b55ac5f8da04cfbadec4e546c
   languageName: node
   linkType: hard
 

@@ -1,36 +1,12 @@
 'use client';
 
-import { DictionaryEntryWithLanguageSchema } from '@/features/dictionary/dictionary.types';
+import { appRoutes } from '@/routes/routes.config';
+import { RoutesContext } from '@/routes/routes.types';
 import { BaseMetadata, createAppRoutes } from '@hyeonqyu/typed-router-next';
-import z from 'zod';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const { AppRoutesProvider, TypedLink, useAppRoutes, useCurrentRouteNode, useTypedPathname, useTypedRouter, useTypedSearchParams, _types } =
-  createAppRoutes<BaseMetadata, null>()({
-    signup: {
-      _metadata: {},
-    },
-    login: {
-      _metadata: {
-        searchParamsSchema: z
-          .object({
-            email: z.string().email().optional(),
-          })
-          .optional(),
-      },
-    },
-    explore: {
-      _metadata: {},
-      search: {
-        _metadata: {},
-        detail: {
-          _metadata: {
-            searchParamsSchema: DictionaryEntryWithLanguageSchema,
-          },
-        },
-      },
-    },
-  });
+  createAppRoutes<BaseMetadata, RoutesContext>()(appRoutes);
 
 export { AppRoutesProvider, TypedLink, useAppRoutes, useCurrentRouteNode, useTypedPathname, useTypedRouter, useTypedSearchParams };
 

@@ -50,6 +50,7 @@ function LoginView() {
 
     try {
       await login(formData);
+      router.push('/');
     } catch (err) {
       setError(err instanceof Error ? err.message : '로그인에 실패했습니다.');
     } finally {

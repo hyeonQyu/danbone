@@ -1,8 +1,7 @@
 'use client';
 
-import { setIdTokenCookie } from '@/auth';
+import { syncTokenToCookie } from '@/auth/token.utils';
 import { ERROR_NAME } from '@/errors';
-import { getCurrentUser } from '@/features/users';
 import { useTypedRouter } from '@/routes';
 import { enqueueClosableSnackbar } from '@/styles';
 import { MutationCache, QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -12,13 +11,6 @@ import { ReactNode, useState } from 'react';
 export interface ReactQueryClientProviderProps {
   children: ReactNode | ReactNode[];
 }
-
-const syncTokenToCookie = async (): Promise<boolean> => {
-  const user = getCurrentUser();
-  if (!user) return false;
-  await setIdTokenCookie(user);
-  return true;
-};
 
 function ReactQueryClientProvider(props: ReactQueryClientProviderProps) {
   const { children } = props;
