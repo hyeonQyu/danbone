@@ -21,7 +21,7 @@ const runner = getRunner();
 
 const inputValidatorAgent = inputValidatorAgentFactory.createAgent('gpt-4.1-mini');
 const queryNormalizerAgent = queryNormalizerAgentFactory.createAgent('gpt-4.1-mini');
-const translatorAgent = translatorAgentFactory.createAgent('gpt-5-nano');
+const translatorAgent = translatorAgentFactory.createAgent('gpt-4o-mini');
 const jaMorphologicalAnalyzerAgent = jaMorphologicalAnalyzerAgentFactory.createAgent('gpt-5-mini');
 const jaDictionaryAgent = jaDictionaryAgentFactory.createAgent('gpt-5-nano');
 
@@ -69,20 +69,20 @@ export const searchJA: ExploreSearchHandler<DictionaryWordByLanguage['ja']> = as
     const inputValidatedResult = await validateQuery({ language: queryLanguage, text: query });
 
     if (!inputValidatedResult.finalOutput?.valid) {
-      throw new InvalidValueError('적절하지 않은 검색어입니다. 다시 입력해주세요.');
+      throw new InvalidValueError('적절하지 않은 검색어입니다.\n다시 입력해주세요.');
     }
 
     const queryNormalizedResult = await normalizeQuery({ language: queryLanguage, text: query });
     const normalizedQuery = queryNormalizedResult.finalOutput?.text;
 
     if (!normalizedQuery) {
-      throw new InvalidValueError('적절하지 않은 검색어입니다. 다시 입력해주세요.');
+      throw new InvalidValueError('적절하지 않은 검색어입니다.\n다시 입력해주세요.\n(정규화 실패)');
     }
 
     const translatedTexts = await getTranslatedTexts(normalizedQuery);
 
     if (!translatedTexts.length) {
-      throw new InvalidValueError('번역에 실패했습니다. 다시 입력해주세요.');
+      throw new InvalidValueError('번역에 실패했습니다.\n다시 입력해주세요.');
     }
 
     return translatedTexts;
@@ -93,14 +93,14 @@ export const searchJA: ExploreSearchHandler<DictionaryWordByLanguage['ja']> = as
     const tokens = morphologicalAnalysisResult.finalOutput?.tokens;
 
     if (!tokens?.length) {
-      throw new InvalidValueError('형태소 분석에 실패했습니다. 다시 입력해주세요.');
+      throw new InvalidValueError('형태소 분석에 실패했습니다.\n다시 입력해주세요.');
     }
 
     const dictionaryWords = await getDictionaryWordsJA({ sourceLanguage, words: tokens.map(({ base }) => base) });
     const words = dictionaryWords.finalOutput?.words;
 
     if (!words?.length) {
-      throw new InvalidValueError('사전 검색에 실패했습니다. 다시 입력해주세요.');
+      throw new InvalidValueError('사전 검색에 실패했습니다.\n다시 입력해주세요.');
     }
 
     return words;
