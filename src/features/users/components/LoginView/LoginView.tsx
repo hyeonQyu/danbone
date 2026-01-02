@@ -3,16 +3,19 @@
 import { Logo } from '@/components/Logo';
 import { login } from '@/features/users';
 import type { LoginData } from '@/features/users/users.types';
+import { TypedLink, useTypedRouter, useTypedSearchParams } from '@/routes';
 import { usePxToRem } from '@/styles';
 import { Alert, Box, Button, CircularProgress, TextField, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import Link from 'next/link';
-import { useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 
 function LoginView() {
+  const router = useTypedRouter();
+  const searchParams = useTypedSearchParams('/login');
+
   const { palette, spacing, typography, heights } = useTheme();
   const [formData, setFormData] = useState<LoginData>({
-    email: '',
+    email: searchParams?.email ?? '',
     password: '',
   });
   const [loading, setLoading] = useState(false);
@@ -20,7 +23,13 @@ function LoginView() {
 
   const pxToRem = usePxToRem();
 
-  const handleInputChange = (field: keyof LoginData) => (e: React.ChangeEvent<HTMLInputElement>) => {
+  useEffect(() => {
+    if (searchParams?.email) {
+      router.replace('/login');
+    }
+  }, [searchParams?.email, router]);
+
+  const handleInputChange = (field: keyof LoginData) => (e: ChangeEvent<HTMLInputElement>) => {
     setFormData((prev) => ({
       ...prev,
       [field]: e.target.value,
@@ -28,7 +37,7 @@ function LoginView() {
     if (error) setError(null);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     if (!formData.email || !formData.password) {
@@ -112,7 +121,7 @@ function LoginView() {
           계정이 없으신가요?
         </Typography>
 
-        <Link href="/register" passHref>
+        <TypedLink href="/signup" passHref>
           <Typography
             variant="body2"
             sx={{
@@ -127,7 +136,7 @@ function LoginView() {
           >
             회원가입
           </Typography>
-        </Link>
+        </TypedLink>
       </Box>
     </Box>
   );

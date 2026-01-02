@@ -1,10 +1,10 @@
+import { BackButton } from '@/components/BackButton';
 import { Loading } from '@/components/Loading';
+import { SlideInContainer } from '@/components/SlideInContainer';
 import { ExploreSearchInputField } from '@/features/explore/components/ExploreSearchInputField';
 import { Language } from '@/language';
 import { useTypedRouter } from '@/routes/routes';
-import { ArrowBack } from '@mui/icons-material';
-import { Box, IconButton, useTheme } from '@mui/material';
-import { motion } from 'framer-motion';
+import { Box, useTheme } from '@mui/material';
 import { ReactNode } from 'react';
 
 interface ExploreSearchViewTemplateProps {
@@ -22,28 +22,7 @@ function ExploreSearchViewTemplate({ queryLanguage, isSearching, query, onSearch
   const handleToExplore = () => router.push('/explore');
 
   return (
-    <Box
-      component={motion.div}
-      initial={{ x: '100%' }}
-      animate={{ x: 0 }}
-      transition={{
-        type: 'spring',
-        stiffness: 500,
-        damping: 30,
-      }}
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        width: '100%',
-        height: '100vh',
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        zIndex: 1000,
-        backgroundColor: palette.background.default,
-        transform: 'translateX(100%)',
-      }}
-    >
+    <SlideInContainer>
       <Box
         sx={{
           display: 'flex',
@@ -54,9 +33,7 @@ function ExploreSearchViewTemplate({ queryLanguage, isSearching, query, onSearch
           borderBottom: `1px solid ${palette.divider}`,
         }}
       >
-        <IconButton onClick={handleToExplore} sx={{ padding: spacing(1) }}>
-          <ArrowBack sx={{ color: palette.text.primary }} />
-        </IconButton>
+        <BackButton onBack={handleToExplore} />
 
         <Box sx={{ flex: 1 }}>
           <ExploreSearchInputField queryLanguage={queryLanguage} onSearch={onSearch} autoFocus blurOnSearch disabled={isSearching} />
@@ -72,7 +49,7 @@ function ExploreSearchViewTemplate({ queryLanguage, isSearching, query, onSearch
       >
         {isSearching ? <Loading messages={[`${query} 검색 중...`, '잠시만 기다려 주세요...', '처리 중입니다...']} /> : renderResults()}
       </Box>
-    </Box>
+    </SlideInContainer>
   );
 }
 

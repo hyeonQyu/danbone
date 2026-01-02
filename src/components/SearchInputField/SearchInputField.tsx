@@ -31,15 +31,15 @@ function SearchInputField({
   const { palette } = useTheme();
   const pxToRem = usePxToRem();
 
-  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.nativeEvent.isComposing) return;
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.nativeEvent.isComposing) return;
 
-    if (event.key === 'Enter') {
-      const target = event.target as HTMLInputElement;
+    if (e.key === 'Enter') {
+      const target = e.target as HTMLInputElement;
       onSearch?.(target.value);
 
       if (blurOnSearch) {
-        event.currentTarget.blur();
+        e.currentTarget.blur();
       }
     }
   };

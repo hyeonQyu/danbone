@@ -1,3 +1,4 @@
+import { Language } from '@/language';
 import z from 'zod';
 
 export const PartOfSpeechSchemaByLanguage = {
@@ -40,3 +41,27 @@ export type PartOfSpeechByLanguage = {
 export type DictionaryEntryByLanguage = {
   [K in keyof typeof DictionaryEntrySchemaByLanguage]: z.infer<(typeof DictionaryEntrySchemaByLanguage)[K]>;
 };
+
+export type DictionaryEntryWithLanguage = {
+  [K in keyof typeof DictionaryEntrySchemaByLanguage]: {
+    language: K;
+  } & z.infer<(typeof DictionaryEntrySchemaByLanguage)[K]>;
+}[keyof typeof DictionaryEntrySchemaByLanguage];
+
+export type DictionaryEntryWithLanguageByLanguage<L extends keyof typeof DictionaryEntrySchemaByLanguage> = {
+  language: L;
+} & z.infer<(typeof DictionaryEntrySchemaByLanguage)[L]>;
+
+export const DictionaryEntryWithLanguageSchema = z.custom<DictionaryEntryWithLanguage>((data) => {
+  if (!data || typeof data !== 'object') return false;
+  const { language, ...entry } = data as DictionaryEntryWithLanguageByLanguage<Language>;
+
+  if (!(language in DictionaryEntrySchemaByLanguage)) return false;
+
+  try {
+    DictionaryEntrySchemaByLanguage[language as keyof typeof DictionaryEntrySchemaByLanguage].parse(entry);
+    return true;
+  } catch {
+    return false;
+  }
+});

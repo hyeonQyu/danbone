@@ -21,5 +21,10 @@ export const createUserServerService = getServerServiceCreator<UserServerService
 
       return user;
     },
+
+    checkEmailExists: async (email) => {
+      const user = await usersRepository.getUserByEmail(email);
+      return user !== null;
+    },
   };
 });

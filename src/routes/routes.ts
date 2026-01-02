@@ -1,22 +1,38 @@
+'use client';
+
+import { DictionaryEntryWithLanguageSchema } from '@/features/dictionary/dictionary.types';
 import { BaseMetadata, createAppRoutes } from '@hyeonqyu/typed-router-next';
+import z from 'zod';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const { AppRoutesProvider, TypedLink, useAppRoutes, useCurrentRouteNode, useTypedPathname, useTypedRouter, _types } = createAppRoutes<
-  BaseMetadata,
-  null
->()({
-  login: {
-    _metadata: {},
-  },
-  explore: {
-    _metadata: {},
-    search: {
+const { AppRoutesProvider, TypedLink, useAppRoutes, useCurrentRouteNode, useTypedPathname, useTypedRouter, useTypedSearchParams, _types } =
+  createAppRoutes<BaseMetadata, null>()({
+    signup: {
       _metadata: {},
     },
-  },
-});
+    login: {
+      _metadata: {
+        searchParamsSchema: z
+          .object({
+            email: z.string().email().optional(),
+          })
+          .optional(),
+      },
+    },
+    explore: {
+      _metadata: {},
+      search: {
+        _metadata: {},
+        detail: {
+          _metadata: {
+            searchParamsSchema: DictionaryEntryWithLanguageSchema,
+          },
+        },
+      },
+    },
+  });
 
-export { AppRoutesProvider, TypedLink, useAppRoutes, useCurrentRouteNode, useTypedPathname, useTypedRouter };
+export { AppRoutesProvider, TypedLink, useAppRoutes, useCurrentRouteNode, useTypedPathname, useTypedRouter, useTypedSearchParams };
 
 export type AppRoutesMetadata = typeof _types.AppRoutesMetadata;
 export type AppRoutesContext = typeof _types.AppRoutesContext;
