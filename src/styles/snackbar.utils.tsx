@@ -1,3 +1,5 @@
+'use client';
+
 import { TIME_UNIT } from '@/lib';
 import { Close } from '@mui/icons-material';
 import { closeSnackbar, enqueueSnackbar, OptionsWithExtraProps, SnackbarKey, SnackbarMessage, VariantType } from 'notistack';

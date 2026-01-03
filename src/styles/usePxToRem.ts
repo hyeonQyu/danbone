@@ -1,3 +1,5 @@
+'use client';
+
 import { useCallback, useState } from 'react';
 
 const DEFAULT_BASE_FONT_SIZE = 16;

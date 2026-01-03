@@ -3115,6 +3115,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "danbone@workspace:."
   dependencies:
+    "@emotion/cache": "npm:^11.14.0"
     "@emotion/react": "npm:^11.14.0"
     "@emotion/styled": "npm:^11.14.1"
     "@hyeonqyu/typed-router-next": "npm:^1.3.0"

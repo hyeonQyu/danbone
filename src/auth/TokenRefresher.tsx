@@ -4,7 +4,7 @@ import { firebase } from '@/data/client/firebase';
 import { ReactNode, useEffect, useEffectEvent, useRef } from 'react';
 import { deleteIdTokenCookie, setIdTokenCookie } from './token.utils';
 
-export const TokenRefresher = ({ children }: { children: ReactNode }) => {
+function TokenRefresher({ children }: { children: ReactNode }) {
   const unsubscribeRef = useRef<(() => void) | null>(null);
 
   const initTokenRefresh = useEffectEvent(() => {
@@ -37,4 +37,6 @@ export const TokenRefresher = ({ children }: { children: ReactNode }) => {
   }, []);
 
   return <>{children}</>;
-};
+}
+
+export default TokenRefresher;

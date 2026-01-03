@@ -1,2 +1,2 @@
 export * from './token.utils';
-export { TokenRefresher as TokenRefreshProvider } from './TokenRefresher';
+export { default as TokenRefresher } from './TokenRefresher';
