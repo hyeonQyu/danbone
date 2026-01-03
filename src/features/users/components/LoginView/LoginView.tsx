@@ -3,31 +3,29 @@
 import { Logo } from '@/components/Logo';
 import { login } from '@/features/users';
 import type { LoginData } from '@/features/users/users.types';
-import { TypedLink, useTypedRouter, useTypedSearchParams } from '@/routes';
+import { TypedLink, useRedirect } from '@/routes';
 import { usePxToRem } from '@/styles';
 import { Alert, Box, Button, CircularProgress, TextField, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+import { ChangeEvent, FormEvent, useState } from 'react';
 
-function LoginView() {
-  const router = useTypedRouter();
-  const searchParams = useTypedSearchParams('/login');
+interface LoginViewProps {
+  defaultEmail?: string;
+  redirectTo?: string;
+}
+
+function LoginView({ defaultEmail, redirectTo }: LoginViewProps) {
+  const redirectAfterLogin = useRedirect(redirectTo);
 
   const { palette, spacing, typography, heights } = useTheme();
   const [formData, setFormData] = useState<LoginData>({
-    email: searchParams?.email ?? '',
+    email: defaultEmail ?? '',
     password: '',
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const pxToRem = usePxToRem();
-
-  useEffect(() => {
-    if (searchParams?.email) {
-      router.replace('/login');
-    }
-  }, [searchParams?.email, router]);
 
   const handleInputChange = (field: keyof LoginData) => (e: ChangeEvent<HTMLInputElement>) => {
     setFormData((prev) => ({
@@ -50,7 +48,7 @@ function LoginView() {
 
     try {
       await login(formData);
-      router.push('/');
+      redirectAfterLogin();
     } catch (err) {
       setError(err instanceof Error ? err.message : '로그인에 실패했습니다.');
     } finally {

@@ -12,3 +12,5 @@ export type RoutesContext = {
 export const RedirectSearchParamsSchema = z.object({
   redirect: z.string().optional(),
 });
+
+export type RedirectSearchParams = z.infer<typeof RedirectSearchParamsSchema>;
