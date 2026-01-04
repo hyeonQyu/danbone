@@ -1,7 +1,5 @@
-import { LANGUAGES } from '@/language';
+import { LanguageSchema } from '@/language';
 import z from 'zod';
-
-export const LanguageSchema = z.enum(LANGUAGES);
 
 export const LocalizedTextSchema = z.object({
   language: LanguageSchema,

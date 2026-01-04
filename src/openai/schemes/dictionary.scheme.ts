@@ -1,5 +1,5 @@
 import { DictionaryEntrySchemaByLanguage } from '@/features/dictionary';
-import { LanguageSchema } from '@/openai/schemes';
+import { LanguageSchema } from '@/language';
 import z from 'zod';
 
 export const DictionaryInputSchema = z.object({
