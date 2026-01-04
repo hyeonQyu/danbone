@@ -1,4 +1,5 @@
 import { TokenRefresher } from '@/auth';
+import { IndexedDBProvider } from '@/indexed-db';
 import { LanguageProvider } from '@/language';
 import { ReactQueryClientProvider } from '@/react-query';
 import { AppRoutesProvider } from '@/routes';
@@ -24,7 +25,9 @@ export default function RootLayout({
             <ThemeProvider>
               <LanguageProvider>
                 <ReactQueryClientProvider>
-                  <TokenRefresher>{children}</TokenRefresher>
+                  <IndexedDBProvider>
+                    <TokenRefresher>{children}</TokenRefresher>
+                  </IndexedDBProvider>
                 </ReactQueryClientProvider>
               </LanguageProvider>
             </ThemeProvider>
