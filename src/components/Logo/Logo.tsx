@@ -1,20 +1,14 @@
-import { Typography, useTheme } from '@mui/material';
+import { RESOURCES } from '@public';
+import Image from 'next/image';
 
-function Logo() {
-  const theme = useTheme();
+interface LogoProps {
+  width?: number;
+}
 
-  return (
-    <Typography
-      variant="h3"
-      sx={{
-        textAlign: 'center',
-        color: theme.palette.text.primary,
-        marginBottom: theme.spacing(2),
-      }}
-    >
-      단번에
-    </Typography>
-  );
+function Logo({ width = 100 }: LogoProps) {
+  const aspectRatio = 274 / 460;
+  const height = Math.round(width * aspectRatio);
+  return <Image src={RESOURCES.images.logo} alt="Logo" width={width} height={height} />;
 }
 
 export default Logo;
