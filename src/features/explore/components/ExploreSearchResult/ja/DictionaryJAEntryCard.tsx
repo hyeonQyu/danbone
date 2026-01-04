@@ -19,7 +19,6 @@ function DictionaryJAEntryCard({ entry }: DictionaryJAEntryCardProps) {
   const getPartOfSpeechLabel = useGetJAPartOfSpeechLabel();
 
   const handleClick = () => {
-    console.log(entry);
     router.push('/explore/search/detail', {
       searchParams: {
         language: 'ja',
