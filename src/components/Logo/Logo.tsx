@@ -5,9 +5,10 @@ interface LogoProps {
   width?: number;
 }
 
+const ASPECT_RATIO = 373 / 461;
+
 function Logo({ width = 100 }: LogoProps) {
-  const aspectRatio = 274 / 460;
-  const height = Math.round(width * aspectRatio);
+  const height = Math.round(width * ASPECT_RATIO);
   return <Image src={RESOURCES.images.logo} alt="Logo" width={width} height={height} />;
 }
 
