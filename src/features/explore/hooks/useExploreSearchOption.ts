@@ -1,5 +1,5 @@
-import { useExploreQueryLanguage } from '@/features/explore/hooks/useExploreQueryLanguage';
-import { useExploreStore } from '@/features/explore/stores/explore.store';
+import { useExploreQueryLanguage } from '@/features/explore/hooks';
+import { useExploreStore } from '@/features/explore/stores';
 import { ExploreSearchOption } from '@/features/explore/types';
 import { useSourceLanguage } from '@/language';
 

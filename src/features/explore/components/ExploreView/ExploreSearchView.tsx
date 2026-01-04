@@ -3,8 +3,7 @@
 import ExploreSearchErrorResult from '@/features/explore/components/ExploreSearchErrorResult/ExploreSearchErrorResult';
 import { ExploreSearchJAResults } from '@/features/explore/components/ExploreSearchResult';
 import { ExploreSearchViewTemplate } from '@/features/explore/components/ExploreSearchViewTemplate';
-import { useQueryExploreSearch } from '@/features/explore/hooks';
-import { useExploreQueryLanguage } from '@/features/explore/hooks/useExploreQueryLanguage';
+import { useExploreQueryLanguage, useQueryExploreSearch } from '@/features/explore/hooks';
 import { useExploreStore } from '@/features/explore/stores';
 
 function ExploreSearchView() {
