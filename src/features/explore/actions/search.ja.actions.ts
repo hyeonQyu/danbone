@@ -66,7 +66,8 @@ const _searchJA: ExploreSearchHandler<DictionaryWordByLanguage['ja']> = async ({
       targetLanguage: TARGET_LANGUAGE,
       text: normalizedQuery,
     });
-    return devLogTap(translatedTextsResult.finalOutput?.texts, 'translatedTexts') ?? [];
+
+    return devLogTap(translatedTextsResult.finalOutput?.texts, '번역된 문자열') ?? [];
   };
 
   const getNormalizedJATexts = async () => {
@@ -81,7 +82,7 @@ const _searchJA: ExploreSearchHandler<DictionaryWordByLanguage['ja']> = async ({
     }
 
     const queryNormalizedResult = await normalizeQuery({ language: queryLanguage, text: query });
-    const normalizedQuery = devLogTap(queryNormalizedResult.finalOutput?.text, 'normalizedQuery');
+    const normalizedQuery = devLogTap(queryNormalizedResult.finalOutput?.text, '정규화된 검색어');
 
     if (!normalizedQuery) {
       throw new InvalidValueError('적절하지 않은 검색어입니다.\n다시 입력해주세요.\n(정규화 실패)');
@@ -98,7 +99,7 @@ const _searchJA: ExploreSearchHandler<DictionaryWordByLanguage['ja']> = async ({
 
   const getDictionaryWords = async (normalizedJAText: string) => {
     const morphologicalAnalysisResult = await morphologicalAnalysisJA(normalizedJAText);
-    const tokens = morphologicalAnalysisResult.finalOutput?.tokens;
+    const tokens = devLogTap(morphologicalAnalysisResult.finalOutput?.tokens, '형태소 분리된 토큰');
 
     if (!tokens?.length) {
       throw new InvalidValueError('형태소 분석에 실패했습니다.\n다시 입력해주세요.');
@@ -114,7 +115,7 @@ const _searchJA: ExploreSearchHandler<DictionaryWordByLanguage['ja']> = async ({
     return words;
   };
 
-  const normalizedJATexts = devLogTap(await getNormalizedJATexts(), 'normalizedJATexts');
+  const normalizedJATexts = devLogTap(await getNormalizedJATexts(), '정규화된 일본어 문자열');
 
   const results = await Promise.allSettled(
     normalizedJATexts.map(async (text) => {
