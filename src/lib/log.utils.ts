@@ -1,5 +1,4 @@
-import { getEnv } from '@/lib/env.utils';
-import { tap } from '@/lib/function.utils';
+import { getEnv, tap } from '@/lib';
 
 export const devLog = (...params: unknown[]) => {
   if (getEnv() === 'production') return;
