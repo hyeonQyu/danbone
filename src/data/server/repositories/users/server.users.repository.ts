@@ -1,9 +1,9 @@
-import { getFirebaseRepositoryCreator } from '@/data/repositories/repository.utils';
-import { UsersRepository } from '@/data/repositories/users/users.repository.types';
-import { UserEntity } from '@/features/users/users.types';
+import { getFirebaseServerRepositoryCreator } from '@/data/server/repositories/server.repository.utils';
+import { UsersServerRepository } from '@/data/server/repositories/users/server.users.repository.types';
+import { UserEntity } from '@/features/users';
 import { Timestamp } from 'firebase-admin/firestore';
 
-export const userRepository = getFirebaseRepositoryCreator('users')<UsersRepository>(({ db, auth, collectionName }) => {
+export const usersServerRepository = getFirebaseServerRepositoryCreator('users')<UsersServerRepository>(({ db, auth, collectionName }) => {
   return {
     createUser: async ({ email, name, password }) => {
       const userRecord = await auth.createUser({
