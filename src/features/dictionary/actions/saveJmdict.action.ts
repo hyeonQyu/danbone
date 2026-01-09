@@ -3,18 +3,33 @@
 import { jmdictServiceServer } from '@/data/server/server.container';
 import { JmdictEntry, JmdictEntrySchema } from '@/features/dictionary/jmdict.types';
 
-export const saveNextJmdictBatch = async (jsonData: unknown, batchSize: number) => {
+export const getJmdictProgress = async () => {
   try {
-    if (!Array.isArray(jsonData)) {
-      throw new Error('JSON 데이터는 배열이어야 합니다.');
+    const storedCount = await jmdictServiceServer.getStoredCount();
+
+    return {
+      success: true,
+      data: { startIndex: storedCount },
+    };
+  } catch (error) {
+    console.error('❌ JMdict 진행 상태 조회 실패:', error);
+
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : '진행 상태 조회 실패',
+    };
+  }
+};
+
+export const saveJmdictBatch = async (batch: JmdictEntry[]) => {
+  try {
+    if (!Array.isArray(batch) || batch.length === 0) {
+      throw new Error('배치가 비어있습니다.');
     }
 
-    const sampleEntry = jsonData[0];
-    JmdictEntrySchema.parse(sampleEntry);
+    JmdictEntrySchema.parse(batch[0]);
 
-    const entries = jsonData as JmdictEntry[];
-
-    const result = await jmdictServiceServer.saveNextBatch(entries, batchSize);
+    const result = await jmdictServiceServer.saveEntries(batch);
 
     return {
       success: true,

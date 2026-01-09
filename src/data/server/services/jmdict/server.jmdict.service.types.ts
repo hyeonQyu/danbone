@@ -3,16 +3,12 @@ import { JmdictSearchIndexesRepository } from '@/data/server/repositories/jmdict
 import { JmdictEntry } from '@/features/dictionary/jmdict.types';
 
 export interface JmdictServerService {
-  saveNextBatch: (
-    allEntries: JmdictEntry[],
-    batchSize: number,
-  ) => Promise<{
+  saveEntries: (batch: JmdictEntry[]) => Promise<{
     savedEntries: number;
     savedIndexes: number;
-    totalStored: number;
-    isComplete: boolean;
     duration: number;
   }>;
+  getStoredCount: () => Promise<number>;
 }
 
 export interface JmdictServerServiceDependencies {

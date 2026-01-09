@@ -1,10 +1,10 @@
 'use client';
 
-import { saveNextJmdictBatch } from '@/features/dictionary/actions';
+import { getJmdictProgress, saveJmdictBatch } from '@/features/dictionary/actions';
 import { JmdictEntry } from '@/features/dictionary/jmdict.types';
 import { useState } from 'react';
 
-const ENTRIES_BATCH_SIZE = 2;
+const ENTRIES_BATCH_SIZE = 1000;
 
 export default function JmdictSavePage() {
   const [jsonData, setJsonData] = useState<JmdictEntry[] | null>(null);
@@ -57,13 +57,45 @@ export default function JmdictSavePage() {
     setError(null);
 
     try {
-      const response = await saveNextJmdictBatch(jsonData, ENTRIES_BATCH_SIZE);
+      // 1. 서버로부터 현재 진행 상태 가져오기
+      const progressResponse = await getJmdictProgress();
+      if (!progressResponse.success || !progressResponse.data) {
+        throw new Error('진행 상태 조회 실패');
+      }
+
+      const { startIndex } = progressResponse.data;
+
+      // 완료 확인
+      if (startIndex >= jsonData.length) {
+        setResult({
+          savedEntries: 0,
+          savedIndexes: 0,
+          totalStored: startIndex,
+          isComplete: true,
+          duration: 0,
+        });
+        return;
+      }
+
+      // 2. 필요한 배치만 슬라이스
+      const batch = jsonData.slice(startIndex, startIndex + ENTRIES_BATCH_SIZE);
+
+      // 3. 작은 배치만 서버로 전송
+      const response = await saveJmdictBatch(batch);
 
       if (!response.success || !response.data) {
         throw new Error(response.error || '저장 실패');
       }
 
-      setResult(response.data);
+      // 4. 결과 업데이트 (클라이언트가 totalStored 계산)
+      const totalStored = startIndex + response.data.savedEntries;
+      setResult({
+        savedEntries: response.data.savedEntries,
+        savedIndexes: response.data.savedIndexes,
+        totalStored,
+        isComplete: totalStored >= jsonData.length,
+        duration: response.data.duration,
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : '저장 중 오류 발생');
     } finally {

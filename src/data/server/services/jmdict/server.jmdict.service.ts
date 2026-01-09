@@ -40,60 +40,54 @@ export const createJmdictServerService = getServerServiceCreator<JmdictServerSer
       return { savedEntries, savedIndexes };
     };
 
-    const saveNextBatch = async (allEntries: JmdictEntry[], batchSize: number) => {
+    const flattenNestedArrays = <T>(value: T[]): T[] => {
+      return value.map((item) => {
+        if (Array.isArray(item)) {
+          return item.join(',') as T;
+        }
+        return item;
+      });
+    };
+
+    const validateAndConvertBatch = (batch: JmdictEntry[]): JmdictEntity[] => {
+      const validatedBatch = batch.map((entry) => JmdictEntrySchema.parse(entry));
+      const now = Timestamp.now().toDate();
+
+      return validatedBatch.map((entry) => ({
+        ...entry,
+        sense: entry.sense.map((s) => ({
+          ...s,
+          related: flattenNestedArrays(s.related),
+          antonym: flattenNestedArrays(s.antonym),
+          languageSource: flattenNestedArrays(s.languageSource),
+        })),
+        createdAt: now,
+        updatedAt: now,
+      }));
+    };
+
+    const saveEntries = async (batch: JmdictEntry[]) => {
       const startTime = Date.now();
 
-      const checkCompletedAllEntries = (storedCount: number): boolean => {
-        return storedCount >= allEntries.length;
-      };
-
-      const extractNextBatch = (storedCount: number): JmdictEntry[] => {
-        return allEntries.slice(storedCount, storedCount + batchSize);
-      };
-
-      const validateAndConvertBatch = (batch: JmdictEntry[]): JmdictEntity[] => {
-        const validatedBatch = batch.map((entry) => JmdictEntrySchema.parse(entry));
-        const now = Timestamp.now().toDate();
-
-        return validatedBatch.map((entry) => ({
-          ...entry,
-          createdAt: now,
-          updatedAt: now,
-        }));
-      };
-
-      const buildResult = (savedEntries: number, savedIndexes: number, storedCount: number) => {
-        const totalStored = storedCount + savedEntries;
-        const isComplete = totalStored >= allEntries.length;
-        const duration = Date.now() - startTime;
-
-        devLog(`✅ JMdict 저장 완료: ${savedEntries} entries, ${savedIndexes} indexes (${duration}ms)`);
-        devLog(`📊 진행률: ${totalStored} / ${allEntries.length} (${Math.round((totalStored / allEntries.length) * 100)}%)`);
-
-        return {
-          savedEntries,
-          savedIndexes,
-          totalStored,
-          isComplete,
-          duration,
-        };
-      };
-
-      const storedCount = await jmdictEntriesRepository.getStoredCount();
-
-      if (checkCompletedAllEntries(storedCount)) {
-        return buildResult(0, 0, storedCount);
-      }
-
-      const nextBatch = extractNextBatch(storedCount);
-      const entities = validateAndConvertBatch(nextBatch);
+      const entities = validateAndConvertBatch(batch);
       const { savedEntries, savedIndexes } = await processEntitiesWithBatchCommit(entities);
+      const duration = Date.now() - startTime;
+      devLog(`✅ JMdict 저장 완료: ${savedEntries} entries, ${savedIndexes} indexes (${duration}ms)`);
 
-      return buildResult(savedEntries, savedIndexes, storedCount);
+      return {
+        savedEntries,
+        savedIndexes,
+        duration,
+      };
+    };
+
+    const getStoredCount = async () => {
+      return await jmdictEntriesRepository.getStoredCount();
     };
 
     return {
-      saveNextBatch,
+      saveEntries,
+      getStoredCount,
     };
   },
 );
