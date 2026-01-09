@@ -39,3 +39,7 @@ const db = getFirestore(app);
 const storage = getStorage(app);
 
 export const firebaseAdmin = { auth, db, storage };
+
+export const FIRESTORE_LIMITS = {
+  batchOperation: 500,
+} as const;

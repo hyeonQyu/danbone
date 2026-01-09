@@ -11,7 +11,7 @@ function MetadataTitle() {
   const currentRouteNode = useCurrentRouteNode();
 
   const title = useMemo(() => {
-    return currentRouteNode._metadata.title?.({
+    return currentRouteNode?._metadata.title?.({
       client: {
         targetLanguage,
         searchParams,
