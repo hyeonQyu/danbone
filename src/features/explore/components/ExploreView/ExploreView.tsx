@@ -2,10 +2,8 @@
 
 import { ExploreSearchInputField } from '@/features/explore/components/ExploreSearchInputField';
 import { useExploreQueryLanguage } from '@/features/explore/hooks';
-import { useGetLanguageLabel } from '@/language';
-import { Language } from '@/language/language.types';
-import { useSourceLanguage, useTargetLanguage } from '@/language/LanguageContext';
-import { useTypedRouter } from '@/routes/routes';
+import { getLanguageLabel, Language, useSourceLanguage, useTargetLanguage } from '@/language';
+import { useTypedRouter } from '@/routes';
 import { usePxToRem } from '@/styles';
 import { Box, FormControl, MenuItem, Select, SelectChangeEvent, Typography, useTheme } from '@mui/material';
 import { motion } from 'framer-motion';
@@ -13,7 +11,6 @@ import { motion } from 'framer-motion';
 function ExploreView() {
   const sourceLanguage = useSourceLanguage();
   const targetLanguage = useTargetLanguage();
-  const getLanguageLabel = useGetLanguageLabel();
 
   const { palette, spacing, shadows } = useTheme();
   const pxToRem = usePxToRem();

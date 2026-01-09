@@ -1,5 +1,6 @@
-import { LANGUAGES } from '@/language/language.constants';
 import z from 'zod';
+
+export const LANGUAGES = ['ko', 'ja'] as const;
 
 export const LanguageSchema = z.enum(LANGUAGES);
 

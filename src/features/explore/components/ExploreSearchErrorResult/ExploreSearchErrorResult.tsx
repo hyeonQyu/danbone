@@ -20,7 +20,7 @@ function ExploreSearchErrorResult({ error }: ExploreSearchErrorResultProps) {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        p: spacing(6),
+        p: `${spacing(6)} ${spacing(2)}`,
         minHeight: pxToRem(300),
       }}
     >

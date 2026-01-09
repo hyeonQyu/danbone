@@ -1,8 +1,7 @@
 import { COOKIE } from '@/lib';
-import { AppRoutesPathname } from '@/routes';
+import { AppRoutesMetadata, AppRoutesPathname, MinimalUser, RoutesContext } from '@/routes';
 import { appRoutes } from '@/routes/routes.config';
-import { MinimalUser } from '@/routes/routes.types';
-import { getSafely } from '@hyeonqyu/typed-router-next';
+import { getSafely, RouteNode } from '@hyeonqyu/typed-router-next';
 import { jwtDecode } from 'jwt-decode';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -11,20 +10,13 @@ type FirebaseTokenPayload = {
   email?: string;
 };
 
-type RouteWithMetadata = {
-  _metadata: {
-    accessible?: (context: { user: MinimalUser | null }) => boolean;
-    [key: string]: unknown;
-  };
-};
-
-const hasMetadata = (route: unknown): route is RouteWithMetadata => {
+const hasMetadata = (route: unknown): route is RouteNode<AppRoutesMetadata, RoutesContext> => {
   return Boolean(route && typeof route === 'object' && '_metadata' in route);
 };
 
 const hasAccessibleFunction = (
-  metadata: RouteWithMetadata['_metadata'],
-): metadata is RouteWithMetadata['_metadata'] & {
+  metadata: AppRoutesMetadata,
+): metadata is AppRoutesMetadata & {
   accessible: (context: { user: MinimalUser | null }) => boolean;
 } => {
   return Boolean(metadata && 'accessible' in metadata && typeof metadata.accessible === 'function');
@@ -69,7 +61,7 @@ export function proxy(request: NextRequest) {
   const idToken = request.cookies.get(COOKIE.idToken)?.value;
   const user = getUserFromToken(idToken);
 
-  const context = { user };
+  const context: RoutesContext = { server: { user } };
   const isAccessible = metadata.accessible(context);
 
   if (!isAccessible) {

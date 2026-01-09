@@ -1,3 +1,5 @@
+import { TargetLanguage } from '@/language';
+import { SearchParams } from '@hyeonqyu/typed-router-next';
 import z from 'zod';
 
 export type MinimalUser = {
@@ -5,8 +7,18 @@ export type MinimalUser = {
   email?: string;
 };
 
-export type RoutesContext = {
+export type RoutesServerContext = {
   user: MinimalUser | null;
+};
+
+export type RoutesClientContext = {
+  targetLanguage: TargetLanguage;
+  searchParams?: SearchParams;
+};
+
+export type RoutesContext = {
+  server?: RoutesServerContext;
+  client?: RoutesClientContext;
 };
 
 export const RedirectSearchParamsSchema = z.object({

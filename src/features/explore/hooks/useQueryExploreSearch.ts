@@ -1,8 +1,7 @@
 import { useExploreSearchOption } from '@/features/explore/hooks/useExploreSearchOption';
 import { useQueryExploreSearchJA } from '@/features/explore/hooks/useQueryExploreSearchJA';
 import { useExploreStore } from '@/features/explore/stores';
-import { useTargetLanguage } from '@/language';
-import { Language } from '@/language/language.types';
+import { Language, useTargetLanguage } from '@/language';
 import { useEffect } from 'react';
 
 export const useQueryExploreSearch = () => {
