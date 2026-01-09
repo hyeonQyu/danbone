@@ -4,6 +4,8 @@ import { saveNextJmdictBatch } from '@/features/dictionary/actions';
 import { JmdictEntry } from '@/features/dictionary/jmdict.types';
 import { useState } from 'react';
 
+const ENTRIES_BATCH_SIZE = 2;
+
 export default function JmdictSavePage() {
   const [jsonData, setJsonData] = useState<JmdictEntry[] | null>(null);
   const [loading, setLoading] = useState(false);
@@ -24,10 +26,16 @@ export default function JmdictSavePage() {
     try {
       setError(null);
       const text = await file.text();
-      const data = JSON.parse(text);
+      const parsed = JSON.parse(text);
 
-      if (!Array.isArray(data)) {
-        throw new Error('JSON 파일은 배열 형식이어야 합니다.');
+      // 배열이면 그대로 사용, 객체면 words 속성 추출
+      let data: JmdictEntry[];
+      if (Array.isArray(parsed)) {
+        data = parsed;
+      } else if (parsed && typeof parsed === 'object' && Array.isArray(parsed.words)) {
+        data = parsed.words;
+      } else {
+        throw new Error('JSON 파일은 배열이거나 { words: [...] } 형식이어야 합니다.');
       }
 
       setJsonData(data);
@@ -49,7 +57,7 @@ export default function JmdictSavePage() {
     setError(null);
 
     try {
-      const response = await saveNextJmdictBatch(jsonData);
+      const response = await saveNextJmdictBatch(jsonData, ENTRIES_BATCH_SIZE);
 
       if (!response.success || !response.data) {
         throw new Error(response.error || '저장 실패');
@@ -156,7 +164,7 @@ export default function JmdictSavePage() {
       >
         <h2 style={{ marginTop: 0 }}>2. 저장</h2>
         <div style={{ marginBottom: '1rem', fontSize: '0.9rem', color: '#666' }}>
-          <p>💡 한 번 클릭 시 자동으로 다음 4,000개 entries 저장</p>
+          <p>💡 한 번 클릭 시 자동으로 다음 {ENTRIES_BATCH_SIZE}개 entries 저장</p>
           <p>⚠️ 무료 플랜 제한: 하루 20,000 writes (권장: 4,000 entries/일)</p>
           <p>📅 예상 소요일: 5일</p>
         </div>
@@ -175,7 +183,7 @@ export default function JmdictSavePage() {
             width: '100%',
           }}
         >
-          {loading ? '저장 중...' : result?.isComplete ? '저장 완료' : '저장 (다음 4,000개)'}
+          {loading ? '저장 중...' : result?.isComplete ? '저장 완료' : `저장 (다음 ${ENTRIES_BATCH_SIZE}개)`}
         </button>
       </div>
 

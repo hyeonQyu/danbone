@@ -9,7 +9,7 @@ import { ZodTypeAny } from 'zod';
 export const useSearchParamsObject = (): Record<string, string> => {
   const currentRouteNode = useCurrentRouteNode();
   const searchParams = useSearchParams();
-  const searchParamsSchema = currentRouteNode._metadata.searchParamsSchema;
+  const searchParamsSchema = currentRouteNode?._metadata?.searchParamsSchema;
 
   return useMemo(() => {
     const rawObject = convertIterableToObject(searchParams);

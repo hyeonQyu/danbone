@@ -1,64 +1,99 @@
+import { firebaseAdmin, FIRESTORE_LIMITS } from '@/data/server/firebaseAdmin.config';
 import { JmdictServerService, JmdictServerServiceDependencies } from '@/data/server/services/jmdict/server.jmdict.service.types';
 import { getServerServiceCreator } from '@/data/server/services/server.service.utils';
 import { JmdictEntity } from '@/features/dictionary/jmdict.entity';
 import { JmdictEntry, JmdictEntrySchema } from '@/features/dictionary/jmdict.types';
+import { devLog } from '@/lib';
 import { Timestamp } from 'firebase-admin/firestore';
 
-const BATCH_SIZE = 4000; // 하루 저장 개수 (무료 플랜 제한 고려)
-
 export const createJmdictServerService = getServerServiceCreator<JmdictServerService, JmdictServerServiceDependencies>(
-  ({ jmdictRepository }) => {
-    return {
-      saveNextBatch: async (allEntries: JmdictEntry[]) => {
-        const startTime = Date.now();
+  ({ jmdictEntriesRepository, jmdictSearchIndexesRepository }) => {
+    const processEntitiesWithBatchCommit = async (entities: JmdictEntity[]) => {
+      let savedEntries = 0;
+      let savedIndexes = 0;
+      let batch = firebaseAdmin.db.batch();
+      let operationCount = 0;
 
-        // 1. 현재 저장된 개수 조회
-        const storedCount = await jmdictRepository.getStoredCount();
-
-        // 2. 완료 여부 확인
-        if (storedCount >= allEntries.length) {
-          return {
-            savedEntries: 0,
-            savedIndexes: 0,
-            totalStored: storedCount,
-            isComplete: true,
-            duration: Date.now() - startTime,
-          };
+      const commitCurrentBatch = async () => {
+        if (operationCount > 0) {
+          await batch.commit();
+          batch = firebaseAdmin.db.batch();
+          operationCount = 0;
         }
+      };
 
-        // 3. 다음 배치 추출
-        const nextBatch = allEntries.slice(storedCount, storedCount + BATCH_SIZE);
+      for (const entity of entities) {
+        const entryOperations = jmdictEntriesRepository.addEntriesToBatch(batch, [entity]);
+        const indexOperations = jmdictSearchIndexesRepository.addIndexesToBatch(batch, [entity]);
 
-        // 4. 데이터 검증
-        const validatedBatch = nextBatch.map((entry) => JmdictEntrySchema.parse(entry));
+        operationCount += entryOperations + indexOperations;
+        savedEntries += entryOperations;
+        savedIndexes += indexOperations;
 
-        // 5. JmdictEntry[] → JmdictEntity[] 변환
+        if (operationCount >= FIRESTORE_LIMITS.batchOperation) {
+          await commitCurrentBatch();
+        }
+      }
+
+      await commitCurrentBatch();
+
+      return { savedEntries, savedIndexes };
+    };
+
+    const saveNextBatch = async (allEntries: JmdictEntry[], batchSize: number) => {
+      const startTime = Date.now();
+
+      const checkCompletedAllEntries = (storedCount: number): boolean => {
+        return storedCount >= allEntries.length;
+      };
+
+      const extractNextBatch = (storedCount: number): JmdictEntry[] => {
+        return allEntries.slice(storedCount, storedCount + batchSize);
+      };
+
+      const validateAndConvertBatch = (batch: JmdictEntry[]): JmdictEntity[] => {
+        const validatedBatch = batch.map((entry) => JmdictEntrySchema.parse(entry));
         const now = Timestamp.now().toDate();
-        const entities: JmdictEntity[] = validatedBatch.map((entry) => ({
+
+        return validatedBatch.map((entry) => ({
           ...entry,
           createdAt: now,
           updatedAt: now,
         }));
+      };
 
-        // 6. Repository를 통해 저장
-        const result = await jmdictRepository.saveEntries(entities);
-
-        // 7. 결과 반환
-        const totalStored = storedCount + result.savedEntries;
+      const buildResult = (savedEntries: number, savedIndexes: number, storedCount: number) => {
+        const totalStored = storedCount + savedEntries;
         const isComplete = totalStored >= allEntries.length;
         const duration = Date.now() - startTime;
 
-        console.log(`✅ JMdict 저장 완료: ${result.savedEntries} entries, ${result.savedIndexes} indexes (${duration}ms)`);
-        console.log(`📊 진행률: ${totalStored} / ${allEntries.length} (${Math.round((totalStored / allEntries.length) * 100)}%)`);
+        devLog(`✅ JMdict 저장 완료: ${savedEntries} entries, ${savedIndexes} indexes (${duration}ms)`);
+        devLog(`📊 진행률: ${totalStored} / ${allEntries.length} (${Math.round((totalStored / allEntries.length) * 100)}%)`);
 
         return {
-          savedEntries: result.savedEntries,
-          savedIndexes: result.savedIndexes,
+          savedEntries,
+          savedIndexes,
           totalStored,
           isComplete,
           duration,
         };
-      },
+      };
+
+      const storedCount = await jmdictEntriesRepository.getStoredCount();
+
+      if (checkCompletedAllEntries(storedCount)) {
+        return buildResult(0, 0, storedCount);
+      }
+
+      const nextBatch = extractNextBatch(storedCount);
+      const entities = validateAndConvertBatch(nextBatch);
+      const { savedEntries, savedIndexes } = await processEntitiesWithBatchCommit(entities);
+
+      return buildResult(savedEntries, savedIndexes, storedCount);
+    };
+
+    return {
+      saveNextBatch,
     };
   },
 );

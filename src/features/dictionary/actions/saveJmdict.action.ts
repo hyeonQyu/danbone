@@ -3,7 +3,7 @@
 import { jmdictServiceServer } from '@/data/server/server.container';
 import { JmdictEntry, JmdictEntrySchema } from '@/features/dictionary/jmdict.types';
 
-export const saveNextJmdictBatch = async (jsonData: unknown) => {
+export const saveNextJmdictBatch = async (jsonData: unknown, batchSize: number) => {
   try {
     if (!Array.isArray(jsonData)) {
       throw new Error('JSON 데이터는 배열이어야 합니다.');
@@ -14,7 +14,7 @@ export const saveNextJmdictBatch = async (jsonData: unknown) => {
 
     const entries = jsonData as JmdictEntry[];
 
-    const result = await jmdictServiceServer.saveNextBatch(entries);
+    const result = await jmdictServiceServer.saveNextBatch(entries, batchSize);
 
     return {
       success: true,
