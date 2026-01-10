@@ -1,4 +1,5 @@
-import { PartOfSpeechByLanguage } from '@/features/dictionary/dictionary.types';
+import { PartOfSpeechByLanguage } from '@/features/dictionary';
+import { useGetPartOfSpeechLabel } from './useGetPartOfSpeechLabel';
 
 const labelByPartOfSpeech: Record<PartOfSpeechByLanguage['ko'], string> = {
   verb: '동사',
@@ -12,7 +13,5 @@ const labelByPartOfSpeech: Record<PartOfSpeechByLanguage['ko'], string> = {
 };
 
 export const useGetKOPartOfSpeechLabel = () => {
-  return (pos: PartOfSpeechByLanguage['ko']) => {
-    return labelByPartOfSpeech[pos];
-  };
+  return useGetPartOfSpeechLabel(labelByPartOfSpeech);
 };
