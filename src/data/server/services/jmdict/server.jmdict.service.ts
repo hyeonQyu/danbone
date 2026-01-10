@@ -3,7 +3,8 @@ import { JmdictServerService, JmdictServerServiceDependencies } from '@/data/ser
 import { getServerServiceCreator } from '@/data/server/services/server.service.utils';
 import { JmdictEntity } from '@/features/dictionary/jmdict.entity';
 import { JmdictEntry, JmdictEntrySchema } from '@/features/dictionary/jmdict.types';
-import { devLog } from '@/lib';
+import { devLog, TIME_UNIT } from '@/lib';
+import { withTimeout } from 'es-toolkit';
 import { Timestamp } from 'firebase-admin/firestore';
 
 export const createJmdictServerService = getServerServiceCreator<JmdictServerService, JmdictServerServiceDependencies>(
@@ -66,28 +67,26 @@ export const createJmdictServerService = getServerServiceCreator<JmdictServerSer
       }));
     };
 
-    const saveEntries = async (batch: JmdictEntry[]) => {
-      const startTime = Date.now();
-
-      const entities = validateAndConvertBatch(batch);
-      const { savedEntries, savedIndexes } = await processEntitiesWithBatchCommit(entities);
-      const duration = Date.now() - startTime;
-      devLog(`✅ JMdict 저장 완료: ${savedEntries} entries, ${savedIndexes} indexes (${duration}ms)`);
-
-      return {
-        savedEntries,
-        savedIndexes,
-        duration,
-      };
-    };
-
-    const getStoredCount = async () => {
-      return await jmdictEntriesRepository.getStoredCount();
-    };
-
     return {
-      saveEntries,
-      getStoredCount,
+      saveEntries: async (batch: JmdictEntry[]) =>
+        withTimeout(async () => {
+          const startTime = Date.now();
+
+          const entities = validateAndConvertBatch(batch);
+          const { savedEntries, savedIndexes } = await processEntitiesWithBatchCommit(entities);
+          const duration = Date.now() - startTime;
+          devLog(`✅ JMdict 저장 완료: ${savedEntries} entries, ${savedIndexes} indexes (${duration}ms)`);
+
+          return {
+            savedEntries,
+            savedIndexes,
+            duration,
+          };
+        }, TIME_UNIT.unitOfMs.asSecond * 10),
+
+      getStoredCount: () => {
+        return jmdictEntriesRepository.getStoredCount();
+      },
     };
   },
 );
