@@ -1,3 +1,4 @@
+export * from './array.utils';
 export * from './cookie.constants';
 export * from './cookie.utils';
 export * from './env.types';

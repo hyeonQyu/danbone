@@ -3,7 +3,7 @@ import { JmdictServerService, JmdictServerServiceDependencies } from '@/data/ser
 import { getServerServiceCreator } from '@/data/server/services/server.service.utils';
 import { JmdictEntity } from '@/features/dictionary/jmdict.entity';
 import { JmdictEntry, JmdictEntrySchema } from '@/features/dictionary/jmdict.types';
-import { devLog, TIME_UNIT } from '@/lib';
+import { devLog, TIME_UNIT, toUniqueArray } from '@/lib';
 import { withTimeout } from 'es-toolkit';
 import { Timestamp } from 'firebase-admin/firestore';
 
@@ -67,6 +67,17 @@ export const createJmdictServerService = getServerServiceCreator<JmdictServerSer
       }));
     };
 
+    const sortEntriesByCommon = (a: JmdictEntity, b: JmdictEntity) => {
+      const hasCommon = (entity: JmdictEntity) => entity.kanji.some((k) => k.common) || entity.kana.some((k) => k.common);
+
+      const aHasCommon = hasCommon(a);
+      const bHasCommon = hasCommon(b);
+
+      if (aHasCommon && !bHasCommon) return -1;
+      if (!aHasCommon && bHasCommon) return 1;
+      return 0;
+    };
+
     return {
       saveEntries: async (batch: JmdictEntry[]) =>
         withTimeout(async () => {
@@ -86,6 +97,22 @@ export const createJmdictServerService = getServerServiceCreator<JmdictServerSer
 
       getStoredCount: () => {
         return jmdictEntriesRepository.getStoredCount();
+      },
+
+      findById: async (id: string) => {
+        return jmdictEntriesRepository.findById(id);
+      },
+
+      findByTerm: async ({ searchTerm, termType }) => {
+        const indexes = await jmdictSearchIndexesRepository.findBySearchTerm(searchTerm, termType);
+
+        if (indexes.length === 0) {
+          return [];
+        }
+
+        const uniqueEntryIds = toUniqueArray(indexes, ({ entryId }) => entryId);
+        const entries = await jmdictEntriesRepository.findByIds(uniqueEntryIds);
+        return entries.sort(sortEntriesByCommon);
       },
     };
   },
