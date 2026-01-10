@@ -14,7 +14,7 @@ const labelByPartOfSpeech: Record<PartOfSpeechByLanguage['ja'], string> = {
 };
 
 export const useGetJAPartOfSpeechLabel = () => {
-  return (pos: PartOfSpeechByLanguage['ja']) => {
-    return labelByPartOfSpeech[pos];
+  return (partOfSpeeches: PartOfSpeechByLanguage['ja'][]) => {
+    return partOfSpeeches.map((pos) => labelByPartOfSpeech[pos]).join(', ');
   };
 };

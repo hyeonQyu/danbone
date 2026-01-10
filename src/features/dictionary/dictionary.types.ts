@@ -22,15 +22,15 @@ export const DictionaryEntrySchemaByLanguage = {
     notation: z.string(),
     pronunciation: z.string(),
     meanings: z.array(z.string()),
-    pos: PartOfSpeechSchemaByLanguage['ko'],
+    partOfSpeeches: z.array(PartOfSpeechSchemaByLanguage['ko']),
     examples: z.array(z.string()),
   }),
   ja: z.object({
     notation: z.string(),
     pronunciation: z.string(),
-    meanings: z.array(z.string()).min(1).max(3),
-    pos: PartOfSpeechSchemaByLanguage['ja'],
-    examples: z.array(z.string()).min(1).max(2),
+    meanings: z.array(z.string()).min(1),
+    partOfSpeeches: z.array(PartOfSpeechSchemaByLanguage['ja']),
+    examples: z.array(z.string()),
   }),
 } as const;
 

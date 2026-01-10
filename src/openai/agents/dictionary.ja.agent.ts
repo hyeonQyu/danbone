@@ -184,6 +184,9 @@ VERIFICATION CHECKLIST before returning:
 □ Does each entry have ALL 5 required fields?
 □ Are examples relevant to the specific meaning in that entry?`;
 
+/**
+ * @deprecated jmdict 사용으로 deprecated 처리
+ */
 export const jaDictionaryAgentFactory = buildAgentFactory(
   {
     name: 'Japanese Dictionary',

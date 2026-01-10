@@ -9,7 +9,7 @@ interface DictionaryJAEntryCardProps {
 }
 
 function DictionaryJAEntryCard({ entry }: DictionaryJAEntryCardProps) {
-  const { notation, pronunciation, meanings, pos } = entry;
+  const { notation, pronunciation, meanings, partOfSpeeches } = entry;
 
   const { spacing, palette, transitions, shadows } = useTheme();
   const pxToRem = usePxToRem();
@@ -65,7 +65,7 @@ function DictionaryJAEntryCard({ entry }: DictionaryJAEntryCardProps) {
         <Typography variant="body2" color="text.secondary" component="span">
           [{pronunciation}]
         </Typography>
-        <Chip label={getPartOfSpeechLabel(pos)} size="small" sx={{ ml: 'auto' }} variant="filled" />
+        <Chip label={getPartOfSpeechLabel(partOfSpeeches)} size="small" sx={{ ml: 'auto' }} variant="filled" />
       </Box>
 
       <Box>

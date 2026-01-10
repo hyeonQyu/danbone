@@ -9,7 +9,7 @@ interface DictionaryJAEntryDetailProps {
 }
 
 function DictionaryJAEntryDetail({ entry }: DictionaryJAEntryDetailProps) {
-  const { notation, pronunciation, meanings, pos, examples } = entry;
+  const { notation, pronunciation, meanings, partOfSpeeches, examples } = entry;
 
   const { spacing } = useTheme();
   const pxToRem = usePxToRem();
@@ -39,7 +39,7 @@ function DictionaryJAEntryDetail({ entry }: DictionaryJAEntryDetailProps) {
           {notation}
         </Typography>
         <Box sx={{ mb: spacing(2) }}>
-          <Chip label={getPartOfSpeechLabel(pos)} color="primary" sx={{ fontWeight: 600, fontSize: '0.95rem' }} />
+          <Chip label={getPartOfSpeechLabel(partOfSpeeches)} color="primary" sx={{ fontWeight: 600, fontSize: '0.95rem' }} />
         </Box>
         <Typography
           variant="h6"
