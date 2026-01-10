@@ -12,7 +12,9 @@ export interface JmdictServerService {
   saveEntries: (batch: JmdictEntry[]) => Promise<{
     savedEntries: number;
     savedIndexes: number;
-    duration: number;
+  }>;
+  updateEntries: (batch: JmdictEntry[]) => Promise<{
+    updatedEntries: number;
   }>;
   getStoredCount: () => Promise<number>;
   findById: (id: string) => Promise<JmdictEntity | null>;
