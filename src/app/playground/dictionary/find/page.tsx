@@ -71,7 +71,7 @@ export default function JmdictFindPage() {
 
     try {
       const startTime = performance.now();
-      const data = await findJmdictByTerm(kanjiInput.trim(), 'kanji');
+      const data = await findJmdictByTerm({ searchTerm: kanjiInput.trim(), termType: 'kanji' });
       const duration = performance.now() - startTime;
 
       // 예상 read count: index 조회 (평균 2-3) + entry 조회 (N개)
@@ -104,7 +104,7 @@ export default function JmdictFindPage() {
 
     try {
       const startTime = performance.now();
-      const data = await findJmdictByTerm(kanaInput.trim(), 'kana');
+      const data = await findJmdictByTerm({ searchTerm: kanaInput.trim(), termType: 'kana' });
       const duration = performance.now() - startTime;
 
       const estimatedIndexReads = Math.min(data.length * 1.5, 5);

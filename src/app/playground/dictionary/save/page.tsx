@@ -4,7 +4,7 @@ import { getJmdictProgress, saveJmdictBatch } from '@/features/dictionary/action
 import { JmdictEntry } from '@/features/dictionary/jmdict.types';
 import { useState } from 'react';
 
-const ENTRIES_BATCH_SIZE = 1000;
+const ENTRIES_BATCH_SIZE = 50;
 
 export default function JmdictSavePage() {
   const [jsonData, setJsonData] = useState<JmdictEntry[] | null>(null);
@@ -14,7 +14,6 @@ export default function JmdictSavePage() {
     savedIndexes: number;
     totalStored: number;
     isComplete: boolean;
-    duration: number;
   } | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -72,7 +71,6 @@ export default function JmdictSavePage() {
           savedIndexes: 0,
           totalStored: startIndex,
           isComplete: true,
-          duration: 0,
         });
         return;
       }
@@ -94,7 +92,6 @@ export default function JmdictSavePage() {
         savedIndexes: response.data.savedIndexes,
         totalStored,
         isComplete: totalStored >= jsonData.length,
-        duration: response.data.duration,
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : '저장 중 오류 발생');
@@ -235,7 +232,6 @@ export default function JmdictSavePage() {
             <li>저장된 Entries: {result.savedEntries.toLocaleString()}개</li>
             <li>생성된 검색 인덱스: {result.savedIndexes.toLocaleString()}개</li>
             <li>총 저장된 Entries: {result.totalStored.toLocaleString()}개</li>
-            <li>소요 시간: {(result.duration / 1000).toFixed(1)}초</li>
             <li>남은 Entries: {jsonData ? (jsonData.length - result.totalStored).toLocaleString() : 0}개</li>
           </ul>
           <div

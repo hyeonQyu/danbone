@@ -8,3 +8,7 @@ const LABEL_BY_LANGUAGE: Record<Language, string> = {
 export const getLanguageLabel = (language: Language) => {
   return LABEL_BY_LANGUAGE[language];
 };
+
+export const jmdictLanguageToDanboneLanguage = (language: string) => {
+  return language === 'eng' ? 'en' : (language as Language);
+};
