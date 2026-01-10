@@ -1,9 +1,13 @@
 'use server';
 
+import { jmdictServiceServer } from '@/data/server';
+import { FindByTermParams } from '@/data/server/services/jmdict';
 import { InvalidValueError } from '@/errors';
+import { JmdictEntity, JmdictGloss, JmdictSense } from '@/features/dictionary';
 import { ExploreSearchHandler } from '@/features/explore/types';
-import { TargetLanguage } from '@/language';
-import { devLogTap } from '@/lib';
+import { jmdictLanguageToDanboneLanguage, TargetLanguage } from '@/language';
+import { devLogError, devLogTap } from '@/lib';
+import { checkResultFulfilled, checkResultRejected } from '@/lib/promise.utils';
 import {
   DictionaryInput,
   DictionaryWordByLanguage,
@@ -49,6 +53,98 @@ const morphologicalAnalysisJA = async (input: string) => {
   return runner.run(jaMorphologicalAnalyzerAgent, input);
 };
 
+const jaWordToSearchParam = (word: string): FindByTermParams => {
+  // TODO termType 추론
+  return {
+    searchTerm: word,
+    termType: 'kanji',
+  };
+};
+
+const getJmdictEntries = async (word: string) => {
+  const searchParam = jaWordToSearchParam(word);
+  try {
+    return await jmdictServiceServer.findByTerm(searchParam);
+  } catch (e) {
+    devLogError('❌ JMdict 용어 조회 실패:', word);
+    devLogError('❌ 검색 파라미터:', searchParam);
+    devLogError('❌ 에러:', e);
+    return [];
+  }
+};
+
+const getJmtdictSenseLanguage = (sense: JmdictSense) => {
+  return jmdictLanguageToDanboneLanguage(sense.gloss[0]?.lang);
+};
+
+const checkJmtSenseLanguage = (checkingLanguage: string) => (sense: JmdictSense) => {
+  return getJmtdictSenseLanguage(sense) === checkingLanguage;
+};
+
+const getDictionaryWordsJA2 = async ({ sourceLanguage, words }: DictionaryInput) => {
+  const checkJmdictEntryHasSourceLanguageSense = (entry: JmdictEntity) => {
+    return entry.sense.some(checkJmtSenseLanguage(sourceLanguage));
+  };
+
+  // TODO: 실제 번역 API 호출 또는 AI 번역 로직
+  const translateGlossToSourceLanguage = async (gloss: JmdictGloss[]): Promise<JmdictGloss[]> => {
+    return gloss.map((g) => ({
+      ...g,
+      lang: sourceLanguage,
+      // text: await translateText(gloss.text, targetLang), // 실제 번역 필요
+    }));
+  };
+
+  const addSourceLanguageSenseToJmdictEntry = async (entry: JmdictEntity): Promise<JmdictEntity> => {
+    const englishSenses = entry.sense.filter(checkJmtSenseLanguage('en'));
+
+    const newSourceLanguageSense = await Promise.all(
+      englishSenses.map(async (sense) => {
+        const sourceLanguageGloss = await translateGlossToSourceLanguage(sense.gloss);
+        return { ...sense, gloss: sourceLanguageGloss };
+      }),
+    );
+
+    return {
+      ...entry,
+      sense: [...entry.sense, ...newSourceLanguageSense],
+    };
+  };
+
+  const searchedWordsWithJmtdictEntries = (await Promise.allSettled(words.map(getJmdictEntries))).filter(checkResultFulfilled());
+
+  const wordsWithJmtdictEntriesWithUpdated = await Promise.all(
+    searchedWordsWithJmtdictEntries.map(({ value: jmtdictEntries }) => {
+      return Promise.all(
+        jmtdictEntries.map(async (jmtdictEntry) => {
+          if (checkJmdictEntryHasSourceLanguageSense(jmtdictEntry)) {
+            return {
+              entry: jmtdictEntry,
+              updated: false,
+            };
+          }
+
+          return {
+            entry: await addSourceLanguageSenseToJmdictEntry(jmtdictEntry),
+            updated: true,
+          };
+        }),
+      );
+    }),
+  );
+
+  const updatedEntries = wordsWithJmtdictEntriesWithUpdated
+    .flat()
+    .filter(({ updated }) => updated)
+    .map(({ entry }) => entry);
+
+  if (updatedEntries.length > 0) {
+    await jmdictServiceServer.updateEntries(updatedEntries);
+  }
+
+  // 조회된 결과 데이터 정제 후 반환
+};
+
 const getDictionaryWordsJA = async (input: DictionaryInput) => {
   return runner.run(jaDictionaryAgent, JSON.stringify(input));
 };
@@ -56,7 +152,7 @@ const getDictionaryWordsJA = async (input: DictionaryInput) => {
 const _searchJA: ExploreSearchHandler<DictionaryWordByLanguage['ja']> = async ({ query, queryLanguage, sourceLanguage }) => {
   const TARGET_LANGUAGE: TargetLanguage = 'ja' as const;
 
-  const getTranslatedTexts = async (normalizedQuery: string) => {
+  const getTranslatedJATexts = async (normalizedQuery: string) => {
     if (queryLanguage === TARGET_LANGUAGE) {
       return [normalizedQuery];
     }
@@ -88,13 +184,13 @@ const _searchJA: ExploreSearchHandler<DictionaryWordByLanguage['ja']> = async ({
       throw new InvalidValueError('적절하지 않은 검색어입니다.\n다시 입력해주세요.\n(정규화 실패)');
     }
 
-    const translatedTexts = await getTranslatedTexts(normalizedQuery);
+    const translatedJATexts = await getTranslatedJATexts(normalizedQuery);
 
-    if (!translatedTexts.length) {
+    if (!translatedJATexts.length) {
       throw new InvalidValueError('번역에 실패했습니다.\n다시 입력해주세요.');
     }
 
-    return translatedTexts;
+    return translatedJATexts;
   };
 
   const getDictionaryWords = async (normalizedJAText: string) => {
@@ -124,13 +220,11 @@ const _searchJA: ExploreSearchHandler<DictionaryWordByLanguage['ja']> = async ({
     }),
   );
 
-  const dictionaryWordsByNormalizedJAText = results
-    .filter((result) => result.status === 'fulfilled')
-    .map((result) => (result as PromiseFulfilledResult<{ text: string; words: DictionaryWordByLanguage['ja'][] }>).value);
+  const dictionaryWordsByNormalizedJAText = results.filter(checkResultFulfilled()).map(({ value }) => value);
+  const firstRejection = results.find(checkResultRejected());
 
-  if (!dictionaryWordsByNormalizedJAText.length) {
-    const firstRejection = results.find((result) => result.status === 'rejected') as PromiseRejectedResult;
-    throw firstRejection.reason;
+  if (firstRejection) {
+    throw new Error(firstRejection.reason);
   }
 
   return dictionaryWordsByNormalizedJAText;
