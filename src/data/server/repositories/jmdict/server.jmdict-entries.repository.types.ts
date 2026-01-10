@@ -4,4 +4,6 @@ import { WriteBatch } from 'firebase-admin/firestore';
 export interface JmdictEntriesRepository {
   getStoredCount(): Promise<number>;
   addEntriesToBatch(batch: WriteBatch, entries: JmdictEntity[]): number;
+  findById(id: string): Promise<JmdictEntity | null>;
+  findByIds(ids: string[]): Promise<JmdictEntity[]>;
 }
