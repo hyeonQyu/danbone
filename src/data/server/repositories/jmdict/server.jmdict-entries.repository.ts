@@ -21,6 +21,15 @@ export const jmdictEntriesRepository = getFirebaseServerRepositoryCreator('jmdic
     return entries.length;
   };
 
+  const updateEntriesToBatch = (batch: WriteBatch, entries: Omit<JmdictEntity, 'createdAt'>[]): number => {
+    entries.forEach((entry) => {
+      const entryDoc = db.collection(collectionName).doc(entry.id);
+      batch.update(entryDoc, entry as Partial<JmdictEntity>);
+    });
+
+    return entries.length;
+  };
+
   const findById = async (id: string): Promise<JmdictEntity | null> => {
     const docSnap = await db.collection(collectionName).doc(id).get();
     if (!docSnap.exists) {
@@ -44,6 +53,7 @@ export const jmdictEntriesRepository = getFirebaseServerRepositoryCreator('jmdic
   return {
     getStoredCount,
     addEntriesToBatch,
+    updateEntriesToBatch,
     findById,
     findByIds,
   };

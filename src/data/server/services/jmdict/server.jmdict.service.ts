@@ -41,6 +41,35 @@ export const createJmdictServerService = getServerServiceCreator<JmdictServerSer
       return { savedEntries, savedIndexes };
     };
 
+    const processEntitiesWithBatchUpdate = async (entities: Omit<JmdictEntity, 'createdAt'>[]) => {
+      let updatedEntries = 0;
+      let batch = firebaseAdmin.db.batch();
+      let operationCount = 0;
+
+      const commitCurrentBatch = async () => {
+        if (operationCount > 0) {
+          await batch.commit();
+          batch = firebaseAdmin.db.batch();
+          operationCount = 0;
+        }
+      };
+
+      for (const entity of entities) {
+        const entryOperations = jmdictEntriesRepository.updateEntriesToBatch(batch, [entity]);
+
+        operationCount += entryOperations;
+        updatedEntries += entryOperations;
+
+        if (operationCount >= FIRESTORE_LIMITS.batchOperation) {
+          await commitCurrentBatch();
+        }
+      }
+
+      await commitCurrentBatch();
+
+      return { updatedEntries };
+    };
+
     const flattenNestedArrays = <T>(value: T[]): T[] => {
       return value.map((item) => {
         if (Array.isArray(item)) {
@@ -50,19 +79,35 @@ export const createJmdictServerService = getServerServiceCreator<JmdictServerSer
       });
     };
 
-    const validateAndConvertBatch = (batch: JmdictEntry[]): JmdictEntity[] => {
-      const validatedBatch = batch.map((entry) => JmdictEntrySchema.parse(entry));
-      const now = Timestamp.now().toDate();
+    const validateAndProcessEntry = (entry: JmdictEntry) => {
+      const validatedEntry = JmdictEntrySchema.parse(entry);
 
-      return validatedBatch.map((entry) => ({
-        ...entry,
-        sense: entry.sense.map((s) => ({
+      return {
+        ...validatedEntry,
+        sense: validatedEntry.sense.map((s) => ({
           ...s,
           related: flattenNestedArrays(s.related),
           antonym: flattenNestedArrays(s.antonym),
           languageSource: flattenNestedArrays(s.languageSource),
         })),
+      };
+    };
+
+    const validateAndConvertBatch = (batch: JmdictEntry[]): JmdictEntity[] => {
+      const now = Timestamp.now().toDate();
+
+      return batch.map((entry) => ({
+        ...validateAndProcessEntry(entry),
         createdAt: now,
+        updatedAt: now,
+      }));
+    };
+
+    const validateAndConvertBatchForUpdate = (batch: JmdictEntry[]): Omit<JmdictEntity, 'createdAt'>[] => {
+      const now = Timestamp.now().toDate();
+
+      return batch.map((entry) => ({
+        ...validateAndProcessEntry(entry),
         updatedAt: now,
       }));
     };
@@ -91,7 +136,20 @@ export const createJmdictServerService = getServerServiceCreator<JmdictServerSer
           return {
             savedEntries,
             savedIndexes,
-            duration,
+          };
+        }, TIME_UNIT.unitOfMs.asSecond * 10),
+
+      updateEntries: async (batch: JmdictEntry[]) =>
+        withTimeout(async () => {
+          const startTime = Date.now();
+
+          const entities = validateAndConvertBatchForUpdate(batch);
+          const { updatedEntries } = await processEntitiesWithBatchUpdate(entities);
+          const duration = Date.now() - startTime;
+          devLog(`✅ JMdict 업데이트 완료: ${updatedEntries} entries (${duration}ms)`);
+
+          return {
+            updatedEntries,
           };
         }, TIME_UNIT.unitOfMs.asSecond * 10),
 
