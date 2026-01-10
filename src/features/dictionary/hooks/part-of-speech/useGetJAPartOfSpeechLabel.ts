@@ -1,4 +1,5 @@
-import { PartOfSpeechByLanguage } from '@/features/dictionary/dictionary.types';
+import { PartOfSpeechByLanguage } from '@/features/dictionary';
+import { useGetPartOfSpeechLabel } from './useGetPartOfSpeechLabel';
 
 const labelByPartOfSpeech: Record<PartOfSpeechByLanguage['ja'], string> = {
   godanVerb: '1그룹 동사',
@@ -14,7 +15,5 @@ const labelByPartOfSpeech: Record<PartOfSpeechByLanguage['ja'], string> = {
 };
 
 export const useGetJAPartOfSpeechLabel = () => {
-  return (partOfSpeeches: PartOfSpeechByLanguage['ja'][]) => {
-    return partOfSpeeches.map((pos) => labelByPartOfSpeech[pos]).join(', ');
-  };
+  return useGetPartOfSpeechLabel(labelByPartOfSpeech);
 };
