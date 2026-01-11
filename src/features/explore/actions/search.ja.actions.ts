@@ -6,8 +6,17 @@ import { InvalidValueError } from '@/errors';
 import { convertJmdictEntityToWord, JmdictEntity, JmdictGloss, JmdictSense } from '@/features/dictionary';
 import { ExploreSearchHandler } from '@/features/explore/types';
 import { jmdictLanguageToDanboneLanguage, TargetLanguage } from '@/language';
-import { devLogError, devLogTap } from '@/lib';
-import { checkResultFulfilled, checkResultRejected } from '@/lib/promise.utils';
+import {
+  checkResultFulfilled,
+  checkResultRejected,
+  devLogError,
+  devLogTap,
+  hasAlphabet,
+  hasKanji,
+  isHiragana,
+  isKatakana,
+  overSome,
+} from '@/lib';
 import {
   DictionaryInput,
   DictionaryWordByLanguage,
@@ -52,11 +61,22 @@ const morphologicalAnalysisJA = async (input: string) => {
 };
 
 const jaWordToSearchParam = (word: string): FindByTermParams => {
-  // TODO termType 추론
-  return {
-    searchTerm: word,
-    termType: 'kanji',
-  };
+  if (overSome(hasKanji, hasAlphabet)(word)) {
+    return {
+      searchTerm: word,
+      termType: 'kanji',
+    };
+  }
+
+  if (overSome(isHiragana, isKatakana)(word)) {
+    return {
+      searchTerm: word,
+      termType: 'kana',
+    };
+  }
+
+  devLogError('❌ 유효하지 않은 일본어 단어 형식:', word);
+  throw new InvalidValueError(`유효하지 않은 일본어 단어 형식: ${word}`);
 };
 
 const getJmdictEntries = async (word: string) => {
