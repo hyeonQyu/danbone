@@ -19,18 +19,18 @@ export const PartOfSpeechSchemaByLanguage = {
 
 export const DictionaryEntrySchemaByLanguage = {
   ko: z.object({
-    notation: z.string(),
-    pronunciation: z.string(),
+    notations: z.array(z.string()).min(1),
+    pronunciations: z.array(z.string()).min(1),
     meanings: z.array(z.string()),
     partOfSpeeches: z.array(PartOfSpeechSchemaByLanguage['ko']),
-    examples: z.array(z.string()),
+    examples: z.array(z.string()).default([]),
   }),
   ja: z.object({
-    notation: z.string(),
-    pronunciation: z.string(),
+    notations: z.array(z.string()).min(1),
+    pronunciations: z.array(z.string()).min(1),
     meanings: z.array(z.string()).min(1),
     partOfSpeeches: z.array(PartOfSpeechSchemaByLanguage['ja']),
-    examples: z.array(z.string()),
+    examples: z.array(z.string()).default([]),
   }),
 } as const;
 

@@ -27,15 +27,16 @@ const hasMeanings = (entry: DictionaryEntryByLanguage['ja']) => entry.meanings.l
 const hasPartOfSpeeches = (entry: DictionaryEntryByLanguage['ja']) => entry.partOfSpeeches.length > 0;
 
 export const convertJmdictEntityToWord = (entity: JmdictEntity, sourceLanguage: string): DictionaryWordByLanguage['ja'] => {
-  const notation = entity.kanji[0]?.text || entity.kana[0]?.text;
-  const pronunciation = entity.kana[0]?.text || '';
+  const notations = entity.kanji.length > 0 ? entity.kanji.map(({ text }) => text) : entity.kana.map(({ text }) => text);
+  const pronunciations = entity.kana.map(({ text }) => text);
+  const keyword = notations[0];
 
   return {
-    keyword: notation,
+    keyword,
     entries: entity.sense
       .map((sense) => ({
-        notation,
-        pronunciation,
+        notations,
+        pronunciations,
         partOfSpeeches: mapJmdictPosArrayToInternalPosArray(sense.partOfSpeech),
         meanings: sense.gloss.filter(({ lang }) => lang === sourceLanguage).map(({ text }) => text),
         examples: [],

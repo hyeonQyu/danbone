@@ -9,7 +9,7 @@ interface DictionaryJAEntryCardProps {
 }
 
 function DictionaryJAEntryCard({ entry }: DictionaryJAEntryCardProps) {
-  const { notation, pronunciation, meanings, partOfSpeeches } = entry;
+  const { notations, pronunciations, meanings, partOfSpeeches } = entry;
 
   const { spacing, palette, transitions, shadows } = useTheme();
   const pxToRem = usePxToRem();
@@ -58,13 +58,35 @@ function DictionaryJAEntryCard({ entry }: DictionaryJAEntryCardProps) {
         },
       }}
     >
-      <Box sx={{ mb: spacing(1), display: 'flex', alignItems: 'center', gap: spacing(1) }}>
-        <Typography variant="subtitle1" component="span" sx={{ fontWeight: 600 }}>
-          {notation}
-        </Typography>
-        <Typography variant="body2" color="text.secondary" component="span">
-          [{pronunciation}]
-        </Typography>
+      <Box sx={{ mb: spacing(1), display: 'flex', alignItems: 'center', gap: spacing(1), flexWrap: 'wrap' }}>
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, alignItems: 'baseline' }}>
+          {notations.map((notation, index) => (
+            <Box key={index} sx={{ display: 'flex', alignItems: 'baseline' }}>
+              <Typography variant="subtitle1" component="span" sx={{ fontWeight: 600 }}>
+                {notation}
+              </Typography>
+              {index < notations.length - 1 && (
+                <Typography variant="subtitle1" component="span">
+                  ,
+                </Typography>
+              )}
+            </Box>
+          ))}
+        </Box>
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, alignItems: 'baseline' }}>
+          {pronunciations.map((pronunciation, index) => (
+            <Box key={index} sx={{ display: 'flex', alignItems: 'baseline' }}>
+              <Typography variant="body2" color="text.secondary" component="span">
+                [{pronunciation}]
+              </Typography>
+              {index < pronunciations.length - 1 && (
+                <Typography variant="body2" color="text.secondary" component="span">
+                  ,
+                </Typography>
+              )}
+            </Box>
+          ))}
+        </Box>
         <Chip label={getPartOfSpeechLabel(partOfSpeeches)} size="small" sx={{ ml: 'auto' }} variant="filled" />
       </Box>
 

@@ -9,7 +9,7 @@ interface DictionaryJAEntryDetailProps {
 }
 
 function DictionaryJAEntryDetail({ entry }: DictionaryJAEntryDetailProps) {
-  const { notation, pronunciation, meanings, partOfSpeeches, examples } = entry;
+  const { notations, pronunciations, meanings, partOfSpeeches, examples } = entry;
 
   const { spacing } = useTheme();
   const pxToRem = usePxToRem();
@@ -27,30 +27,63 @@ function DictionaryJAEntryDetail({ entry }: DictionaryJAEntryDetailProps) {
       }}
     >
       <Box sx={{ mb: spacing(5) }}>
-        <Typography
-          variant="h3"
-          component="h1"
-          sx={{
-            fontWeight: 800,
-            fontSize: { xs: '2.5rem', md: '3rem' },
-            mb: spacing(2),
-          }}
-        >
-          {notation}
-        </Typography>
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, alignItems: 'baseline', mb: spacing(2) }}>
+          {notations.map((notation, index) => (
+            <Box key={index} sx={{ display: 'flex', alignItems: 'baseline' }}>
+              <Typography
+                variant="h3"
+                component="h1"
+                sx={{
+                  fontWeight: 800,
+                  fontSize: { xs: '2.5rem', md: '3rem' },
+                }}
+              >
+                {notation}
+              </Typography>
+              {index < notations.length - 1 && (
+                <Typography
+                  variant="h3"
+                  component="span"
+                  sx={{
+                    fontWeight: 800,
+                    fontSize: { xs: '2.5rem', md: '3rem' },
+                  }}
+                >
+                  ,
+                </Typography>
+              )}
+            </Box>
+          ))}
+        </Box>
         <Box sx={{ mb: spacing(2) }}>
           <Chip label={getPartOfSpeechLabel(partOfSpeeches)} color="primary" sx={{ fontWeight: 600, fontSize: '0.95rem' }} />
         </Box>
-        <Typography
-          variant="h6"
-          color="text.secondary"
-          sx={{
-            fontSize: { xs: '1.1rem', md: '1.3rem' },
-            mb: spacing(4),
-          }}
-        >
-          [{pronunciation}]
-        </Typography>
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, alignItems: 'baseline' }}>
+          {pronunciations.map((pronunciation, index) => (
+            <Box key={index} sx={{ display: 'flex', alignItems: 'baseline' }}>
+              <Typography
+                variant="h6"
+                color="text.secondary"
+                sx={{
+                  fontSize: { xs: '1.1rem', md: '1.3rem' },
+                }}
+              >
+                [{pronunciation}]
+              </Typography>
+              {index < pronunciations.length - 1 && (
+                <Typography
+                  variant="h6"
+                  color="text.secondary"
+                  sx={{
+                    fontSize: { xs: '1.1rem', md: '1.3rem' },
+                  }}
+                >
+                  ,
+                </Typography>
+              )}
+            </Box>
+          ))}
+        </Box>
       </Box>
 
       <Box sx={{ mb: spacing(5) }}>
