@@ -27,70 +27,67 @@ function DictionaryJAEntryDetail({ entry }: DictionaryJAEntryDetailProps) {
       }}
     >
       <Box sx={{ mb: spacing(5) }}>
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, alignItems: 'baseline', mb: spacing(2) }}>
+        <Typography
+          variant="h3"
+          component="h1"
+          sx={{
+            fontWeight: 800,
+            fontSize: { xs: '2rem', md: '3rem' },
+            mb: spacing(2),
+          }}
+        >
           {notations.map((notation, index) => (
-            <Box key={index} sx={{ display: 'flex', alignItems: 'baseline' }}>
-              <Typography
-                variant="h3"
-                component="h1"
-                sx={{
-                  fontWeight: 800,
-                  fontSize: { xs: '2.5rem', md: '3rem' },
-                }}
-              >
-                {notation}
-              </Typography>
+            <Box
+              key={index}
+              component="span"
+              sx={{
+                display: 'inline-block',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {notation}
               {index < notations.length - 1 && (
-                <Typography
-                  variant="h3"
-                  component="span"
-                  sx={{
-                    fontWeight: 800,
-                    fontSize: { xs: '2.5rem', md: '3rem' },
-                  }}
-                >
+                <Box component="span" sx={{ ml: 0.2, mr: 0.8 }}>
                   ,
-                </Typography>
+                </Box>
               )}
             </Box>
           ))}
-        </Box>
+        </Typography>
         <Box sx={{ mb: spacing(2) }}>
           <Chip label={getPartOfSpeechLabel(partOfSpeeches)} color="primary" sx={{ fontWeight: 600, fontSize: '0.95rem' }} />
         </Box>
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, alignItems: 'baseline' }}>
+        <Typography
+          variant="h6"
+          color="text.secondary"
+          sx={{
+            fontSize: { xs: '1.2rem', md: '1.3rem' },
+          }}
+        >
+          [
           {pronunciations.map((pronunciation, index) => (
-            <Box key={index} sx={{ display: 'flex', alignItems: 'baseline' }}>
-              <Typography
-                variant="h6"
-                color="text.secondary"
-                sx={{
-                  fontSize: { xs: '1.1rem', md: '1.3rem' },
-                }}
-              >
-                [{pronunciation}]
-              </Typography>
+            <Box
+              key={index}
+              component="span"
+              sx={{
+                display: 'inline-block',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {pronunciation}
               {index < pronunciations.length - 1 && (
-                <Typography
-                  variant="h6"
-                  color="text.secondary"
-                  sx={{
-                    fontSize: { xs: '1.1rem', md: '1.3rem' },
-                  }}
-                >
-                  ,
-                </Typography>
+                <Box component="span" sx={{ ml: 0.8, mr: 0.8 }}>
+                  /
+                </Box>
               )}
             </Box>
           ))}
-        </Box>
+          ]
+        </Typography>
       </Box>
 
-      <Box sx={{ mb: spacing(5) }}>
-        <DictionaryOrderedListSection title="의미" items={meanings} />
-      </Box>
-
-      <DictionaryOrderedListSection title="예문" items={examples} />
+      <DictionaryOrderedListSection title="의미" items={meanings} />
+      {/* <DictionaryOrderedListSection title="예문" items={examples} /> */}
     </Box>
   );
 }
