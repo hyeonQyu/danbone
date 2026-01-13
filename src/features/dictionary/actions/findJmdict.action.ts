@@ -1,6 +1,7 @@
 'use server';
 
 import { jmdictServiceServer } from '@/data/server/server.container';
+import { FindByTermParams } from '@/data/server/services/jmdict';
 import { InvalidValueError } from '@/errors';
 import { DictionaryEntryByLanguage } from '@/features/dictionary/dictionary.types';
 import { convertJmdictEntityToDictionaryEntry } from '@/features/dictionary/dictionary.utils';
@@ -23,7 +24,14 @@ export const findJmdictById = async (id: string) => {
  * 테스트용
  * @deprecated
  */
-export const findJmdictByTerm = jmdictServiceServer.findByTerm;
+export const findJmdictByTerm = async (params: FindByTermParams) => {
+  const entries = await jmdictServiceServer.findByTerm(params);
+  if (!entries) {
+    return null;
+  }
+  // TODO: DAN-98 에서 수정
+  return entries.map((entry) => convertJmdictEntityToDictionaryEntry(entry, 'eng'));
+};
 
 interface GetDictionaryEntryJAParams {
   entryId: string;
@@ -44,5 +52,6 @@ export const getDictionaryEntryJA = async ({
     return null;
   }
 
-  return convertJmdictEntityToDictionaryEntry(jmdictEntry, sourceLanguage);
+  // TODO: DAN-98 에서 수정
+  return convertJmdictEntityToDictionaryEntry(jmdictEntry, 'eng');
 };

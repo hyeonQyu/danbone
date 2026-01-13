@@ -2,6 +2,7 @@ import { getDictionaryEntryJA } from '@/features/dictionary/actions/findJmdict.a
 import { DICTIONARY_QUERY_KEY } from '@/features/dictionary/dictionary.queryKey';
 import { DictionaryEntryByLanguage } from '@/features/dictionary/dictionary.types';
 import { useSourceLanguage } from '@/language';
+import { TIME_UNIT } from '@/lib';
 import { Box, CircularProgress, Typography } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import DictionaryJAEntryDetail from './DictionaryJAEntryDetail';
@@ -23,6 +24,7 @@ function DictionaryJAEntryDetailView({ id }: DictionaryJAEntryDetailViewProps) {
       return await getDictionaryEntryJA({ entryId: id, sourceLanguage });
     },
     enabled: Boolean(id && sourceLanguage),
+    staleTime: TIME_UNIT.unitOfMs.asMinute * 10,
   });
 
   if (isLoading) {

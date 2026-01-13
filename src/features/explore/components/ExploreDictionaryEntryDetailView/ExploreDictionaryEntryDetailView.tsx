@@ -2,6 +2,7 @@ import { BackButton } from '@/components/BackButton';
 import { PageViewContainer } from '@/components/PageViewContainer';
 import { SlideInContainer } from '@/components/SlideInContainer';
 import { DictionaryJAEntryDetailView } from '@/features/dictionary/components/DictionaryEntryDetail';
+import { useElementHeight } from '@/hooks';
 import { useTargetLanguage } from '@/language';
 import { useTypedRouter, useTypedSearchParams } from '@/routes';
 import { Z_INDEX } from '@/styles/zIndex.constants';
@@ -18,6 +19,8 @@ function ExploreDictionaryEntryDetailView() {
   const router = useTypedRouter();
 
   const handleBack = () => router.back();
+
+  const { ref: backButtonBoxRef, height: backButtonBoxHeight } = useElementHeight<HTMLDivElement>();
 
   const renderContent = () => {
     if (targetLanguage === 'ja') {
@@ -36,9 +39,10 @@ function ExploreDictionaryEntryDetailView() {
   return (
     <SlideInContainer>
       <Box
+        ref={backButtonBoxRef}
         sx={{
           padding: `${spacing(2)} ${spacing(1)}`,
-          position: 'absolute',
+          position: 'fixed',
           top: 0,
           left: 0,
           zIndex: Z_INDEX.backward,
@@ -47,7 +51,19 @@ function ExploreDictionaryEntryDetailView() {
         <BackButton onBack={handleBack} />
       </Box>
 
-      <PageViewContainer>{renderContent()}</PageViewContainer>
+      <PageViewContainer
+        sx={{
+          minHeight: 'auto',
+          maxHeight: backButtonBoxHeight > 0 ? `calc(100vh - ${backButtonBoxHeight}px)` : '100vh',
+          overflowY: 'auto',
+          top: backButtonBoxHeight,
+          position: 'relative',
+          justifyContent: 'flex-start',
+          alignItems: 'flex-start',
+        }}
+      >
+        {renderContent()}
+      </PageViewContainer>
     </SlideInContainer>
   );
 }

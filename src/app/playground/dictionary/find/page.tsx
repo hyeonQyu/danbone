@@ -2,10 +2,12 @@
 
 import { JmdictEntity } from '@/features/dictionary';
 import { findJmdictById, findJmdictByTerm } from '@/features/dictionary/actions';
+import { DictionaryEntryByLanguage } from '@/features/dictionary/dictionary.types';
+import { devLogTap } from '@/lib';
 import { useState } from 'react';
 
 type SearchResult = {
-  entries: JmdictEntity[];
+  entries: JmdictEntity[] | DictionaryEntryByLanguage['ja'][];
   duration: number;
   readCount: number;
   error?: string;
@@ -74,6 +76,18 @@ export default function JmdictFindPage() {
       const data = await findJmdictByTerm({ searchTerm: kanjiInput.trim(), termType: 'kanji' });
       const duration = performance.now() - startTime;
 
+      devLogTap(data, 'kanji search result');
+
+      if (!data) {
+        setKanjiResult({
+          entries: [],
+          duration,
+          readCount: 1,
+          error: '결과를 찾을 수 없습니다.',
+        });
+        return;
+      }
+
       // 예상 read count: index 조회 (평균 2-3) + entry 조회 (N개)
       const estimatedIndexReads = Math.min(data.length * 1.5, 5);
       const estimatedReadCount = Math.ceil(estimatedIndexReads + data.length);
@@ -106,6 +120,18 @@ export default function JmdictFindPage() {
       const startTime = performance.now();
       const data = await findJmdictByTerm({ searchTerm: kanaInput.trim(), termType: 'kana' });
       const duration = performance.now() - startTime;
+
+      devLogTap(data, 'kana search result');
+
+      if (!data) {
+        setKanaResult({
+          entries: [],
+          duration,
+          readCount: 1,
+          error: '결과를 찾을 수 없습니다.',
+        });
+        return;
+      }
 
       const estimatedIndexReads = Math.min(data.length * 1.5, 5);
       const estimatedReadCount = Math.ceil(estimatedIndexReads + data.length);
@@ -359,7 +385,7 @@ function ResultDisplay({ result }: { result: SearchResult }) {
 }
 
 // Entry 카드 컴포넌트
-function EntryCard({ entry }: { entry: JmdictEntity }) {
+function EntryCard({ entry }: { entry: JmdictEntity | DictionaryEntryByLanguage['ja'] }) {
   const hasCommon = entry.kanji.some((k) => k.common) || entry.kana.some((k) => k.common);
 
   return (
