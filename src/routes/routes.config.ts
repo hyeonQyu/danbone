@@ -42,8 +42,8 @@ export const appRoutes = {
           title: ({ client }) => {
             if (!client) return '단어 상세 보기';
             const { searchParams } = client;
-            const { language, notation } = DictionaryEntryWithLanguageSchema.parse(searchParams);
-            return `${getLanguageLabel(language)} - ${notation}`;
+            const { language, notations } = DictionaryEntryWithLanguageSchema.parse(searchParams);
+            return `${getLanguageLabel(language)} - ${notations[0]}`;
           },
           searchParamsSchema: DictionaryEntryWithLanguageSchema,
         },
