@@ -27,7 +27,12 @@ export const normalizeToSchema = <T extends z.ZodTypeAny>(schema: T, data: unkno
     const fieldSchema = shape[key];
     const value = normalized[key];
 
-    if (value === undefined || value === null) continue;
+    if (value === undefined || value === null) {
+      if (fieldSchema instanceof z.ZodDefault) {
+        normalized[key] = fieldSchema._def.defaultValue();
+      }
+      continue;
+    }
 
     if (fieldSchema instanceof z.ZodArray) {
       if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {

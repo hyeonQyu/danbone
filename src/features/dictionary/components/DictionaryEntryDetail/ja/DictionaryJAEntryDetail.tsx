@@ -9,7 +9,7 @@ interface DictionaryJAEntryDetailProps {
 }
 
 function DictionaryJAEntryDetail({ entry }: DictionaryJAEntryDetailProps) {
-  const { notation, pronunciation, meanings, partOfSpeeches, examples } = entry;
+  const { notations, pronunciations, meanings, partOfSpeeches, examples } = entry;
 
   const { spacing } = useTheme();
   const pxToRem = usePxToRem();
@@ -32,11 +32,27 @@ function DictionaryJAEntryDetail({ entry }: DictionaryJAEntryDetailProps) {
           component="h1"
           sx={{
             fontWeight: 800,
-            fontSize: { xs: '2.5rem', md: '3rem' },
+            fontSize: { xs: '2rem', md: '3rem' },
             mb: spacing(2),
           }}
         >
-          {notation}
+          {notations.map((notation, index) => (
+            <Box
+              key={index}
+              component="span"
+              sx={{
+                display: 'inline-block',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {notation}
+              {index < notations.length - 1 && (
+                <Box component="span" sx={{ ml: 0.2, mr: 0.8 }}>
+                  ,
+                </Box>
+              )}
+            </Box>
+          ))}
         </Typography>
         <Box sx={{ mb: spacing(2) }}>
           <Chip label={getPartOfSpeechLabel(partOfSpeeches)} color="primary" sx={{ fontWeight: 600, fontSize: '0.95rem' }} />
@@ -45,19 +61,33 @@ function DictionaryJAEntryDetail({ entry }: DictionaryJAEntryDetailProps) {
           variant="h6"
           color="text.secondary"
           sx={{
-            fontSize: { xs: '1.1rem', md: '1.3rem' },
-            mb: spacing(4),
+            fontSize: { xs: '1.2rem', md: '1.3rem' },
           }}
         >
-          [{pronunciation}]
+          [
+          {pronunciations.map((pronunciation, index) => (
+            <Box
+              key={index}
+              component="span"
+              sx={{
+                display: 'inline-block',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {pronunciation}
+              {index < pronunciations.length - 1 && (
+                <Box component="span" sx={{ ml: 0.8, mr: 0.8 }}>
+                  /
+                </Box>
+              )}
+            </Box>
+          ))}
+          ]
         </Typography>
       </Box>
 
-      <Box sx={{ mb: spacing(5) }}>
-        <DictionaryOrderedListSection title="의미" items={meanings} />
-      </Box>
-
-      <DictionaryOrderedListSection title="예문" items={examples} />
+      <DictionaryOrderedListSection title="의미" items={meanings} />
+      {/* <DictionaryOrderedListSection title="예문" items={examples} /> */}
     </Box>
   );
 }

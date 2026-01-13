@@ -1,4 +1,4 @@
-import { JmdictEntriesRepository } from '@/data/server/repositories/jmdict/server.jmdict-entries.repository.types';
+import { JmdictEntriesRepository } from '@/data/server/repositories/jmdict/server.jmdictEntries.repository.types';
 import { getFirebaseServerRepositoryCreator, serializeEntity } from '@/data/server/repositories/server.repository.utils';
 import { JmdictEntity } from '@/features/dictionary';
 import { WriteBatch } from 'firebase-admin/firestore';
@@ -50,11 +50,30 @@ export const jmdictEntriesRepository = getFirebaseServerRepositoryCreator('jmdic
     return docSnaps.filter((snap) => snap.exists).map((snap) => serializeEntity<JmdictEntity>(snap.data()!));
   };
 
+  const getAllEntriesPaginated = async (
+    batchSize: number,
+    startAfterId?: string,
+  ): Promise<{ entries: JmdictEntity[]; lastId: string | null; hasMore: boolean }> => {
+    let query = db.collection(collectionName).orderBy('id').limit(batchSize);
+
+    if (startAfterId) {
+      query = query.startAfter(startAfterId);
+    }
+
+    const snapshot = await query.get();
+    const entries = snapshot.docs.map((doc) => serializeEntity<JmdictEntity>(doc.data()!));
+    const lastId = entries.length > 0 ? entries[entries.length - 1].id : null;
+    const hasMore = snapshot.docs.length === batchSize;
+
+    return { entries, lastId, hasMore };
+  };
+
   return {
     getStoredCount,
     addEntriesToBatch,
     updateEntriesToBatch,
     findById,
     findByIds,
+    getAllEntriesPaginated,
   };
 });

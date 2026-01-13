@@ -1,4 +1,4 @@
-import { JmdictSearchIndexesRepository } from '@/data/server/repositories/jmdict/server.jmdict-search-indexes.repository.types';
+import { JmdictSearchIndexesRepository } from '@/data/server/repositories/jmdict/server.jmdictSearchIndexes.repository.types';
 import { getFirebaseServerRepositoryCreator } from '@/data/server/repositories/server.repository.utils';
 import { JmdictEntity, JmdictSearchIndexEntity, JmdictTermType } from '@/features/dictionary';
 import { WriteBatch } from 'firebase-admin/firestore';

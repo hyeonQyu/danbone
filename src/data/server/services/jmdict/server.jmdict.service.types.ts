@@ -1,5 +1,5 @@
-import { JmdictEntriesRepository } from '@/data/server/repositories/jmdict/server.jmdict-entries.repository.types';
-import { JmdictSearchIndexesRepository } from '@/data/server/repositories/jmdict/server.jmdict-search-indexes.repository.types';
+import { JmdictEntriesRepository } from '@/data/server/repositories/jmdict/server.jmdictEntries.repository.types';
+import { JmdictSearchIndexesRepository } from '@/data/server/repositories/jmdict/server.jmdictSearchIndexes.repository.types';
 import { JmdictEntity, JmdictTermType } from '@/features/dictionary';
 import { JmdictEntry } from '@/features/dictionary/jmdict.types';
 

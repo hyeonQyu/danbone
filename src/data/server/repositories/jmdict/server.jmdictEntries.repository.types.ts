@@ -7,4 +7,8 @@ export interface JmdictEntriesRepository {
   updateEntriesToBatch(batch: WriteBatch, entries: Omit<JmdictEntity, 'createdAt'>[]): number;
   findById(id: string): Promise<JmdictEntity | null>;
   findByIds(ids: string[]): Promise<JmdictEntity[]>;
+  getAllEntriesPaginated(
+    batchSize: number,
+    startAfterId?: string,
+  ): Promise<{ entries: JmdictEntity[]; lastId: string | null; hasMore: boolean }>;
 }
