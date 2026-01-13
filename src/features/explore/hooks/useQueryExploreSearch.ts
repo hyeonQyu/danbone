@@ -1,59 +1,43 @@
+import { DictionaryEntryByLanguage } from '@/features/dictionary/dictionary.types';
 import { useExploreSearchOption } from '@/features/explore/hooks/useExploreSearchOption';
 import { useQueryExploreSearchJA } from '@/features/explore/hooks/useQueryExploreSearchJA';
 import { useExploreStore } from '@/features/explore/stores';
 import { ExploreSearchResult } from '@/features/explore/types';
 import { Language, useTargetLanguage } from '@/language';
-import { DictionaryWordByLanguage } from '@/openai';
 import { useEffect } from 'react';
 
 // 더미 데이터 (개발/테스트용)
-const DUMMY_JA_RESULTS: Array<ExploreSearchResult<DictionaryWordByLanguage['ja']>> = [
+const DUMMY_JA_RESULTS: Array<ExploreSearchResult<DictionaryEntryByLanguage['ja']>> = [
   {
     text: '짧은 단어 2개 테스트',
-    words: [
+    entries: [
       {
-        keyword: 'お化け',
-        entries: [
+        id: 'dummy-1',
+        kanji: [{ common: true, text: 'お化け', tags: [] }],
+        kana: [
           {
-            notations: ['お化け', '御化け'],
-            pronunciations: ['おばけ', 'オバケ'],
-            meanings: ['유령', '귀신'],
-            partOfSpeeches: ['noun'],
-            examples: [],
+            common: true,
+            text: 'おばけ',
+            tags: [],
+            appliesToKanji: ['お化け'],
           },
         ],
-      },
-    ],
-  },
-  {
-    text: '긴 단어 2개 테스ト',
-    words: [
-      {
-        keyword: '疑問符付き感嘆符',
-        entries: [
+        sense: [
           {
-            notations: ['疑問符付き感嘆符', 'エクスクラメーションマーク'],
-            pronunciations: ['ぎもんふつきかんたんふ', 'エクスクラメーションマーク'],
-            meanings: ['물음표가 붙은 느낌표', '느낌표'],
-            partOfSpeeches: ['noun'],
-            examples: [],
-          },
-        ],
-      },
-    ],
-  },
-  {
-    text: '짧은 단어 4개 테스트',
-    words: [
-      {
-        keyword: '食べる',
-        entries: [
-          {
-            notations: ['食べる', 'たべる', '喰べる', '食う'],
-            pronunciations: ['たべる', 'くう', 'タベル', 'クウ'],
-            meanings: ['먹다', '섭취하다'],
-            partOfSpeeches: ['ichidanVerb'],
-            examples: [],
+            partOfSpeech: ['noun'],
+            appliesToKanji: [],
+            appliesToKana: [],
+            related: [],
+            antonym: [],
+            field: [],
+            dialect: [],
+            misc: [],
+            info: [],
+            languageSource: [],
+            gloss: [
+              { lang: 'ko', gender: null, type: null, text: '유령' },
+              { lang: 'ko', gender: null, type: null, text: '귀신' },
+            ],
           },
         ],
       },

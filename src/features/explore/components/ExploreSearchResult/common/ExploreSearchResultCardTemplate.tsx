@@ -2,16 +2,16 @@ import { ExploreSearchResult } from '@/features/explore/types';
 import { Box, Stack, Typography, useTheme } from '@mui/material';
 import { ReactNode } from 'react';
 
-interface ExploreSearchResultCardTemplateProps<TDictionaryWord extends object> {
-  result: ExploreSearchResult<TDictionaryWord>;
-  renderWord: (word: TDictionaryWord) => ReactNode;
+interface ExploreSearchResultCardTemplateProps<TDictionaryEntry extends object> {
+  result: ExploreSearchResult<TDictionaryEntry>;
+  renderEntry: (entry: TDictionaryEntry) => ReactNode;
 }
 
-function ExploreSearchResultCardTemplate<TDictionaryWord extends object>({
+function ExploreSearchResultCardTemplate<TDictionaryEntry extends object>({
   result,
-  renderWord,
-}: ExploreSearchResultCardTemplateProps<TDictionaryWord>) {
-  const { text, words } = result;
+  renderEntry,
+}: ExploreSearchResultCardTemplateProps<TDictionaryEntry>) {
+  const { text, entries } = result;
 
   const { spacing, shape, palette } = useTheme();
 
@@ -31,9 +31,9 @@ function ExploreSearchResultCardTemplate<TDictionaryWord extends object>({
       </Box>
 
       <Stack spacing={spacing(3)}>
-        {words.map((word, index) => (
+        {entries.map((entry, index) => (
           <Box key={index} sx={{ mb: spacing(1) }}>
-            {renderWord(word)}
+            {renderEntry(entry)}
           </Box>
         ))}
       </Stack>

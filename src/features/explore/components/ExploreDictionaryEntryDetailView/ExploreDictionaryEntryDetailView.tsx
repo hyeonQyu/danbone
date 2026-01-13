@@ -1,34 +1,36 @@
 import { BackButton } from '@/components/BackButton';
 import { PageViewContainer } from '@/components/PageViewContainer';
 import { SlideInContainer } from '@/components/SlideInContainer';
-import { DictionaryEntryByLanguage, DictionaryEntrySchemaByLanguage } from '@/features/dictionary';
-import { DictionaryJAEntryDetail } from '@/features/dictionary/components/DictionaryEntryDetail';
-import { normalizeToSchema } from '@/lib';
+import { DictionaryJAEntryDetailView } from '@/features/dictionary/components/DictionaryEntryDetail';
+import { useTargetLanguage } from '@/language';
 import { useTypedRouter, useTypedSearchParams } from '@/routes';
 import { Z_INDEX } from '@/styles/zIndex.constants';
-import { Box, useTheme } from '@mui/material';
+import { Box, Typography, useTheme } from '@mui/material';
 
 function ExploreDictionaryEntryDetailView() {
   const { spacing } = useTheme();
 
   const searchParams = useTypedSearchParams('/explore/search/detail');
-  const { language, ...rawEntry } = searchParams;
-  const entry = normalizeToSchema(DictionaryEntrySchemaByLanguage[language], rawEntry);
+  const { id } = searchParams;
+
+  const targetLanguage = useTargetLanguage();
 
   const router = useTypedRouter();
 
   const handleBack = () => router.back();
 
   const renderContent = () => {
-    if (language === 'ja') {
-      return <DictionaryJAEntryDetail entry={entry as DictionaryEntryByLanguage['ja']} />;
+    if (targetLanguage === 'ja') {
+      return <DictionaryJAEntryDetailView id={id} />;
     }
 
-    if (language === 'ko') {
-      return <div>한국어 사전은 아직 지원하지 않습니다.</div>;
-    }
-
-    return <div>지원하지 않는 언어입니다.</div>;
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
+        <Typography variant="body1" color="text.secondary">
+          지원하지 않는 언어입니다.
+        </Typography>
+      </Box>
+    );
   };
 
   return (

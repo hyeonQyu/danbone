@@ -1,9 +1,11 @@
-import { DictionaryEntryWithLanguageSchema } from '@/features/dictionary';
-import { getLanguageLabel } from '@/language';
 import { RedirectSearchParamsSchema, RoutesContext } from '@/routes/routes.types';
 import { accessibleOnLoggedIn, accessibleOnLoggedOut, getExploreTitle } from '@/routes/routes.utils';
 import { BaseMetadata, createAppRoutes } from '@hyeonqyu/typed-router-next';
 import z from 'zod';
+
+const DetailSearchParamsSchema = z.object({
+  id: z.string(),
+});
 
 export const appRoutes = {
   authentication: {
@@ -39,13 +41,8 @@ export const appRoutes = {
       },
       detail: {
         _metadata: {
-          title: ({ client }) => {
-            if (!client) return '단어 상세 보기';
-            const { searchParams } = client;
-            const { language, notations } = DictionaryEntryWithLanguageSchema.parse(searchParams);
-            return `${getLanguageLabel(language)} - ${notations[0]}`;
-          },
-          searchParamsSchema: DictionaryEntryWithLanguageSchema,
+          title: () => '단어 상세 보기',
+          searchParamsSchema: DetailSearchParamsSchema,
         },
       },
     },

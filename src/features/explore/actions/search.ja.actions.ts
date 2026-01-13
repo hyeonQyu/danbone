@@ -3,7 +3,13 @@
 import { jmdictServiceServer } from '@/data/server';
 import { FindByTermParams } from '@/data/server/services/jmdict';
 import { InvalidValueError } from '@/errors';
-import { convertJmdictEntityToWord, JmdictEntity, JmdictGloss, JmdictSense } from '@/features/dictionary';
+import {
+  convertJmdictEntityToDictionaryEntry,
+  DictionaryEntryByLanguage,
+  JmdictEntity,
+  JmdictGloss,
+  JmdictSense,
+} from '@/features/dictionary';
 import { ExploreSearchHandler } from '@/features/explore/types';
 import { jmdictLanguageToDanboneLanguage, TargetLanguage } from '@/language';
 import {
@@ -18,8 +24,6 @@ import {
   overSome,
 } from '@/lib';
 import {
-  DictionaryInput,
-  DictionaryWordByLanguage,
   getRunner,
   inputValidatorAgentFactory,
   jaMorphologicalAnalyzerAgentFactory,
@@ -28,6 +32,7 @@ import {
   TranslationSource,
   translatorAgentFactory,
 } from '@/openai';
+import { DictionaryInput } from '@/openai/schemes/dictionary.scheme';
 import { withUsageTracking } from '@/openai/tracking';
 import { identity } from 'es-toolkit';
 
@@ -79,7 +84,7 @@ const jaWordToSearchParam = (word: string): FindByTermParams => {
   throw new InvalidValueError(`유효하지 않은 일본어 단어 형식: ${word}`);
 };
 
-const getJmdictEntries = async (word: string) => {
+const getJmdictEntries = async (word: string): Promise<JmdictEntity[]> => {
   const searchParam = jaWordToSearchParam(word);
   try {
     return await jmdictServiceServer.findByTerm(searchParam);
@@ -99,7 +104,7 @@ const checkJmtSenseLanguage = (checkingLanguage: string) => (sense: JmdictSense)
   return getJmdictSenseLanguage(sense) === checkingLanguage;
 };
 
-const getDictionaryWordsJA = async ({ sourceLanguage, words }: DictionaryInput): Promise<DictionaryWordByLanguage['ja'][]> => {
+const getDictionaryEntriesJA = async ({ sourceLanguage, words }: DictionaryInput): Promise<DictionaryEntryByLanguage['ja'][]> => {
   const checkJmdictEntryHasSourceLanguageSense = (entry: JmdictEntity) => {
     return entry.sense.some(checkJmtSenseLanguage(sourceLanguage));
   };
@@ -129,43 +134,40 @@ const getDictionaryWordsJA = async ({ sourceLanguage, words }: DictionaryInput):
     };
   };
 
-  const searchedWordsWithJmdictEntries = (await Promise.allSettled(words.map(getJmdictEntries))).filter(checkResultFulfilled());
+  const searchResults = (await Promise.allSettled(words.map(getJmdictEntries))).filter(checkResultFulfilled());
 
-  const wordsWithJmdictEntriesWithUpdated = await Promise.all(
-    searchedWordsWithJmdictEntries.map(({ value: jmdictEntries }) => {
-      return Promise.all(
-        jmdictEntries.map(async (jmdictEntry) => {
-          if (checkJmdictEntryHasSourceLanguageSense(jmdictEntry)) {
+  const entriesWithUpdateStatus = (
+    await Promise.all(
+      searchResults.map(({ value: jmdictEntries }) => {
+        return Promise.all(
+          jmdictEntries.map(async (jmdictEntry) => {
+            if (checkJmdictEntryHasSourceLanguageSense(jmdictEntry)) {
+              return {
+                entry: jmdictEntry,
+                updated: false,
+              };
+            }
+
             return {
-              entry: jmdictEntry,
-              updated: false,
+              entry: await addSourceLanguageSenseToJmdictEntry(jmdictEntry),
+              updated: true,
             };
-          }
+          }),
+        );
+      }),
+    )
+  ).flat();
 
-          return {
-            entry: await addSourceLanguageSenseToJmdictEntry(jmdictEntry),
-            updated: true,
-          };
-        }),
-      );
-    }),
-  );
-
-  const updatedEntries = wordsWithJmdictEntriesWithUpdated
-    .flat()
-    .filter(({ updated }) => updated)
-    .map(({ entry }) => entry);
+  const updatedEntries = entriesWithUpdateStatus.filter(({ updated }) => updated).map(({ entry }) => entry);
 
   if (updatedEntries.length > 0) {
     await jmdictServiceServer.updateEntries(updatedEntries);
   }
 
-  return wordsWithJmdictEntriesWithUpdated
-    .map((entriesWithUpdate) => entriesWithUpdate.map(({ entry }) => convertJmdictEntityToWord(entry, sourceLanguage)))
-    .flat();
+  return entriesWithUpdateStatus.map(({ entry }) => convertJmdictEntityToDictionaryEntry(entry, sourceLanguage));
 };
 
-const _searchJA: ExploreSearchHandler<DictionaryWordByLanguage['ja']> = async ({ query, queryLanguage, sourceLanguage }) => {
+const _searchJA: ExploreSearchHandler<DictionaryEntryByLanguage['ja']> = async ({ query, queryLanguage, sourceLanguage }) => {
   const TARGET_LANGUAGE: TargetLanguage = 'ja' as const;
 
   const getTranslatedJATexts = async (normalizedQuery: string) => {
@@ -209,7 +211,7 @@ const _searchJA: ExploreSearchHandler<DictionaryWordByLanguage['ja']> = async ({
     return translatedJATexts;
   };
 
-  const getDictionaryWords = async (normalizedJAText: string) => {
+  const getDictionaryEntries = async (normalizedJAText: string) => {
     const morphologicalAnalysisResult = await morphologicalAnalysisJA(normalizedJAText);
     const tokens = devLogTap(morphologicalAnalysisResult.finalOutput?.tokens, '형태소 분리된 토큰');
 
@@ -217,32 +219,32 @@ const _searchJA: ExploreSearchHandler<DictionaryWordByLanguage['ja']> = async ({
       throw new InvalidValueError('형태소 분석에 실패했습니다.\n다시 입력해주세요.');
     }
 
-    const words = await getDictionaryWordsJA({ sourceLanguage, words: tokens.map(({ base }) => base) });
+    const entries = await getDictionaryEntriesJA({ sourceLanguage, words: tokens.map(({ base }) => base) });
 
-    if (!words?.length) {
+    if (!entries?.length) {
       throw new InvalidValueError('사전 검색에 실패했습니다.\n다시 입력해주세요.');
     }
 
-    return words;
+    return entries;
   };
 
   const normalizedJATexts = devLogTap(await getNormalizedJATexts(), '정규화된 일본어 문자열');
 
-  const results = await Promise.allSettled(
+  const searchResults = await Promise.allSettled(
     normalizedJATexts.map(async (text) => {
-      const words = await getDictionaryWords(text);
-      return { text, words };
+      const entries = await getDictionaryEntries(text);
+      return { text, entries };
     }),
   );
 
-  const dictionaryWordsByNormalizedJAText = results.filter(checkResultFulfilled()).map(({ value }) => value);
-  const firstRejection = results.find(checkResultRejected());
+  const entriesByNormalizedText = searchResults.filter(checkResultFulfilled()).map(({ value }) => value);
+  const firstRejection = searchResults.find(checkResultRejected());
 
   if (firstRejection) {
     throw new Error(firstRejection.reason);
   }
 
-  return dictionaryWordsByNormalizedJAText;
+  return entriesByNormalizedText;
 };
 
 export const searchJA = withUsageTracking('searchJA', _searchJA, {

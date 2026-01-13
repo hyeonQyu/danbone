@@ -1,15 +1,94 @@
 import { useGetJAPartOfSpeechLabel } from '@/features/dictionary';
-import { DictionaryWordByLanguage } from '@/openai';
+import { DictionaryEntryByLanguage } from '@/features/dictionary/dictionary.types';
+import { JmdictKana, JmdictKanji, JmdictKanjiTag } from '@/features/dictionary/jmdict.types';
+import { overSome } from '@/lib';
 import { useTypedRouter } from '@/routes';
 import { usePxToRem } from '@/styles';
 import { Box, Chip, Typography, useTheme } from '@mui/material';
 
 interface DictionaryJAEntryCardProps {
-  entry: DictionaryWordByLanguage['ja']['entries'][number];
+  entry: DictionaryEntryByLanguage['ja'];
 }
 
+const MAX_PRIMARY_MEANINGS = 2;
+
+const getCommon = ({ common }: { common: boolean }) => common;
+
+const filterSearchOnlyNotations = (kanji: JmdictKanji[], kana: JmdictKana[]) => ({
+  validKanji: kanji.filter(({ tags }) => !tags.includes('sK')),
+  validKana: kana.filter(({ tags }) => !tags.includes('sk')),
+});
+
+const checkHasOnlyKanaCommon = (kana: JmdictKana[], kanji: JmdictKanji[]) => {
+  const hasCommonKana = kana.some(getCommon);
+  const hasCommonKanji = kanji.some(getCommon);
+  return hasCommonKana && !hasCommonKanji;
+};
+
+const checkKanjiTag = (compareTag: JmdictKanjiTag) => (tag: JmdictKanjiTag) => tag === compareTag;
+
+const shouldPreferKanaOverKanji = (kanji: JmdictKanji, kana: JmdictKana[]) => {
+  return kanji.tags.some(overSome(checkKanjiTag('rK'), checkKanjiTag('oK'))) && kana.length > 0;
+};
+
+const getFirstCommonKana = (kana: JmdictKana[]) => {
+  return kana.find(getCommon)!.text;
+};
+
+const selectBestNotation = ({ kanji, kana }: { kanji: JmdictKanji[]; kana: JmdictKana[] }) => {
+  const { validKanji, validKana } = filterSearchOnlyNotations(kanji, kana);
+
+  if (checkHasOnlyKanaCommon(validKana, validKanji)) {
+    return getFirstCommonKana(validKana);
+  }
+
+  if (validKanji.length > 0) {
+    const firstKanji = validKanji[0];
+
+    if (shouldPreferKanaOverKanji(firstKanji, validKana)) {
+      return validKana[0].text;
+    }
+
+    return firstKanji.text;
+  }
+
+  return validKana[0].text;
+};
+
+const calculateTotalNotations = (validKanji: JmdictKanji[], validKana: JmdictKana[]) => {
+  return validKanji.length + (validKanji.length === 0 ? validKana.length : 0);
+};
+
+const getFirstReading = (kana: JmdictKana[]) => kana[0].text;
+
+const getPrimaryPartOfSpeech = (sense: DictionaryEntryByLanguage['ja']['sense']) => {
+  return sense[0]?.partOfSpeech[0];
+};
+
+const getPrimaryMeanings = (sense: DictionaryEntryByLanguage['ja']['sense']) => {
+  return sense
+    .slice(0, MAX_PRIMARY_MEANINGS)
+    .map(({ gloss }) => gloss[0]?.text)
+    .filter(Boolean);
+};
+
+const calculateRemainingSenseCount = (totalSenseCount: number) => {
+  return Math.max(0, totalSenseCount - 2);
+};
+
 function DictionaryJAEntryCard({ entry }: DictionaryJAEntryCardProps) {
-  const { notations, pronunciations, meanings, partOfSpeeches } = entry;
+  const { id, kanji, kana, sense } = entry;
+
+  const notation = selectBestNotation({ kanji, kana });
+
+  const { validKanji, validKana } = filterSearchOnlyNotations(kanji, kana);
+  const totalNotations = calculateTotalNotations(validKanji, validKana);
+  const hasMoreNotations = totalNotations > 1;
+
+  const reading = getFirstReading(kana);
+  const primaryPos = getPrimaryPartOfSpeech(sense);
+  const primaryMeanings = getPrimaryMeanings(sense);
+  const remainingSenseCount = calculateRemainingSenseCount(sense.length);
 
   const { spacing, palette, transitions, shadows } = useTheme();
   const pxToRem = usePxToRem();
@@ -20,10 +99,7 @@ function DictionaryJAEntryCard({ entry }: DictionaryJAEntryCardProps) {
 
   const handleClick = () => {
     router.push('/explore/search/detail', {
-      searchParams: {
-        language: 'ja',
-        ...entry,
-      },
+      searchParams: { id },
     });
   };
 
@@ -58,44 +134,45 @@ function DictionaryJAEntryCard({ entry }: DictionaryJAEntryCardProps) {
         },
       }}
     >
-      <Box sx={{ mb: spacing(1), display: 'flex', alignItems: 'center', gap: spacing(1), flexWrap: 'wrap' }}>
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, alignItems: 'baseline' }}>
-          {notations.map((notation, index) => (
-            <Box key={index} sx={{ display: 'flex', alignItems: 'baseline' }}>
-              <Typography variant="subtitle1" component="span" sx={{ fontWeight: 600 }}>
-                {notation}
-              </Typography>
-              {index < notations.length - 1 && (
-                <Typography variant="subtitle1" component="span">
-                  ,
-                </Typography>
-              )}
-            </Box>
-          ))}
-        </Box>
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, alignItems: 'baseline' }}>
-          {pronunciations.map((pronunciation, index) => (
-            <Box key={index} sx={{ display: 'flex', alignItems: 'baseline' }}>
-              <Typography variant="body2" color="text.secondary" component="span">
-                [{pronunciation}]
-              </Typography>
-              {index < pronunciations.length - 1 && (
-                <Typography variant="body2" color="text.secondary" component="span">
-                  ,
-                </Typography>
-              )}
-            </Box>
-          ))}
-        </Box>
-        <Chip label={getPartOfSpeechLabel(partOfSpeeches)} size="small" sx={{ ml: 'auto' }} variant="filled" />
+      <Box
+        sx={{
+          mb: spacing(1),
+          display: 'flex',
+          alignItems: 'center',
+          gap: spacing(1),
+          flexWrap: 'wrap',
+        }}
+      >
+        <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+          {notation}
+          {hasMoreNotations && (
+            <Typography component="span" variant="caption" color="text.secondary" sx={{ ml: 0.5 }}>
+              ...
+            </Typography>
+          )}
+        </Typography>
+
+        {kanji.length > 0 && (
+          <Typography variant="body2" color="text.secondary">
+            [{reading}]
+          </Typography>
+        )}
+
+        {primaryPos && <Chip label={getPartOfSpeechLabel([primaryPos])} size="small" sx={{ ml: 'auto' }} variant="filled" />}
       </Box>
 
       <Box>
-        {meanings.map((meaning, index) => (
+        {primaryMeanings.map((meaning, index) => (
           <Typography key={index} variant="body2" color="text.secondary" sx={{ pl: spacing(1), mb: spacing(0.5) }}>
             {index + 1}. {meaning}
           </Typography>
         ))}
+
+        {remainingSenseCount > 0 && (
+          <Typography variant="caption" color="text.secondary" sx={{ pl: spacing(1), fontStyle: 'italic' }}>
+            외 {remainingSenseCount}개 의미
+          </Typography>
+        )}
       </Box>
     </Box>
   );

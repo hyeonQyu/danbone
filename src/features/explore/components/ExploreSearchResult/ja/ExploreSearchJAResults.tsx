@@ -1,18 +1,18 @@
 import ExploreSearchResultCardTemplate from '@/features/explore/components/ExploreSearchResult/common/ExploreSearchResultCardTemplate';
 import ExploreSearchResultsContainer from '@/features/explore/components/ExploreSearchResult/common/ExploreSearchResultsContainer';
-import DictionaryJAWord from '@/features/explore/components/ExploreSearchResult/ja/DictionaryJAWord';
+import DictionaryJAEntryCard from '@/features/explore/components/ExploreSearchResult/ja/DictionaryJAEntryCard';
+import { DictionaryEntryByLanguage } from '@/features/dictionary/dictionary.types';
 import { ExploreSearchResult } from '@/features/explore/types';
-import { DictionaryWordByLanguage } from '@/openai';
 
 interface ExploreSearchJAResultProps {
-  results: Array<ExploreSearchResult<DictionaryWordByLanguage['ja']>>;
+  results: Array<ExploreSearchResult<DictionaryEntryByLanguage['ja']>>;
 }
 
 function ExploreSearchJAResults({ results }: ExploreSearchJAResultProps) {
   return (
     <ExploreSearchResultsContainer>
       {results.map((result) => (
-        <ExploreSearchResultCardTemplate key={result.text} result={result} renderWord={(word) => <DictionaryJAWord word={word} />} />
+        <ExploreSearchResultCardTemplate key={result.text} result={result} renderEntry={(entry) => <DictionaryJAEntryCard entry={entry} />} />
       ))}
     </ExploreSearchResultsContainer>
   );
