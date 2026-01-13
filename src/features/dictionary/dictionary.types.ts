@@ -1,5 +1,6 @@
 import { Language } from '@/language';
 import z from 'zod';
+import { JmdictKanaSchema, JmdictKanjiSchema, JmdictSenseSchema } from './jmdict.types';
 
 export const PartOfSpeechSchemaByLanguage = {
   ko: z.enum(['verb', 'noun', 'adjective', 'adverb', 'particle', 'conjunction', 'article', 'interjection']),
@@ -7,14 +8,28 @@ export const PartOfSpeechSchemaByLanguage = {
     'godanVerb',
     'ichidanVerb',
     'irregularVerb',
+    'auxiliary',
+    'auxiliaryVerb',
+    'auxiliaryAdjective',
+    'copula',
     'noun',
+    'counter',
     'naAdjective',
     'iAdjective',
     'adverb',
     'particle',
     'conjunction',
     'interjection',
+    'expression',
+    'prefix',
+    'suffix',
   ]),
+} as const;
+
+export const DictionarySenseSchemaByLanguage = {
+  ja: JmdictSenseSchema.extend({
+    partOfSpeech: z.array(PartOfSpeechSchemaByLanguage['ja']),
+  }),
 } as const;
 
 export const DictionaryEntrySchemaByLanguage = {
@@ -26,11 +41,10 @@ export const DictionaryEntrySchemaByLanguage = {
     examples: z.array(z.string()).default([]),
   }),
   ja: z.object({
-    notations: z.array(z.string()).min(1),
-    pronunciations: z.array(z.string()).min(1),
-    meanings: z.array(z.string()).min(1),
-    partOfSpeeches: z.array(PartOfSpeechSchemaByLanguage['ja']),
-    examples: z.array(z.string()).default([]),
+    id: z.string(),
+    kanji: z.array(JmdictKanjiSchema),
+    kana: z.array(JmdictKanaSchema),
+    sense: z.array(DictionarySenseSchemaByLanguage.ja),
   }),
 } as const;
 

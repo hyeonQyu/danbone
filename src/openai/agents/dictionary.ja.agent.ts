@@ -1,5 +1,20 @@
 import { buildAgentFactory } from '@/openai/agent.utils';
-import { DictionaryOutputSchemaByLanguage } from '@/openai/schemes';
+// @deprecated - jmdict 사용으로 deprecated
+// import { DictionaryOutputSchemaByLanguage } from '@/openai/schemes';
+import { DictionaryEntrySchemaByLanguage } from '@/features/dictionary/dictionary.types';
+import z from 'zod';
+
+// Deprecated: Word 구조가 제거되었으므로 임시로 정의
+const DictionaryOutputSchemaByLanguage = {
+  ja: z.object({
+    words: z.array(
+      z.object({
+        keyword: z.string(),
+        entries: z.array(DictionaryEntrySchemaByLanguage.ja),
+      }),
+    ),
+  }),
+};
 
 const gpt5Instructions = `
 Provide dictionary information for Japanese words.
