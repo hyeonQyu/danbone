@@ -10,11 +10,12 @@ import {
   JmdictGloss,
   JmdictSense,
 } from '@/features/dictionary';
-import { ExploreSearchHandler } from '@/features/explore/types';
+import { ExploreSearchHandler } from '@/features/explore';
 import { jmdictLanguageToDanboneLanguage, TargetLanguage } from '@/language';
 import {
   checkResultFulfilled,
   checkResultRejected,
+  devLog,
   devLogError,
   devLogTap,
   hasAlphabet,
@@ -27,6 +28,8 @@ import {
   getRunner,
   inputValidatorAgentFactory,
   jaMorphologicalAnalyzerAgentFactory,
+  JmdictTranslationParams,
+  jmdictTranslatorAgentFactory,
   LocalizedText,
   queryNormalizerAgentFactory,
   TranslationSource,
@@ -44,6 +47,7 @@ const inputValidatorAgent = inputValidatorAgentFactory.createAgent('gpt-4.1-mini
 const queryNormalizerAgent = queryNormalizerAgentFactory.createAgent('gpt-4.1-mini');
 const translatorAgent = translatorAgentFactory.createAgent('gpt-4o-mini');
 const jaMorphologicalAnalyzerAgent = jaMorphologicalAnalyzerAgentFactory.createAgent('gpt-4o-mini');
+const jmdictTranslatorAgent = jmdictTranslatorAgentFactory.createAgent('gpt-4o-mini');
 
 const checkQueryLength = (query: string) => {
   return query.length <= MAX_QUERY_LENGTH;
@@ -63,6 +67,10 @@ const translateQuery = async (input: TranslationSource) => {
 
 const morphologicalAnalysisJA = async (input: string) => {
   return runner.run(jaMorphologicalAnalyzerAgent, input);
+};
+
+const translateJmdictSense = async (input: JmdictTranslationParams) => {
+  return runner.run(jmdictTranslatorAgent, JSON.stringify(input));
 };
 
 const jaWordToSearchParam = (word: string): FindByTermParams => {
@@ -109,21 +117,30 @@ const getDictionaryEntriesJA = async ({ sourceLanguage, words }: DictionaryInput
     return entry.sense.some(checkJmtSenseLanguage(sourceLanguage));
   };
 
-  // TODO: 실제 번역 API 호출 또는 AI 번역 로직
-  const translateGlossToSourceLanguage = async (gloss: JmdictGloss[]): Promise<JmdictGloss[]> => {
-    return gloss.map((g) => ({
-      ...g,
+  const translateGlossToSourceLanguage = async (params: Omit<JmdictTranslationParams, 'sourceLanguage'>): Promise<JmdictGloss[]> => {
+    const { finalOutput } = await translateJmdictSense({ ...params, sourceLanguage });
+
+    if (!finalOutput?.texts) {
+      throw new Error('상세 번역 결과를 추출할 수 없습니다.\n다시 입력해주세요.');
+    }
+
+    return finalOutput.texts.map((text, index) => ({
+      ...params.glosses[index],
       lang: sourceLanguage,
-      // text: await translateText(gloss.text, targetLang), // 실제 번역 필요
+      text,
     }));
   };
 
   const addSourceLanguageSenseToJmdictEntry = async (entry: JmdictEntity): Promise<JmdictEntity> => {
-    const englishSenses = entry.sense.filter(checkJmtSenseLanguage('en'));
+    const enSenses = entry.sense.filter(checkJmtSenseLanguage('en'));
 
     const newSourceLanguageSense = await Promise.all(
-      englishSenses.map(async (sense) => {
-        const sourceLanguageGloss = await translateGlossToSourceLanguage(sense.gloss);
+      enSenses.map(async (sense) => {
+        const sourceLanguageGloss = await translateGlossToSourceLanguage({
+          kanjis: entry.kanji.map(({ text }) => text),
+          kanas: entry.kana.map(({ text }) => text),
+          glosses: sense.gloss,
+        });
         return { ...sense, gloss: sourceLanguageGloss };
       }),
     );
@@ -134,7 +151,7 @@ const getDictionaryEntriesJA = async ({ sourceLanguage, words }: DictionaryInput
     };
   };
 
-  const searchResults = (await Promise.allSettled(words.map(getJmdictEntries))).filter(checkResultFulfilled());
+  const searchResults = (await Promise.allSettled(words.map(getJmdictEntries))).filter(checkResultFulfilled);
 
   const entriesWithUpdateStatus = (
     await Promise.all(
@@ -159,6 +176,14 @@ const getDictionaryEntriesJA = async ({ sourceLanguage, words }: DictionaryInput
   ).flat();
 
   const updatedEntries = entriesWithUpdateStatus.filter(({ updated }) => updated).map(({ entry }) => entry);
+  devLog(
+    updatedEntries.map(({ id, kanji, kana }) => ({
+      id,
+      kanji: kanji.map(({ text }) => text).join(','),
+      kana: kana.map(({ text }) => text).join(','),
+    })),
+    '업데이트된 사전 항목 ID',
+  );
 
   if (updatedEntries.length > 0) {
     await jmdictServiceServer.updateEntries(updatedEntries);
@@ -237,8 +262,8 @@ const _searchJA: ExploreSearchHandler<DictionaryEntryByLanguage['ja']> = async (
     }),
   );
 
-  const entriesByNormalizedText = searchResults.filter(checkResultFulfilled()).map(({ value }) => value);
-  const firstRejection = searchResults.find(checkResultRejected());
+  const entriesByNormalizedText = searchResults.filter(checkResultFulfilled).map(({ value }) => value);
+  const firstRejection = searchResults.find(checkResultRejected);
 
   if (firstRejection) {
     throw new Error(firstRejection.reason);

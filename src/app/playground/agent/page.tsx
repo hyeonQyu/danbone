@@ -29,6 +29,7 @@ const AGENT_OPTIONS = [
   { value: 'inputValidator', label: 'Input Validator', description: '입력 검증' },
   { value: 'translator', label: 'Translator', description: '번역' },
   { value: 'morphAnalyzer', label: 'Japanese Morph Analyzer', description: '일본어 형태소 분석' },
+  { value: 'jmdictTranslator', label: 'JMdict Translator', description: 'JMdict 사전 번역' },
   { value: 'dictionaryJa', label: 'Japanese Dictionary', description: '일본어 사전' },
 ] as const;
 
