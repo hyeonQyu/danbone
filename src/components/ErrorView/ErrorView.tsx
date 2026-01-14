@@ -1,17 +1,21 @@
 import { usePxToRem } from '@/styles';
 import { ErrorOutline } from '@mui/icons-material';
-import { Box, Stack, Typography, useTheme } from '@mui/material';
+import { Box, Stack, SxProps, Theme, Typography, useTheme } from '@mui/material';
+import { ReactNode } from 'react';
 
-interface ExploreSearchErrorResultProps {
-  error: Error | unknown;
+interface ErrorViewProps {
+  title: string;
+  message: string;
+  icon?: ReactNode;
+  sx?: SxProps<Theme>;
 }
 
-function ExploreSearchErrorResult({ error }: ExploreSearchErrorResultProps) {
+function ErrorView({ title, message, icon, sx }: ErrorViewProps) {
   const { spacing, palette } = useTheme();
 
   const pxToRem = usePxToRem();
 
-  const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.\n다시 시도해주세요.';
+  const defaultIcon = <ErrorOutline sx={{ fontSize: pxToRem(52), color: palette.error.main }} />;
 
   return (
     <Box
@@ -22,6 +26,7 @@ function ExploreSearchErrorResult({ error }: ExploreSearchErrorResultProps) {
         justifyContent: 'center',
         p: `${spacing(6)} ${spacing(2)}`,
         minHeight: pxToRem(300),
+        ...sx,
       }}
     >
       <Stack
@@ -45,7 +50,7 @@ function ExploreSearchErrorResult({ error }: ExploreSearchErrorResultProps) {
             margin: '0 auto',
           }}
         >
-          <ErrorOutline sx={{ fontSize: pxToRem(52), color: palette.error.main }} />
+          {icon || defaultIcon}
         </Box>
 
         <Typography
@@ -54,7 +59,7 @@ function ExploreSearchErrorResult({ error }: ExploreSearchErrorResultProps) {
             marginTop: spacing(3),
           }}
         >
-          검색에 실패했습니다
+          {title}
         </Typography>
 
         <Typography
@@ -65,11 +70,11 @@ function ExploreSearchErrorResult({ error }: ExploreSearchErrorResultProps) {
             marginTop: spacing(1),
           }}
         >
-          {errorMessage}
+          {message}
         </Typography>
       </Stack>
     </Box>
   );
 }
 
-export default ExploreSearchErrorResult;
+export default ErrorView;

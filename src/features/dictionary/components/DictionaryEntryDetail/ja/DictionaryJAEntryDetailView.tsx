@@ -1,10 +1,10 @@
+import { ErrorView } from '@/components/ErrorView';
 import { Loading } from '@/components/Loading';
 import { getDictionaryEntryJA } from '@/features/dictionary/actions/findJmdict.action';
 import { DICTIONARY_QUERY_KEY } from '@/features/dictionary/dictionary.queryKey';
 import { DictionaryEntryByLanguage } from '@/features/dictionary/dictionary.types';
 import { useSourceLanguage } from '@/language';
 import { TIME_UNIT } from '@/lib';
-import { Box, Typography } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import DictionaryJAEntryDetail from './DictionaryJAEntryDetail';
 
@@ -33,13 +33,7 @@ function DictionaryJAEntryDetailView({ id }: DictionaryJAEntryDetailViewProps) {
   }
 
   if (isError || !entry) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
-        <Typography variant="body1" color="text.secondary">
-          엔트리를 찾을 수 없습니다.
-        </Typography>
-      </Box>
-    );
+    return <ErrorView sx={{ height: '100%' }} title="조회 실패" message="잠시 후 다시 시도해주세요." />;
   }
 
   return <DictionaryJAEntryDetail entry={entry} />;
