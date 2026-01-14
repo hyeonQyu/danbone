@@ -1,4 +1,5 @@
 import {
+  DictionaryEntryByLanguage,
   useGetJADialectLabel,
   useGetJAGlossTypeLabel,
   useGetJAKanaTagLabel,
@@ -6,7 +7,6 @@ import {
   useGetJAMiscLabel,
   useGetJAPartOfSpeechLabel,
 } from '@/features/dictionary';
-import { DictionaryEntryByLanguage } from '@/features/dictionary/dictionary.types';
 import StarIcon from '@mui/icons-material/Star';
 import { Box, Chip, Divider, Typography, useTheme } from '@mui/material';
 

@@ -29,7 +29,6 @@ export const findJmdictByTerm = async (params: FindByTermParams) => {
   if (!entries) {
     return null;
   }
-  // TODO: DAN-98 에서 수정
   return entries.map((entry) => convertJmdictEntityToDictionaryEntry(entry, 'eng'));
 };
 
@@ -52,6 +51,5 @@ export const getDictionaryEntryJA = async ({
     return null;
   }
 
-  // TODO: DAN-98 에서 수정
-  return convertJmdictEntityToDictionaryEntry(jmdictEntry, 'eng');
+  return convertJmdictEntityToDictionaryEntry(jmdictEntry, sourceLanguage);
 };

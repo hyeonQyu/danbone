@@ -29,6 +29,7 @@ const AGENT_OPTIONS = [
   { value: 'inputValidator', label: 'Input Validator', description: '입력 검증' },
   { value: 'translator', label: 'Translator', description: '번역' },
   { value: 'morphAnalyzer', label: 'Japanese Morph Analyzer', description: '일본어 형태소 분석' },
+  { value: 'jmdictTranslator', label: 'JMdict Translator', description: 'JMdict 사전 번역' },
   { value: 'dictionaryJa', label: 'Japanese Dictionary', description: '일본어 사전' },
 ] as const;
 
@@ -266,16 +267,6 @@ export default function TestUsagePage() {
                 </Typography>
                 <Typography variant="body2" component="pre" sx={{ fontFamily: 'monospace', fontSize: '0.75rem', mt: 1 }}>
                   {`{ "text": "조금", "sourceLanguage": "ko", "targetLanguage": "ja" }`}
-                </Typography>
-              </Alert>
-            )}
-            {selectedAgent === 'dictionaryJa' && (
-              <Alert severity="info" sx={{ mt: 1 }}>
-                <Typography variant="body2">
-                  <strong>Japanese Dictionary 입력 형식:</strong> JSON 형식으로 입력해주세요.
-                </Typography>
-                <Typography variant="body2" component="pre" sx={{ fontFamily: 'monospace', fontSize: '0.75rem', mt: 1 }}>
-                  {`{ "sourceLanguage": "ko", "words": ["食べる", "猫", "上手"] }`}
                 </Typography>
               </Alert>
             )}

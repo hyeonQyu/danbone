@@ -2,6 +2,7 @@
 
 import {
   inputValidatorTestCases,
+  jmdictTranslatorTestCases,
   morphAnalyzerJaTestCases,
   queryNormalizerTestCases,
   translatorTestCases,
@@ -10,6 +11,7 @@ import {
 import {
   inputValidatorAgentFactory,
   jaMorphologicalAnalyzerAgentFactory,
+  jmdictTranslatorAgentFactory,
   queryNormalizerAgentFactory,
   translatorAgentFactory,
 } from '@/openai/agents';
@@ -21,6 +23,7 @@ const agentCreators = {
   inputValidator: inputValidatorAgentFactory,
   translator: translatorAgentFactory,
   morphAnalyzer: jaMorphologicalAnalyzerAgentFactory,
+  jmdictTranslator: jmdictTranslatorAgentFactory,
 } as const;
 
 const testCases = {
@@ -28,6 +31,7 @@ const testCases = {
   inputValidator: inputValidatorTestCases,
   translator: translatorTestCases,
   morphAnalyzer: morphAnalyzerJaTestCases,
+  jmdictTranslator: jmdictTranslatorTestCases,
 } as const;
 
 export type AgentName = keyof typeof agentCreators;
