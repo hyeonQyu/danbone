@@ -3,7 +3,8 @@
 import { useInterval } from '@/hooks';
 import { TIME_UNIT } from '@/lib';
 import { usePxToRem } from '@/styles';
-import { Box, CircularProgress, Typography, keyframes, useTheme } from '@mui/material';
+import { Theme } from '@emotion/react';
+import { Box, CircularProgress, SxProps, Typography, keyframes, useTheme } from '@mui/material';
 import { useState } from 'react';
 
 const pulseAnimation = keyframes`
@@ -45,9 +46,10 @@ const defaultLoadingMessages = ['데이터를 불러오는 중...', '잠시만 �
 
 interface LoadingProps {
   messages?: string[];
+  sx?: SxProps<Theme>;
 }
 
-function Loading({ messages = defaultLoadingMessages }: LoadingProps) {
+function Loading({ messages = defaultLoadingMessages, sx }: LoadingProps) {
   const [messageIndex, setMessageIndex] = useState(0);
   const theme = useTheme();
 
@@ -66,6 +68,7 @@ function Loading({ messages = defaultLoadingMessages }: LoadingProps) {
         justifyContent: 'center',
         minHeight: pxToRem(400),
         gap: 3,
+        ...sx,
       }}
     >
       <svg width="0" height="0" style={{ position: 'absolute' }}>
