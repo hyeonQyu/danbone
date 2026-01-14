@@ -21,6 +21,7 @@ function ExploreDictionaryEntryDetailView() {
   const handleBack = () => router.back();
 
   const { ref: backButtonBoxRef, height: backButtonBoxHeight } = useElementHeight<HTMLDivElement>();
+  const maxHeight = backButtonBoxHeight > 0 ? `calc(100vh - ${backButtonBoxHeight}px)` : '100vh';
 
   const renderContent = () => {
     if (targetLanguage === 'ja') {
@@ -54,12 +55,12 @@ function ExploreDictionaryEntryDetailView() {
       <PageViewContainer
         sx={{
           minHeight: 'auto',
-          maxHeight: backButtonBoxHeight > 0 ? `calc(100vh - ${backButtonBoxHeight}px)` : '100vh',
+          height: maxHeight,
+          maxHeight,
           overflowY: 'auto',
           top: backButtonBoxHeight,
           position: 'relative',
-          justifyContent: 'flex-start',
-          alignItems: 'flex-start',
+          display: 'block',
         }}
       >
         {renderContent()}

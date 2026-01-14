@@ -1,9 +1,10 @@
+import { Loading } from '@/components/Loading';
 import { getDictionaryEntryJA } from '@/features/dictionary/actions/findJmdict.action';
 import { DICTIONARY_QUERY_KEY } from '@/features/dictionary/dictionary.queryKey';
 import { DictionaryEntryByLanguage } from '@/features/dictionary/dictionary.types';
 import { useSourceLanguage } from '@/language';
 import { TIME_UNIT } from '@/lib';
-import { Box, CircularProgress, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import DictionaryJAEntryDetail from './DictionaryJAEntryDetail';
 
@@ -28,11 +29,7 @@ function DictionaryJAEntryDetailView({ id }: DictionaryJAEntryDetailViewProps) {
   });
 
   if (isLoading) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
-        <CircularProgress />
-      </Box>
-    );
+    return <Loading sx={{ height: '100%' }} />;
   }
 
   if (isError || !entry) {
