@@ -269,16 +269,6 @@ export default function TestUsagePage() {
                 </Typography>
               </Alert>
             )}
-            {selectedAgent === 'dictionaryJa' && (
-              <Alert severity="info" sx={{ mt: 1 }}>
-                <Typography variant="body2">
-                  <strong>Japanese Dictionary 입력 형식:</strong> JSON 형식으로 입력해주세요.
-                </Typography>
-                <Typography variant="body2" component="pre" sx={{ fontFamily: 'monospace', fontSize: '0.75rem', mt: 1 }}>
-                  {`{ "sourceLanguage": "ko", "words": ["食べる", "猫", "上手"] }`}
-                </Typography>
-              </Alert>
-            )}
           </Box>
 
           <Button variant="contained" size="large" onClick={handleTest} disabled={loading || selectedConfigs.length === 0} sx={{ mt: 3 }}>
