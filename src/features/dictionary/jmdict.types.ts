@@ -99,8 +99,8 @@ export const JmdictGlossTypeSchema = z.enum(['explanation', 'figurative', 'liter
 
 export const JmdictGlossSchema = z.object({
   lang: z.string(),
-  gender: z.string().nullable(),
-  type: JmdictGlossTypeSchema.nullable(),
+  gender: z.string().nullable().optional(),
+  type: JmdictGlossTypeSchema.nullable().optional(),
   text: z.string(),
 });
 

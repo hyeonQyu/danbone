@@ -2,6 +2,7 @@ import { BackButton } from '@/components/BackButton';
 import { PageViewContainer } from '@/components/PageViewContainer';
 import { SlideInContainer } from '@/components/SlideInContainer';
 import { DictionaryJAEntryDetailView } from '@/features/dictionary/components/DictionaryEntryDetail';
+import VocabularyBookAddButton from '@/features/explore/components/ExploreDictionaryEntryDetailView/VocabularyBookAddButton';
 import { useElementHeight } from '@/hooks';
 import { useTargetLanguage } from '@/language';
 import { useTypedRouter, useTypedSearchParams } from '@/routes';
@@ -23,20 +24,6 @@ function ExploreDictionaryEntryDetailView() {
   const { ref: backButtonBoxRef, height: backButtonBoxHeight } = useElementHeight<HTMLDivElement>();
   const maxHeight = backButtonBoxHeight > 0 ? `calc(100vh - ${backButtonBoxHeight}px)` : '100vh';
 
-  const renderContent = () => {
-    if (targetLanguage === 'ja') {
-      return <DictionaryJAEntryDetailView id={id} />;
-    }
-
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
-        <Typography variant="body1" color="text.secondary">
-          지원하지 않는 언어입니다.
-        </Typography>
-      </Box>
-    );
-  };
-
   return (
     <SlideInContainer>
       <Box
@@ -47,9 +34,14 @@ function ExploreDictionaryEntryDetailView() {
           top: 0,
           left: 0,
           zIndex: Z_INDEX.backward,
+          display: 'flex',
+          width: '100%',
+          justifyContent: 'space-between',
+          alignItems: 'center',
         }}
       >
         <BackButton onBack={handleBack} />
+        <VocabularyBookAddButton />
       </Box>
 
       <PageViewContainer
@@ -63,7 +55,19 @@ function ExploreDictionaryEntryDetailView() {
           display: 'block',
         }}
       >
-        {renderContent()}
+        {(() => {
+          if (targetLanguage === 'ja') {
+            return <DictionaryJAEntryDetailView id={id} />;
+          }
+
+          return (
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
+              <Typography variant="body1" color="text.secondary">
+                지원하지 않는 언어입니다.
+              </Typography>
+            </Box>
+          );
+        })()}
       </PageViewContainer>
     </SlideInContainer>
   );

@@ -1,5 +1,5 @@
 import { getFirebaseServerRepositoryCreator, serializeEntity } from '@/data/server/repositories/server.repository.utils';
-import type { VocabularyLearningRepository } from '@/data/server/repositories/vocabulary/server.vocabularyLearnings.repository.types';
+import type { VocabularyLearningRepository } from '@/data/server/repositories/vocabulary/server.vocabularyLearning.repository.types';
 import type { LearningEntryParams, VocabularyLearningEntity } from '@/features/vocabulary';
 import { Timestamp } from 'firebase-admin/firestore';
 
