@@ -4,6 +4,8 @@ import { UserEntity } from '@/features/users';
 import { Timestamp } from 'firebase-admin/firestore';
 
 export const usersServerRepository = getFirebaseServerRepositoryCreator('users')<UsersServerRepository>(({ db, auth, collectionName }) => {
+  const collectionRef = db.collection(collectionName);
+
   return {
     createUser: async ({ email, name, password }) => {
       const userRecord = await auth.createUser({
@@ -22,13 +24,13 @@ export const usersServerRepository = getFirebaseServerRepositoryCreator('users')
         updatedAt: now,
       };
 
-      await db.collection(collectionName).doc(userRecord.uid).set(userEntity);
+      await collectionRef.doc(userRecord.uid).set(userEntity);
 
       return userEntity;
     },
 
     getUserByEmail: async (email) => {
-      const querySnapshot = await db.collection(collectionName).where('email', '==', email).limit(1).get();
+      const querySnapshot = await collectionRef.where('email', '==', email).limit(1).get();
 
       if (querySnapshot.empty) {
         return null;
@@ -38,7 +40,7 @@ export const usersServerRepository = getFirebaseServerRepositoryCreator('users')
     },
 
     getUserById: async (id) => {
-      const doc = await db.collection(collectionName).doc(id).get();
+      const doc = await collectionRef.doc(id).get();
 
       if (!doc.exists || !doc.data()) {
         return null;
