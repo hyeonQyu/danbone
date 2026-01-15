@@ -1,15 +1,8 @@
 'use client';
 
 import { Box, Button, Card, CardContent, Container, Typography } from '@mui/material';
-import { consoleAdminApp } from '../data/actions';
 
 export default function Home() {
-  const handleTestFirebase = async () => {
-    const result = await consoleAdminApp();
-    console.log('서버 응답:', result);
-    alert(result.message);
-  };
-
   return (
     <Container maxWidth="lg">
       <Box sx={{ my: 4 }}>
@@ -21,8 +14,8 @@ export default function Home() {
         </Typography>
 
         <Box sx={{ mt: 4, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-          <Button variant="contained" color="primary" onClick={handleTestFirebase}>
-            Firebase Admin 테스트
+          <Button variant="contained" color="primary">
+            Primary Button
           </Button>
           <Button variant="contained" color="secondary">
             Secondary Button

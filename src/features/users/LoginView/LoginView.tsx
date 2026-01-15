@@ -1,0 +1,139 @@
+'use client';
+
+import { Logo } from '@/components/Logo';
+import { PageViewContainer } from '@/components/PageViewContainer';
+import { login } from '@/features/users';
+import type { LoginData } from '@/features/users/users.types';
+import { usePxToRem } from '@/styles';
+import { Alert, Box, Button, CircularProgress, TextField, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
+import Link from 'next/link';
+import { useState } from 'react';
+
+function LoginView() {
+  const theme = useTheme();
+  const [formData, setFormData] = useState<LoginData>({
+    email: '',
+    password: '',
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const pxToRem = usePxToRem();
+
+  const handleInputChange = (field: keyof LoginData) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: e.target.value,
+    }));
+    if (error) setError(null);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!formData.email || !formData.password) {
+      setError('이메일과 비밀번호를 모두 입력해주세요.');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      await login(formData);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '로그인에 실패했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <PageViewContainer>
+      <Box
+        component="form"
+        onSubmit={handleSubmit}
+        sx={{
+          width: '100%',
+          maxWidth: pxToRem(400),
+          display: 'flex',
+          flexDirection: 'column',
+          gap: theme.spacing(3),
+        }}
+      >
+        <Logo />
+
+        {error && <Alert severity="error">{error}</Alert>}
+
+        <TextField
+          label="이메일"
+          type="email"
+          value={formData.email}
+          onChange={handleInputChange('email')}
+          disabled={loading}
+          fullWidth
+          required
+          autoComplete="email"
+        />
+
+        <TextField
+          label="비밀번호"
+          type="password"
+          value={formData.password}
+          onChange={handleInputChange('password')}
+          disabled={loading}
+          fullWidth
+          required
+          autoComplete="current-password"
+        />
+
+        <Button
+          type="submit"
+          variant="contained"
+          disabled={loading}
+          fullWidth
+          sx={{
+            ...theme.typography.h6,
+            height: theme.heights.lg,
+          }}
+        >
+          {loading ? <CircularProgress size={24} /> : '로그인'}
+        </Button>
+
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: theme.spacing(2),
+            marginTop: theme.spacing(1),
+          }}
+        >
+          <Typography variant="body2" color="textSecondary">
+            계정이 없으신가요?
+          </Typography>
+
+          <Link href="/register" passHref>
+            <Typography
+              variant="body2"
+              sx={{
+                color: theme.palette.primary.main,
+                textDecoration: 'none',
+                fontWeight: 600,
+                cursor: 'pointer',
+                '&:hover': {
+                  textDecoration: 'underline',
+                },
+              }}
+            >
+              회원가입
+            </Typography>
+          </Link>
+        </Box>
+      </Box>
+    </PageViewContainer>
+  );
+}
+
+export default LoginView;
