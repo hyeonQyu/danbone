@@ -1,4 +1,5 @@
 import { TokenRefresher } from '@/auth';
+import { DialogProvider } from '@/dialog';
 import { IndexedDBProvider } from '@/indexed-db';
 import { LanguageProvider } from '@/language';
 import { ReactQueryClientProvider } from '@/react-query';
@@ -19,11 +20,13 @@ export default function RootLayout({
             <MetadataTitle />
             <EmotionCacheProvider>
               <ThemeProvider>
-                <ReactQueryClientProvider>
-                  <IndexedDBProvider>
-                    <TokenRefresher>{children}</TokenRefresher>
-                  </IndexedDBProvider>
-                </ReactQueryClientProvider>
+                <DialogProvider>
+                  <ReactQueryClientProvider>
+                    <IndexedDBProvider>
+                      <TokenRefresher>{children}</TokenRefresher>
+                    </IndexedDBProvider>
+                  </ReactQueryClientProvider>
+                </DialogProvider>
               </ThemeProvider>
             </EmotionCacheProvider>
           </LanguageProvider>

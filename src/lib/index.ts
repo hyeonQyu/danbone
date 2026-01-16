@@ -7,6 +7,7 @@ export * from './function.utils';
 export * from './log.utils';
 export * from './object.utils';
 export * from './promise.utils';
+export * from './random.utils';
 export * from './resolvable.types';
 export * from './resolvable.utils';
 export * from './serverAction.utils';
