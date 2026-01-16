@@ -12,3 +12,14 @@ export const getVocabularyBooks = async (targetLanguage: TargetLanguage) => {
     });
   });
 };
+
+export const createVocabularyBook = async (targetLanguage: TargetLanguage, name: string, color: string) => {
+  return withAuth(async (userId) => {
+    return vocabularyServiceServer.createBook({
+      userId,
+      name,
+      color,
+      targetLanguage,
+    });
+  });
+};

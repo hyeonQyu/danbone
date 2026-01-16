@@ -16,7 +16,7 @@ export const useReactHookFormControl = <
 ) => {
   const { formName, rules, validator = () => true, label: originLabel, required, hideErrorMessage, ...restProps } = params;
 
-  const { field, fieldState } = useController({
+  const { field, fieldState, formState } = useController({
     name: formName,
     rules: {
       ...rules,
@@ -29,8 +29,12 @@ export const useReactHookFormControl = <
     field.onChange(e);
   };
 
-  const error = fieldState.error;
-  const errorMessage = hideErrorMessage ? '' : ((error?.message as string) ?? ' ');
+  const touched = Boolean(formState.touchedFields[formName]);
+  const submitted = formState.isSubmitted;
+  const shouldShowError = touched || submitted;
+
+  const error = shouldShowError ? fieldState.error : undefined;
+  const errorMessage = hideErrorMessage ? '' : error ? (error.message as string) : shouldShowError ? ' ' : undefined;
 
   const label = originLabel ? `${originLabel}${required ? ' *' : ''}` : originLabel;
 

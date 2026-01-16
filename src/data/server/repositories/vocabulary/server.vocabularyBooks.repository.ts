@@ -11,7 +11,7 @@ export const vocabularyBooksRepository = getFirebaseServerRepositoryCreator('voc
   const collectionRef = db.collection(collectionName);
 
   return {
-    create: async ({ userId, name, targetLanguage }) => {
+    create: async ({ userId, name, color, targetLanguage }) => {
       const now = Timestamp.now().toDate();
 
       const entity: VocabularyBookEntity = {
@@ -19,6 +19,7 @@ export const vocabularyBooksRepository = getFirebaseServerRepositoryCreator('voc
         userId,
         targetLanguage,
         name,
+        color,
         entryIds: [],
         createdAt: now,
         updatedAt: now,

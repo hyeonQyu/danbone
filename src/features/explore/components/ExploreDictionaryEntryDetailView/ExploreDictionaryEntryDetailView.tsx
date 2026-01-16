@@ -2,7 +2,7 @@ import { BackButton } from '@/components/BackButton';
 import { PageViewContainer } from '@/components/PageViewContainer';
 import { SlideInContainer } from '@/components/SlideInContainer';
 import { DictionaryJAEntryDetailView } from '@/features/dictionary/components/DictionaryEntryDetail';
-import VocabularyBookAddButton from '@/features/explore/components/ExploreDictionaryEntryDetailView/VocabularyBookAddButton';
+import AddEntryToVocabularyBookButton from '@/features/explore/components/ExploreDictionaryEntryDetailView/AddEntryToVocabularyBookButton';
 import { useElementHeight } from '@/hooks';
 import { useTargetLanguage } from '@/language';
 import { useTypedRouter, useTypedSearchParams } from '@/routes';
@@ -41,7 +41,7 @@ function ExploreDictionaryEntryDetailView() {
         }}
       >
         <BackButton onBack={handleBack} />
-        <VocabularyBookAddButton />
+        <AddEntryToVocabularyBookButton />
       </Box>
 
       <PageViewContainer
