@@ -16,6 +16,7 @@ export interface LearningEntriesParams extends LearningBaseParams {
 
 export interface VocabularyBookEntity extends DocumentEntity, LearningEntriesParams {
   name: string;
+  color: string;
 }
 
 export interface VocabularyLearningEntity extends DocumentEntity, LearningEntryParams {
@@ -36,11 +37,13 @@ export interface VocabularyEntryWithLearning<T extends { id: string }> {
 export interface CreateVocabularyBookParams {
   userId: string;
   name: string;
+  color: string;
   targetLanguage: TargetLanguage;
 }
 
 export interface UpdateVocabularyBookParams {
   name?: string;
+  color?: string;
   entryIds?: string[];
 }
 
