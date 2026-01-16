@@ -3,7 +3,7 @@ import { Loading } from '@/components/Loading';
 import { getDictionaryEntryJA } from '@/features/dictionary/actions/findJmdict.action';
 import { DICTIONARY_QUERY_KEY } from '@/features/dictionary/dictionary.queryKey';
 import { useSourceLanguage } from '@/language';
-import { TIME_UNIT } from '@/lib';
+import { serverAction, TIME_UNIT } from '@/lib';
 import { useQuery } from '@tanstack/react-query';
 import DictionaryJAEntryDetail from './DictionaryJAEntryDetail';
 
@@ -20,9 +20,7 @@ function DictionaryJAEntryDetailView({ id }: DictionaryJAEntryDetailViewProps) {
     isError,
   } = useQuery({
     queryKey: DICTIONARY_QUERY_KEY.entry.get(id, sourceLanguage),
-    queryFn: async () => {
-      return await getDictionaryEntryJA({ entryId: id, sourceLanguage });
-    },
+    queryFn: serverAction(() => getDictionaryEntryJA({ entryId: id, sourceLanguage })),
     enabled: Boolean(id && sourceLanguage),
     staleTime: TIME_UNIT.unitOfMs.asMinute * 10,
   });

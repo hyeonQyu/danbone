@@ -1,13 +1,16 @@
 import { getVocabularyBooks } from '@/features/vocabulary/actions/vocabularyBook.actions';
 import { useTargetLanguage } from '@/language';
+import { serverAction } from '@/lib';
 import AddIcon from '@mui/icons-material/Add';
 import { IconButton, Tooltip } from '@mui/material';
 
 function VocabularyBookAddButton() {
   const targetLanguage = useTargetLanguage();
 
+  const getBooks = serverAction(getVocabularyBooks);
+
   const handleClick = async () => {
-    const books = await getVocabularyBooks(targetLanguage);
+    const books = await getBooks(targetLanguage);
     console.log(books);
   };
 
