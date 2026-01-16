@@ -2,6 +2,7 @@ import { createVocabularyBook } from '@/features/vocabulary/actions/vocabularyBo
 import { VOCABULARY_BOOK_COLORS } from '@/features/vocabulary/vocabulary.constants';
 import { TargetLanguage } from '@/language';
 import { serverAction } from '@/lib';
+import { getMaxLengthRule, getRequiredErrorMessage } from '@/react-hook-form';
 import { ReactHookFormColorSelector, ReactHookFormTextField } from '@/react-hook-form/components';
 import CloseIcon from '@mui/icons-material/Close';
 import { AppBar, Box, Button, Container, IconButton, Toolbar, Typography } from '@mui/material';
@@ -12,6 +13,12 @@ interface VocabularyBookFormData {
   name: string;
   color: string;
 }
+
+const LIMITS = {
+  name: {
+    max: 50,
+  },
+};
 
 interface VocabularyBookAddDialogProps {
   targetLanguage: TargetLanguage;
@@ -36,7 +43,7 @@ function VocabularyBookAddDialog({ targetLanguage, onClose }: VocabularyBookAddD
   const onSubmit = async (data: VocabularyBookFormData) => {
     try {
       setError(null);
-      await serverAction(() => createVocabularyBook(targetLanguage, data.name, data.color));
+      await serverAction(createVocabularyBook)(targetLanguage, data.name, data.color);
       onClose({ created: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : '단어장 생성에 실패했습니다.');
@@ -70,8 +77,8 @@ function VocabularyBookAddDialog({ targetLanguage, onClose }: VocabularyBookAddD
               label="단어장 이름"
               required
               rules={{
-                minLength: { value: 1, message: '단어장 이름을 입력해주세요.' },
-                maxLength: { value: 50, message: '단어장 이름은 최대 50자까지 입력할 수 있습니다.' },
+                required: getRequiredErrorMessage(),
+                ...getMaxLengthRule(LIMITS.name.max),
               }}
               fullWidth
               autoFocus

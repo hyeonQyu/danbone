@@ -1,3 +1,4 @@
+import { SlideUpTransition } from '@/components/SlideUpTransition';
 import { useDialog } from '@/dialog';
 import { getVocabularyBooks } from '@/features/vocabulary/actions/vocabularyBook.actions';
 import { VocabularyBookAddDialog } from '@/features/vocabulary/components/VocabularyBookAddDialog';
@@ -28,6 +29,9 @@ function AddEntryToVocabularyBookButton() {
     if (books.length === 0) {
       const result = await dialog.open<{ created: boolean }>({
         fullScreen: true,
+        slots: {
+          transition: SlideUpTransition,
+        },
         content: (close) => <VocabularyBookAddDialog targetLanguage={targetLanguage} onClose={close} />,
       });
 
