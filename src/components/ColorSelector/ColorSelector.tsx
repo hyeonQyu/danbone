@@ -1,5 +1,5 @@
 import CheckIcon from '@mui/icons-material/Check';
-import { Box, Grid, useTheme } from '@mui/material';
+import { Box, Grid } from '@mui/material';
 
 export interface ColorSelectorProps {
   colors: readonly string[];
@@ -9,12 +9,10 @@ export interface ColorSelectorProps {
 }
 
 function ColorSelector({ colors, value, onChange, error }: ColorSelectorProps) {
-  const { spacing } = useTheme();
-
   return (
     <Grid container spacing={2}>
       {colors.map((color) => (
-        <Grid item key={color}>
+        <Grid key={color}>
           <Box
             onClick={() => onChange(color)}
             sx={{

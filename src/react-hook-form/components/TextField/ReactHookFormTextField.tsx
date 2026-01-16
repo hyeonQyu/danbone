@@ -18,6 +18,9 @@ function ReactHookFormTextField<TFieldValues extends FieldValues = FieldValues>(
 
   const { error: errorFromProps, helperText } = props;
 
+  const shouldShowError = errorFromProps ?? Boolean(error);
+  const helperTextToShow = !shouldShowError && helperText ? helperText : (errorMessage ?? ' ');
+
   return (
     <>
       <TextField
@@ -25,8 +28,8 @@ function ReactHookFormTextField<TFieldValues extends FieldValues = FieldValues>(
         {...restProps}
         label={label}
         onChange={handleChange}
-        error={errorFromProps ?? Boolean(error)}
-        helperText={helperText && errorMessage === ' ' ? helperText : errorMessage}
+        error={shouldShowError}
+        helperText={helperTextToShow}
       />
     </>
   );
