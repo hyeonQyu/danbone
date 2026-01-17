@@ -1,9 +1,6 @@
 import { ErrorView } from '@/components/ErrorView';
 import { Loading } from '@/components/Loading';
-import { getDictionaryEntryJA } from '@/features/dictionary/actions/findJmdict.action';
-import { DICTIONARY_QUERY_KEY } from '@/features/dictionary/dictionary.queryKey';
-import { useSourceLanguage } from '@/language';
-import { serverAction, TIME_UNIT } from '@/lib';
+import { useDictionaryEntryJAFetchQueryOptions } from '@/features/dictionary/hooks/useDictionaryEntryJAFetchQueryOptions';
 import { useQuery } from '@tanstack/react-query';
 import DictionaryJAEntryDetail from './DictionaryJAEntryDetail';
 
@@ -12,18 +9,9 @@ interface DictionaryJAEntryDetailViewProps {
 }
 
 function DictionaryJAEntryDetailView({ id }: DictionaryJAEntryDetailViewProps) {
-  const sourceLanguage = useSourceLanguage();
+  const dictionaryEntryJAFetchQueryOptions = useDictionaryEntryJAFetchQueryOptions(id);
 
-  const {
-    data: entry,
-    isLoading,
-    isError,
-  } = useQuery({
-    queryKey: DICTIONARY_QUERY_KEY.entry.get(id, sourceLanguage),
-    queryFn: serverAction(() => getDictionaryEntryJA({ entryId: id, sourceLanguage })),
-    enabled: Boolean(id && sourceLanguage),
-    staleTime: TIME_UNIT.unitOfMs.asMinute * 10,
-  });
+  const { data: entry, isLoading, isError } = useQuery(dictionaryEntryJAFetchQueryOptions);
 
   if (isLoading) {
     return <Loading sx={{ height: '100%' }} />;

@@ -23,14 +23,7 @@ function ReactHookFormTextField<TFieldValues extends FieldValues = FieldValues>(
 
   return (
     <>
-      <TextField
-        {...field}
-        {...restProps}
-        label={label}
-        onChange={handleChange}
-        error={shouldShowError}
-        helperText={helperTextToShow}
-      />
+      <TextField {...field} {...restProps} label={label} onChange={handleChange} error={shouldShowError} helperText={helperTextToShow} />
     </>
   );
 }

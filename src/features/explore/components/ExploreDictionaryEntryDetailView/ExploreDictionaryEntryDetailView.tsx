@@ -41,7 +41,7 @@ function ExploreDictionaryEntryDetailView() {
         }}
       >
         <BackButton onBack={handleBack} />
-        <AddEntryToVocabularyBookButton />
+        <AddEntryToVocabularyBookButton entryId={id} />
       </Box>
 
       <PageViewContainer

@@ -1,16 +1,28 @@
 import { useDialog } from '@/dialog';
-import { useCreateVocabularyBook, useGetMyVocabularyBooks, useVocabularyBooksFetchQueryOptions } from '@/features/vocabulary/hooks';
+import {
+  useCreateVocabularyBook,
+  useGetMyVocabularyBooks,
+  useMutationAddVocabulary,
+  useSelectVocabularyBook,
+  useVocabularyBooksFetchQueryOptions,
+} from '@/features/vocabulary/hooks';
 import AddIcon from '@mui/icons-material/Add';
 import { IconButton, Tooltip } from '@mui/material';
 import { useQueryClient } from '@tanstack/react-query';
 
-function AddEntryToVocabularyBookButton() {
+interface AddEntryToVocabularyBookButtonProps {
+  entryId: string;
+}
+
+function AddEntryToVocabularyBookButton({ entryId }: AddEntryToVocabularyBookButtonProps) {
   const queryClient = useQueryClient();
   const dialog = useDialog();
 
   const vocabularyBooksQueryOption = useVocabularyBooksFetchQueryOptions();
   const getMyVocabularyBooks = useGetMyVocabularyBooks();
   const createVocabularyBook = useCreateVocabularyBook();
+  const selectVocabularyBook = useSelectVocabularyBook();
+  const { mutateAsync: addVocabulary } = useMutationAddVocabulary();
 
   const handleClick = async () => {
     const books = await getMyVocabularyBooks();
@@ -26,8 +38,19 @@ function AddEntryToVocabularyBookButton() {
       const createBookResult = await createVocabularyBook();
 
       if (createBookResult?.book) {
-        await queryClient.prefetchQuery(vocabularyBooksQueryOption);
+        await Promise.all([
+          queryClient.prefetchQuery(vocabularyBooksQueryOption),
+          addVocabulary({ bookId: createBookResult.book.id, entryId }),
+        ]);
       }
+
+      return;
+    }
+
+    const selectBookResult = await selectVocabularyBook();
+
+    if (selectBookResult?.book) {
+      await addVocabulary({ bookId: selectBookResult.book.id, entryId });
     }
   };
 

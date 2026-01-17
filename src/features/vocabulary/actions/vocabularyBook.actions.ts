@@ -23,3 +23,12 @@ export const createVocabularyBook = async (targetLanguage: TargetLanguage, name:
     });
   });
 };
+
+export const addVocabularyToBook = async (params: { bookId: string; entryId: string }) => {
+  return withAuth(async (userId) => {
+    return vocabularyServiceServer.addEntryToBook({
+      ...params,
+      userId,
+    });
+  });
+};
