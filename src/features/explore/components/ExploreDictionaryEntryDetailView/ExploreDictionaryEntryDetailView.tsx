@@ -6,7 +6,7 @@ import AddEntryToVocabularyBookButton from '@/features/explore/components/Explor
 import { useElementHeight } from '@/hooks';
 import { useTargetLanguage } from '@/language';
 import { useTypedRouter, useTypedSearchParams } from '@/routes';
-import { Z_INDEX } from '@/styles/zIndex.constants';
+import { Z_INDEX } from '@/styles';
 import { Box, Typography, useTheme } from '@mui/material';
 
 function ExploreDictionaryEntryDetailView() {

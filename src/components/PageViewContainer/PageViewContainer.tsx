@@ -1,5 +1,3 @@
-'use client';
-
 import { Box, SxProps, Theme, useTheme } from '@mui/material';
 import { ReactNode } from 'react';
 
@@ -21,6 +19,7 @@ function PageViewContainer({ children, sx }: PageViewContainerProps) {
         minHeight: '100vh',
         backgroundColor: palette.background.default,
         padding: spacing(3),
+        overflow: 'auto',
         ...sx,
       }}
     >

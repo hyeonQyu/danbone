@@ -1,5 +1,8 @@
 'use client';
 
+import { BOTTOM_NAVIGATION_HEIGHT } from '@/components/NavigationLayout';
+import { useBottomNavigation } from '@/routes';
+import { usePxToRem } from '@/styles';
 import { Box, useTheme } from '@mui/material';
 import { motion } from 'framer-motion';
 import { ReactNode } from 'react';
@@ -10,6 +13,11 @@ interface SlideInContainerProps {
 
 function SlideInContainer({ children }: SlideInContainerProps) {
   const { palette } = useTheme();
+  const pxToRem = usePxToRem();
+
+  const { currentNavigationIndex } = useBottomNavigation();
+  const hasBottomNavigation = currentNavigationIndex >= 0;
+  const bottomNavigationHeight = pxToRem(hasBottomNavigation ? BOTTOM_NAVIGATION_HEIGHT : 0);
 
   return (
     <Box
@@ -25,7 +33,7 @@ function SlideInContainer({ children }: SlideInContainerProps) {
         display: 'flex',
         flexDirection: 'column',
         width: '100%',
-        height: '100vh',
+        maxHeight: `calc(100vh - ${bottomNavigationHeight})`,
         position: 'fixed',
         top: 0,
         left: 0,

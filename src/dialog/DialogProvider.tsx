@@ -1,7 +1,7 @@
 'use client';
 
 import { generateRandomKey, r } from '@/lib';
-import { Button, DialogActions, DialogContent, DialogTitle, Dialog as MuiDialog } from '@mui/material';
+import { Button, DialogActions, DialogContent, DialogTitle, Dialog as MUIDialog } from '@mui/material';
 import { ReactNode, useCallback, useMemo, useState } from 'react';
 import { DialogContext } from './DialogContext';
 import { DialogContextValue, DialogInstance, DialogOptions } from './dialog.types';
@@ -101,7 +101,7 @@ export function DialogProvider({ children }: DialogProviderProps) {
         const renderedContent = r(options.content)(handleClose);
 
         return (
-          <MuiDialog
+          <MUIDialog
             key={id}
             open={isOpen}
             fullScreen={options.fullScreen}
@@ -124,7 +124,7 @@ export function DialogProvider({ children }: DialogProviderProps) {
           >
             {options.title && <DialogTitle>{options.title}</DialogTitle>}
             {renderedContent}
-          </MuiDialog>
+          </MUIDialog>
         );
       })}
     </DialogContext.Provider>

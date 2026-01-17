@@ -1,7 +1,16 @@
 import { RedirectSearchParamsSchema, RoutesContext } from '@/routes/routes.types';
 import { accessibleOnLoggedIn, accessibleOnLoggedOut, getExploreTitle } from '@/routes/routes.utils';
-import { BaseMetadata, createAppRoutes } from '@hyeonqyu/typed-router-next';
+import { createAppRoutes } from '@hyeonqyu/typed-router-next';
+import { Explore, ExploreOutlined } from '@mui/icons-material';
+import { ComponentType } from 'react';
 import z from 'zod';
+
+type AppMetadata = {
+  icon?: {
+    outlined: ComponentType;
+    filled: ComponentType;
+  };
+};
 
 const DetailSearchParamsSchema = z.object({
   id: z.string(),
@@ -33,6 +42,11 @@ export const appRoutes = {
     _metadata: {
       title: getExploreTitle,
       accessible: accessibleOnLoggedIn,
+      icon: {
+        outlined: ExploreOutlined,
+        filled: Explore,
+      },
+      label: () => '탐색하기',
     },
     search: {
       _metadata: {
@@ -47,4 +61,4 @@ export const appRoutes = {
       },
     },
   },
-} as const satisfies Parameters<ReturnType<typeof createAppRoutes<BaseMetadata, RoutesContext>>>[0];
+} as const satisfies Parameters<ReturnType<typeof createAppRoutes<AppMetadata, RoutesContext>>>[0];

@@ -1,23 +1,17 @@
 'use client';
 
-import { useSearchParamsObject } from '@/hooks';
-import { useTargetLanguage } from '@/language';
-import { useCurrentRouteNode } from '@/routes';
+import { useClientRoutesContext, useCurrentRouteNode } from '@/routes';
 import { useMemo } from 'react';
 
 function MetadataTitle() {
-  const targetLanguage = useTargetLanguage();
-  const searchParams = useSearchParamsObject();
+  const clientRoutesContext = useClientRoutesContext();
   const currentRouteNode = useCurrentRouteNode();
 
   const title = useMemo(() => {
     return currentRouteNode?._metadata.title?.({
-      client: {
-        targetLanguage,
-        searchParams,
-      },
+      client: clientRoutesContext,
     });
-  }, [searchParams, currentRouteNode, targetLanguage]);
+  }, [clientRoutesContext, currentRouteNode]);
 
   return <title>{title}</title>;
 }
