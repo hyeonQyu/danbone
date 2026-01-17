@@ -1,11 +1,11 @@
+import { FullScreenDialogToolbar } from '@/components/FullScreenDialogToolbar';
 import { createVocabularyBook } from '@/features/vocabulary/actions/vocabularyBook.actions';
 import { VOCABULARY_BOOK_COLORS } from '@/features/vocabulary/vocabulary.constants';
 import { VocabularyBookEntity } from '@/features/vocabulary/vocabulary.types';
 import { getLanguageLabel, TargetLanguage } from '@/language';
 import { devLogError, serverAction } from '@/lib';
 import { getMaxLengthRule, getReactHookFormComponents, getRequiredErrorMessage } from '@/react-hook-form';
-import CloseIcon from '@mui/icons-material/Close';
-import { Box, Button, Container, IconButton, Toolbar, Typography } from '@mui/material';
+import { Box, Button, Container, Typography } from '@mui/material';
 import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
@@ -62,14 +62,7 @@ function VocabularyBookAddDialog({ targetLanguage, onClose }: VocabularyBookAddD
 
   return (
     <>
-      <Toolbar sx={{ borderBottom: '1px solid', borderColor: 'divider' }}>
-        <IconButton edge="start" color="inherit" onClick={() => onClose()} aria-label="닫기" disabled={isSubmitting}>
-          <CloseIcon />
-        </IconButton>
-        <Typography variant="h6" sx={{ flex: 1, ml: 2 }}>
-          새 단어장 만들기
-        </Typography>
-      </Toolbar>
+      <FullScreenDialogToolbar title="새 단어장 만들기" onClose={() => onClose()} disabled={isSubmitting} />
 
       <Container maxWidth="sm" sx={{ pt: 4, pb: 4, overflow: 'auto' }}>
         <FormProvider {...methods}>

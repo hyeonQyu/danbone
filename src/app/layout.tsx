@@ -20,13 +20,13 @@ export default function RootLayout({
             <MetadataTitle />
             <EmotionCacheProvider>
               <ThemeProvider>
-                <DialogProvider>
-                  <ReactQueryClientProvider>
+                <ReactQueryClientProvider>
+                  <DialogProvider>
                     <IndexedDBProvider>
                       <TokenRefresher>{children}</TokenRefresher>
                     </IndexedDBProvider>
-                  </ReactQueryClientProvider>
-                </DialogProvider>
+                  </DialogProvider>
+                </ReactQueryClientProvider>
               </ThemeProvider>
             </EmotionCacheProvider>
           </LanguageProvider>

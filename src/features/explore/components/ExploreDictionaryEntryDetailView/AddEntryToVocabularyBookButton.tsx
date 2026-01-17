@@ -1,6 +1,11 @@
 import { useDialog } from '@/dialog';
-import { useCreateVocabularyBook, useGetMyVocabularyBooks, useVocabularyBooksFetchQueryOptions } from '@/features/vocabulary/hooks';
-import { useMutationAddVocabulary } from '@/features/vocabulary/hooks/useMutationAddVocabulary';
+import {
+  useCreateVocabularyBook,
+  useGetMyVocabularyBooks,
+  useMutationAddVocabulary,
+  useSelectVocabularyBook,
+  useVocabularyBooksFetchQueryOptions,
+} from '@/features/vocabulary/hooks';
 import AddIcon from '@mui/icons-material/Add';
 import { IconButton, Tooltip } from '@mui/material';
 import { useQueryClient } from '@tanstack/react-query';
@@ -16,6 +21,7 @@ function AddEntryToVocabularyBookButton({ entryId }: AddEntryToVocabularyBookBut
   const vocabularyBooksQueryOption = useVocabularyBooksFetchQueryOptions();
   const getMyVocabularyBooks = useGetMyVocabularyBooks();
   const createVocabularyBook = useCreateVocabularyBook();
+  const selectVocabularyBook = useSelectVocabularyBook();
   const { mutateAsync: addVocabulary } = useMutationAddVocabulary();
 
   const handleClick = async () => {
@@ -39,6 +45,12 @@ function AddEntryToVocabularyBookButton({ entryId }: AddEntryToVocabularyBookBut
       }
 
       return;
+    }
+
+    const selectBookResult = await selectVocabularyBook();
+
+    if (selectBookResult?.book) {
+      await addVocabulary({ bookId: selectBookResult.book.id, entryId });
     }
   };
 
