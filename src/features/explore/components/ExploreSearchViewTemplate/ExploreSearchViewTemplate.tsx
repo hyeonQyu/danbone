@@ -42,7 +42,6 @@ function ExploreSearchViewTemplate({ queryLanguage, isSearching, query, onSearch
 
       <Box
         sx={{
-          flex: 1,
           padding: spacing(2),
           overflowY: 'auto',
         }}
