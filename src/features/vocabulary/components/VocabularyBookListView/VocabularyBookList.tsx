@@ -1,18 +1,32 @@
 import { VocabularyBookEntity } from '@/features/vocabulary/vocabulary.types';
+import { useTypedRouter } from '@/routes';
 import { usePxToRem } from '@/styles';
 import { Box, List, ListItemButton, Typography, useTheme } from '@mui/material';
+import { motion } from 'framer-motion';
 
 interface VocabularyBookListProps {
   books: VocabularyBookEntity[];
-  onBookClick: (bookId: string) => void;
 }
 
-function VocabularyBookList({ books, onBookClick }: VocabularyBookListProps) {
+function VocabularyBookList({ books }: VocabularyBookListProps) {
   const { spacing, palette, transitions } = useTheme();
   const pxToRem = usePxToRem();
 
+  const router = useTypedRouter();
+
+  const getHandleClick = (bookId: string) => () => {
+    router.push('/vocabulary/book/[id]', { searchParams: { id: bookId } });
+  };
+
   return (
     <List
+      component={motion.ul}
+      initial={{ opacity: 0, y: -15 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{
+        duration: 0.1,
+        ease: 'easeOut',
+      }}
       sx={{
         display: 'flex',
         flexDirection: 'column',
@@ -24,7 +38,7 @@ function VocabularyBookList({ books, onBookClick }: VocabularyBookListProps) {
       {books.map((book) => (
         <ListItemButton
           key={book.id}
-          onClick={() => onBookClick(book.id)}
+          onClick={getHandleClick(book.id)}
           sx={{
             p: spacing(2.5),
             borderRadius: spacing(1),

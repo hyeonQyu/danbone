@@ -2,12 +2,12 @@ import { useGetJAPartOfSpeechLabel } from '@/features/dictionary';
 import { DictionaryEntryByLanguage } from '@/features/dictionary/dictionary.types';
 import { JmdictKana, JmdictKanji, JmdictKanjiTag } from '@/features/dictionary/jmdict.types';
 import { overSome } from '@/lib';
-import { useTypedRouter } from '@/routes';
 import { usePxToRem } from '@/styles';
 import { Box, Chip, Typography, useTheme } from '@mui/material';
 
 interface DictionaryJAEntryCardProps {
   entry: DictionaryEntryByLanguage['ja'];
+  onClick?: (entry: DictionaryEntryByLanguage['ja']) => void;
 }
 
 const MAX_PRIMARY_MEANINGS = 2;
@@ -76,7 +76,7 @@ const calculateRemainingSenseCount = (totalSenseCount: number) => {
   return Math.max(0, totalSenseCount - 2);
 };
 
-function DictionaryJAEntryCard({ entry }: DictionaryJAEntryCardProps) {
+function DictionaryJAEntryCard({ entry, onClick }: DictionaryJAEntryCardProps) {
   const { id, kanji, kana, sense } = entry;
 
   const notation = selectBestNotation({ kanji, kana });
@@ -93,15 +93,9 @@ function DictionaryJAEntryCard({ entry }: DictionaryJAEntryCardProps) {
   const { spacing, palette, transitions, shadows } = useTheme();
   const pxToRem = usePxToRem();
 
-  const router = useTypedRouter();
-
   const getPartOfSpeechLabel = useGetJAPartOfSpeechLabel();
 
-  const handleClick = () => {
-    router.push('/explore/search/detail', {
-      searchParams: { id },
-    });
-  };
+  const handleClick = () => onClick?.(entry);
 
   return (
     <Box

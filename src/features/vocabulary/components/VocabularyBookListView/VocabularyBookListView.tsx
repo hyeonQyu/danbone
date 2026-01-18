@@ -17,11 +17,6 @@ function VocabularyBookListView() {
 
   const handleCreateBook = () => createVocabularyBook();
 
-  const handleBookClick = (bookId: string) => {
-    // TODO: 단어장 상세 페이지로 이동 (라우트 구현 후 추가)
-    console.log('Navigate to book:', bookId);
-  };
-
   if (isLoading) {
     return <VocabularyBookListViewSkeleton />;
   }
@@ -35,11 +30,7 @@ function VocabularyBookListView() {
         </Button>
       </Box>
 
-      {books.length === 0 ? (
-        <EmptyVocabularyBookList onCreateBook={handleCreateBook} />
-      ) : (
-        <VocabularyBookList books={books} onBookClick={handleBookClick} />
-      )}
+      {books.length === 0 ? <EmptyVocabularyBookList onCreateBook={handleCreateBook} /> : <VocabularyBookList books={books} />}
     </Container>
   );
 }

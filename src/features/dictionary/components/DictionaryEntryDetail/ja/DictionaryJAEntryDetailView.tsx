@@ -18,7 +18,7 @@ function DictionaryJAEntryDetailView({ id }: DictionaryJAEntryDetailViewProps) {
   }
 
   if (isError || !entry) {
-    return <ErrorView sx={{ height: '100%' }} title="조회 실패" message="잠시 후 다시 시도해주세요." />;
+    return <ErrorView title="조회 실패" message="잠시 후 다시 시도해주세요." />;
   }
 
   return <DictionaryJAEntryDetail entry={entry} />;

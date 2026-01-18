@@ -53,7 +53,7 @@ export const appRoutes = {
         title: getExploreTitle,
         accessible: accessibleOnLoggedIn,
       },
-      detail: {
+      '[id]': {
         _metadata: {
           title: () => '단어 상세 보기',
           searchParamsSchema: DetailSearchParamsSchema,
@@ -70,6 +70,15 @@ export const appRoutes = {
         filled: Book,
       },
       label: () => '단어장',
+    },
+    book: {
+      '[id]': {
+        _metadata: {
+          title: getVocabularyTitle,
+          accessible: accessibleOnLoggedIn,
+          searchParamsSchema: DetailSearchParamsSchema,
+        },
+      },
     },
   },
 } as const satisfies Parameters<ReturnType<typeof createAppRoutes<AppMetadata, RoutesContext>>>[0];
