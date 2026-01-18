@@ -1,9 +1,8 @@
 import { FullScreenDialogToolbar } from '@/components/FullScreenDialogToolbar';
 import { SearchInputField } from '@/components/SearchInputField';
-import { useVocabularyBooksFetchQueryOptions } from '@/features/vocabulary/hooks/useVocabularyBooksFetchQueryOptions';
+import { useQueryMyVocabularyBooks } from '@/features/vocabulary/hooks';
 import { VocabularyBookEntity } from '@/features/vocabulary/vocabulary.types';
 import { Box, CircularProgress, Container, List, ListItemButton, ListItemText, Typography } from '@mui/material';
-import { useQuery } from '@tanstack/react-query';
 import { useDeferredValue, useMemo, useState } from 'react';
 
 export type VocabularyBookSelectDialogResult = { book: VocabularyBookEntity };
@@ -16,8 +15,7 @@ function VocabularyBookSelectDialog({ onClose }: VocabularyBookSelectDialogProps
   const [searchQuery, setSearchQuery] = useState('');
   const deferredSearchQuery = useDeferredValue(searchQuery);
 
-  const vocabularyBooksQueryOptions = useVocabularyBooksFetchQueryOptions();
-  const { data: books = [], isLoading: loading } = useQuery(vocabularyBooksQueryOptions);
+  const { data: books = [], isLoading: loading } = useQueryMyVocabularyBooks();
 
   const filteredBooks = useMemo(
     () => books.filter((book) => book.name.toLowerCase().includes(deferredSearchQuery.toLowerCase())),

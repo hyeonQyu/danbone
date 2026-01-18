@@ -12,7 +12,6 @@ type AppMetadata = BaseMetadata & {
   };
 };
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const {
   AppRoutesProvider,
   TypedLink,
@@ -22,6 +21,7 @@ const {
   useTypedRouter,
   useTypedSearchParams,
   getPathnameFromNode,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _types,
 } = createAppRoutes<AppMetadata, RoutesContext>()(appRoutes);
 

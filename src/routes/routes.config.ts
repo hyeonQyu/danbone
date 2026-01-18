@@ -1,7 +1,7 @@
 import { RedirectSearchParamsSchema, RoutesContext } from '@/routes/routes.types';
-import { accessibleOnLoggedIn, accessibleOnLoggedOut, getExploreTitle } from '@/routes/routes.utils';
+import { accessibleOnLoggedIn, accessibleOnLoggedOut, getExploreTitle, getVocabularyTitle } from '@/routes/routes.utils';
 import { createAppRoutes } from '@hyeonqyu/typed-router-next';
-import { Explore, ExploreOutlined } from '@mui/icons-material';
+import { Book, BookOutlined, Explore, ExploreOutlined } from '@mui/icons-material';
 import { ComponentType } from 'react';
 import z from 'zod';
 
@@ -59,6 +59,17 @@ export const appRoutes = {
           searchParamsSchema: DetailSearchParamsSchema,
         },
       },
+    },
+  },
+  vocabulary: {
+    _metadata: {
+      title: getVocabularyTitle,
+      accessible: accessibleOnLoggedIn,
+      icon: {
+        outlined: BookOutlined,
+        filled: Book,
+      },
+      label: () => '단어장',
     },
   },
 } as const satisfies Parameters<ReturnType<typeof createAppRoutes<AppMetadata, RoutesContext>>>[0];

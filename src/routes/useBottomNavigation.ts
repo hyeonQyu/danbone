@@ -6,7 +6,7 @@ export const useBottomNavigation = () => {
   const appRoutes = useAppRoutes();
 
   const navigationProps = useMemo(() => {
-    const navigationRouteNodes = [appRoutes.explore] as const;
+    const navigationRouteNodes = [appRoutes.explore, appRoutes.vocabulary] as const;
 
     return navigationRouteNodes.map((routeNode) => {
       const pathname = getPathnameFromNode(routeNode) ?? '';
