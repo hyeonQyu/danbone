@@ -3,16 +3,14 @@ import { PageViewContainer } from '@/components/PageViewContainer';
 import { SlideInContainer } from '@/components/SlideInContainer';
 import { DictionaryJAEntryDetailView } from '@/features/dictionary/components/DictionaryEntryDetail';
 import AddEntryToVocabularyBookButton from '@/features/explore/components/ExploreDictionaryEntryDetailView/AddEntryToVocabularyBookButton';
-import { useElementHeight } from '@/hooks';
 import { useTargetLanguage } from '@/language';
 import { useTypedRouter, useTypedSearchParams } from '@/routes';
-import { Z_INDEX } from '@/styles';
 import { Box, Typography, useTheme } from '@mui/material';
 
 function ExploreDictionaryEntryDetailView() {
-  const { spacing } = useTheme();
+  const { spacing, palette } = useTheme();
 
-  const searchParams = useTypedSearchParams('/explore/search/detail');
+  const searchParams = useTypedSearchParams('/explore/search/[id]');
   const { id } = searchParams;
 
   const targetLanguage = useTargetLanguage();
@@ -21,23 +19,17 @@ function ExploreDictionaryEntryDetailView() {
 
   const handleBack = () => router.back();
 
-  const { ref: backButtonBoxRef, height: backButtonBoxHeight } = useElementHeight<HTMLDivElement>();
-  const maxHeight = backButtonBoxHeight > 0 ? `calc(100vh - ${backButtonBoxHeight}px)` : '100vh';
-
   return (
     <SlideInContainer>
       <Box
-        ref={backButtonBoxRef}
         sx={{
-          padding: `${spacing(2)} ${spacing(1)}`,
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          zIndex: Z_INDEX.backward,
           display: 'flex',
-          width: '100%',
-          justifyContent: 'space-between',
           alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: spacing(1),
+          padding: `${spacing(2)} ${spacing(1)}`,
+          backgroundColor: palette.background.paper,
+          borderBottom: `1px solid ${palette.divider}`,
         }}
       >
         <BackButton onBack={handleBack} />
@@ -46,12 +38,7 @@ function ExploreDictionaryEntryDetailView() {
 
       <PageViewContainer
         sx={{
-          minHeight: 'auto',
-          height: maxHeight,
-          maxHeight,
           overflowY: 'auto',
-          top: backButtonBoxHeight,
-          position: 'relative',
           display: 'block',
         }}
       >

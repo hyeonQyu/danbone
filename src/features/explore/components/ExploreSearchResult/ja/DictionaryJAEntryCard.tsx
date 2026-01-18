@@ -98,7 +98,7 @@ function DictionaryJAEntryCard({ entry }: DictionaryJAEntryCardProps) {
   const getPartOfSpeechLabel = useGetJAPartOfSpeechLabel();
 
   const handleClick = () => {
-    router.push('/explore/search/detail', {
+    router.push('/explore/search/[id]', {
       searchParams: { id },
     });
   };

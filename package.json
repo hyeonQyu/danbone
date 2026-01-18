@@ -15,7 +15,7 @@
     "@emotion/cache": "^11.14.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
-    "@hyeonqyu/typed-router-next": "^1.5.2",
+    "@hyeonqyu/typed-router-next": "^1.5.5",
     "@mui/icons-material": "^7.3.6",
     "@mui/material": "^7.3.6",
     "@openai/agents": "^0.3.4",

@@ -3,6 +3,7 @@
 import { useCreateVocabularyBook } from '@/features/vocabulary/hooks/useCreateVocabularyBook';
 import { useQueryMyVocabularyBooks } from '@/features/vocabulary/hooks/useQueryMyVocabularyBooks';
 import { getLanguageLabel, useTargetLanguage } from '@/language';
+import { useTypedRouter } from '@/routes';
 import { Add } from '@mui/icons-material';
 import { Box, Button, Container, Typography } from '@mui/material';
 import EmptyVocabularyBookList from './EmptyVocabularyBookList';
@@ -12,14 +13,15 @@ import VocabularyBookListViewSkeleton from './VocabularyBookListViewSkeleton';
 function VocabularyBookListView() {
   const targetLanguage = useTargetLanguage();
 
+  const router = useTypedRouter();
+
   const { data: books = [], isLoading } = useQueryMyVocabularyBooks();
   const createVocabularyBook = useCreateVocabularyBook();
 
   const handleCreateBook = () => createVocabularyBook();
 
   const handleBookClick = (bookId: string) => {
-    // TODO: 단어장 상세 페이지로 이동 (라우트 구현 후 추가)
-    console.log('Navigate to book:', bookId);
+    router.push('/vocabulary/book/[id]', { searchParams: { id: bookId } });
   };
 
   if (isLoading) {
