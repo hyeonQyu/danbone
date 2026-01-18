@@ -2,16 +2,18 @@ import { BackButton } from '@/components/BackButton';
 import { PageViewContainer } from '@/components/PageViewContainer';
 import { SlideInContainer } from '@/components/SlideInContainer';
 import { DictionaryJAEntryDetailView } from '@/features/dictionary/components/DictionaryEntryDetail';
-import AddEntryToVocabularyBookButton from '@/features/explore/components/ExploreDictionaryEntryDetailView/AddEntryToVocabularyBookButton';
+import AddEntryToVocabularyBookButton from '@/features/dictionary/components/DictionaryEntryDetailView/AddEntryToVocabularyBookButton';
 import { useTargetLanguage } from '@/language';
-import { useTypedRouter, useTypedSearchParams } from '@/routes';
+import { useTypedRouter } from '@/routes';
 import { Box, Typography, useTheme } from '@mui/material';
 
-function ExploreDictionaryEntryDetailView() {
-  const { spacing, palette } = useTheme();
+interface DictionaryEntryDetailViewProps {
+  id: string;
+  addableToVocabularyBook?: boolean;
+}
 
-  const searchParams = useTypedSearchParams('/explore/search/[id]');
-  const { id } = searchParams;
+function DictionaryEntryDetailView({ id, addableToVocabularyBook }: DictionaryEntryDetailViewProps) {
+  const { spacing, palette } = useTheme();
 
   const targetLanguage = useTargetLanguage();
 
@@ -33,7 +35,7 @@ function ExploreDictionaryEntryDetailView() {
         }}
       >
         <BackButton onBack={handleBack} />
-        <AddEntryToVocabularyBookButton entryId={id} />
+        {addableToVocabularyBook && <AddEntryToVocabularyBookButton entryId={id} />}
       </Box>
 
       <PageViewContainer
@@ -60,4 +62,4 @@ function ExploreDictionaryEntryDetailView() {
   );
 }
 
-export default ExploreDictionaryEntryDetailView;
+export default DictionaryEntryDetailView;

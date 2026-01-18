@@ -80,5 +80,11 @@ export const appRoutes = {
         },
       },
     },
+    '[id]': {
+      _metadata: {
+        title: () => '단어 상세 보기',
+        searchParamsSchema: DetailSearchParamsSchema,
+      },
+    },
   },
 } as const satisfies Parameters<ReturnType<typeof createAppRoutes<AppMetadata, RoutesContext>>>[0];
