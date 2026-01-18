@@ -10,7 +10,7 @@ export const useVocabularyBooksFetchQueryOptions = (): FetchQueryOptions<Vocabul
   const targetLanguage = useTargetLanguage();
 
   return useMemo(() => {
-    const booksQueryKey = VOCABULARY_QUERY_KEY.books.get(targetLanguage);
+    const booksQueryKey = VOCABULARY_QUERY_KEY.books.list(targetLanguage);
     const fetchVocabularyBooks = serverAction(() => getVocabularyBooks(targetLanguage));
 
     return {

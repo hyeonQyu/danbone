@@ -1,5 +1,7 @@
+import { VocabularyEntryListView } from '@/features/vocabulary/components/VocabularyEntryListView';
+
 function VocabularyBookDetailPage() {
-  return <div>VocabularyBookDetailPage</div>;
+  return <VocabularyEntryListView />;
 }
 
 export default VocabularyBookDetailPage;

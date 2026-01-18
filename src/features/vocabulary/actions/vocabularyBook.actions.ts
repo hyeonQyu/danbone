@@ -32,3 +32,12 @@ export const addVocabularyToBook = async (params: { bookId: string; entryId: str
     });
   });
 };
+
+export const getVocabularyBookDetail = async (bookId: string) => {
+  return withAuth(async (userId) => {
+    return vocabularyServiceServer.getBookWithDetails({
+      bookId,
+      userId,
+    });
+  });
+};

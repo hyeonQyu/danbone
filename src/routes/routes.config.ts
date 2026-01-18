@@ -76,6 +76,7 @@ export const appRoutes = {
         _metadata: {
           title: getVocabularyTitle,
           accessible: accessibleOnLoggedIn,
+          searchParamsSchema: DetailSearchParamsSchema,
         },
       },
     },

@@ -145,8 +145,6 @@ function DictionaryJAEntryDetail({ entry }: DictionaryJAEntryDetailProps) {
             <Box
               key={senseIndex}
               sx={{
-                // mb: spacing(4),
-                pb: spacing(3),
                 borderBottom: senseIndex < sense.length - 1 ? '1px solid' : 'none',
                 borderColor: 'divider',
               }}

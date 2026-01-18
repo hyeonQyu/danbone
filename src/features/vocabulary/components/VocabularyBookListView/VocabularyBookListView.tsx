@@ -3,7 +3,6 @@
 import { useCreateVocabularyBook } from '@/features/vocabulary/hooks/useCreateVocabularyBook';
 import { useQueryMyVocabularyBooks } from '@/features/vocabulary/hooks/useQueryMyVocabularyBooks';
 import { getLanguageLabel, useTargetLanguage } from '@/language';
-import { useTypedRouter } from '@/routes';
 import { Add } from '@mui/icons-material';
 import { Box, Button, Container, Typography } from '@mui/material';
 import EmptyVocabularyBookList from './EmptyVocabularyBookList';
@@ -13,16 +12,10 @@ import VocabularyBookListViewSkeleton from './VocabularyBookListViewSkeleton';
 function VocabularyBookListView() {
   const targetLanguage = useTargetLanguage();
 
-  const router = useTypedRouter();
-
   const { data: books = [], isLoading } = useQueryMyVocabularyBooks();
   const createVocabularyBook = useCreateVocabularyBook();
 
   const handleCreateBook = () => createVocabularyBook();
-
-  const handleBookClick = (bookId: string) => {
-    router.push('/vocabulary/book/[id]', { searchParams: { id: bookId } });
-  };
 
   if (isLoading) {
     return <VocabularyBookListViewSkeleton />;
@@ -37,11 +30,7 @@ function VocabularyBookListView() {
         </Button>
       </Box>
 
-      {books.length === 0 ? (
-        <EmptyVocabularyBookList onCreateBook={handleCreateBook} />
-      ) : (
-        <VocabularyBookList books={books} onBookClick={handleBookClick} />
-      )}
+      {books.length === 0 ? <EmptyVocabularyBookList onCreateBook={handleCreateBook} /> : <VocabularyBookList books={books} />}
     </Container>
   );
 }

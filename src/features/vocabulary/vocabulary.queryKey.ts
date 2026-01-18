@@ -4,6 +4,7 @@ export const VOCABULARY_QUERY_KEY = {
   all: () => ['vocabulary'] as const,
   books: {
     all: () => [...VOCABULARY_QUERY_KEY.all(), 'books'] as const,
-    get: (targetLanguage: TargetLanguage) => [...VOCABULARY_QUERY_KEY.books.all(), targetLanguage] as const,
+    list: (targetLanguage: TargetLanguage) => [...VOCABULARY_QUERY_KEY.books.all(), targetLanguage] as const,
+    getOne: (targetLanguage: TargetLanguage, bookId: string) => [...VOCABULARY_QUERY_KEY.books.all(), targetLanguage, bookId] as const,
   },
 };

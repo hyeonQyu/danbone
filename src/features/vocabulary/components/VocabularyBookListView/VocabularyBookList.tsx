@@ -1,15 +1,21 @@
 import { VocabularyBookEntity } from '@/features/vocabulary/vocabulary.types';
+import { useTypedRouter } from '@/routes';
 import { usePxToRem } from '@/styles';
 import { Box, List, ListItemButton, Typography, useTheme } from '@mui/material';
 
 interface VocabularyBookListProps {
   books: VocabularyBookEntity[];
-  onBookClick: (bookId: string) => void;
 }
 
-function VocabularyBookList({ books, onBookClick }: VocabularyBookListProps) {
+function VocabularyBookList({ books }: VocabularyBookListProps) {
   const { spacing, palette, transitions } = useTheme();
   const pxToRem = usePxToRem();
+
+  const router = useTypedRouter();
+
+  const getHandleClick = (bookId: string) => () => {
+    router.push('/vocabulary/book/[id]', { searchParams: { id: bookId } });
+  };
 
   return (
     <List
@@ -24,7 +30,7 @@ function VocabularyBookList({ books, onBookClick }: VocabularyBookListProps) {
       {books.map((book) => (
         <ListItemButton
           key={book.id}
-          onClick={() => onBookClick(book.id)}
+          onClick={getHandleClick(book.id)}
           sx={{
             p: spacing(2.5),
             borderRadius: spacing(1),
