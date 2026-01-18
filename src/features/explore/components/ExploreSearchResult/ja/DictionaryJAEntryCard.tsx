@@ -77,7 +77,7 @@ const calculateRemainingSenseCount = (totalSenseCount: number) => {
 };
 
 function DictionaryJAEntryCard({ entry, onClick }: DictionaryJAEntryCardProps) {
-  const { id, kanji, kana, sense } = entry;
+  const { kanji, kana, sense } = entry;
 
   const notation = selectBestNotation({ kanji, kana });
 

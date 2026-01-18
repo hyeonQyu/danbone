@@ -1,3 +1,5 @@
+'use client';
+
 import { FullScreenDialogToolbar } from '@/components/FullScreenDialogToolbar';
 import { SearchInputField } from '@/components/SearchInputField';
 import { useQueryMyVocabularyBooks } from '@/features/vocabulary/hooks';

@@ -1,3 +1,5 @@
+'use client';
+
 import { FullScreenDialogToolbar } from '@/components/FullScreenDialogToolbar';
 import { createVocabularyBook } from '@/features/vocabulary/actions/vocabularyBook.actions';
 import { VOCABULARY_BOOK_COLORS } from '@/features/vocabulary/vocabulary.constants';

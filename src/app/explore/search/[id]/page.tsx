@@ -1,12 +1,16 @@
 'use client';
 
 import { SlideInContainer } from '@/components/SlideInContainer';
-import { ExploreDictionaryEntryDetailView } from '@/features/explore/components/ExploreDictionaryEntryDetailView';
+import { DictionaryEntryDetailView } from '@/features/dictionary';
+import { useTypedSearchParams } from '@/routes';
 
 function ExploreDictionaryEntryDetailPage() {
+  const searchParams = useTypedSearchParams('/explore/search/[id]');
+  const { id } = searchParams;
+
   return (
     <SlideInContainer>
-      <ExploreDictionaryEntryDetailView />
+      <DictionaryEntryDetailView id={id} addableToVocabularyBook />
     </SlideInContainer>
   );
 }

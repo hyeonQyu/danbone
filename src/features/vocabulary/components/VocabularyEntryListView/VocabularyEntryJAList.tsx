@@ -1,7 +1,8 @@
-import { convertJmdictEntityToDictionaryEntry, JmdictEntity } from '@/features/dictionary';
+import { convertJmdictEntityToDictionaryEntry, DictionaryEntryByLanguage, JmdictEntity } from '@/features/dictionary';
 import { DictionaryJAEntryCard } from '@/features/explore/components/ExploreSearchResult';
 import { VocabularyEntryWithLearning } from '@/features/vocabulary/vocabulary.types';
 import { useSourceLanguage } from '@/language';
+import { useTypedRouter } from '@/routes';
 import { Box } from '@mui/material';
 
 interface VocabularyEntryJAListProps {
@@ -11,8 +12,12 @@ interface VocabularyEntryJAListProps {
 function VocabularyEntryJAList({ entries }: VocabularyEntryJAListProps) {
   const sourceLanguage = useSourceLanguage();
 
-  const handleEntryClick = (entryId: string) => {
-    // TODO: 단어 클릭 시 상세 페이지로 이동하는 핸들러 구현 필요
+  const router = useTypedRouter();
+
+  const handleEntryClick = (entry: DictionaryEntryByLanguage['ja']) => {
+    router.push('/vocabulary/[id]', {
+      searchParams: { id: entry.id },
+    });
   };
 
   return (
@@ -24,7 +29,11 @@ function VocabularyEntryJAList({ entries }: VocabularyEntryJAListProps) {
       }}
     >
       {entries.map(({ entryId, dictionaryEntry }) => (
-        <DictionaryJAEntryCard key={entryId} entry={convertJmdictEntityToDictionaryEntry(dictionaryEntry, sourceLanguage)} />
+        <DictionaryJAEntryCard
+          key={entryId}
+          entry={convertJmdictEntityToDictionaryEntry(dictionaryEntry, sourceLanguage)}
+          onClick={handleEntryClick}
+        />
       ))}
     </Box>
   );
