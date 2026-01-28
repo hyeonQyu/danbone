@@ -1,7 +1,7 @@
-import { getAgentCreator } from '@/openai/agent.utils';
+import { buildAgentFactory } from '@/openai/agent.utils';
 import { queryClassifierOutputSchema } from '@/openai/schemes';
 
-export const createAgentQueryClassifier = getAgentCreator(
+export const queryClassifierAgentFactory = buildAgentFactory(
   {
     name: 'Query classifier',
     outputType: queryClassifierOutputSchema,

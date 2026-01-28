@@ -1,8 +1,28 @@
 'use client';
 
 import { TextModel } from '@/openai/model.types';
+import {
+  Alert,
+  Box,
+  Button,
+  Checkbox,
+  Chip,
+  CircularProgress,
+  Container,
+  Divider,
+  FormControl,
+  FormControlLabel,
+  InputLabel,
+  MenuItem,
+  Paper,
+  Select,
+  Tab,
+  Tabs,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { useEffect, useState } from 'react';
-import { getSupportedModels, testUsageAction, type AgentName } from './actions';
+import { evaluateAgentAction, getSupportedModels, getTestCases, testUsageAction, type AgentName } from './actions';
 
 const AGENT_OPTIONS = [
   { value: 'searchInputGuardrail', label: 'Search Input Guardrail', description: '입력 문장 수 검증' },
@@ -33,22 +53,32 @@ const MODEL_OPTIONS: { value: TextModel; label: string; category: string }[] = [
 ];
 
 export default function TestUsagePage() {
+  const [mode, setMode] = useState<'single' | 'evaluate'>('single');
   const [input, setInput] = useState('안녕하세요. 저는 대한민국 사람입니다.');
   const [selectedAgent, setSelectedAgent] = useState<AgentName>('searchInputGuardrail');
   const [selectedModels, setSelectedModels] = useState<TextModel[]>([]);
   const [supportedModels, setSupportedModels] = useState<TextModel[]>([]);
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<Awaited<ReturnType<typeof testUsageAction>> | null>(null);
+  const [evalResults, setEvalResults] = useState<Awaited<ReturnType<typeof evaluateAgentAction>> | null>(null);
+  const [testCases, setTestCases] = useState<unknown[]>([]);
 
-  // 에이전트가 변경되면 지원하는 모델 목록을 가져옴
+  // 필터 상태
+  const [filterModels, setFilterModels] = useState<TextModel[]>([]);
+  const [filterResult, setFilterResult] = useState<'all' | 'passed' | 'failed'>('all');
+
+  // 에이전트가 변경되면 지원하는 모델 목록과 테스트 케이스를 가져옴
   useEffect(() => {
-    const loadSupportedModels = async () => {
+    const loadData = async () => {
       const models = await getSupportedModels(selectedAgent);
       setSupportedModels(models);
       // 기존 선택된 모델 중 지원하지 않는 모델은 제거
       setSelectedModels((prev) => prev.filter((model) => models.includes(model)));
+
+      const cases = await getTestCases(selectedAgent);
+      setTestCases(cases);
     };
-    loadSupportedModels();
+    loadData();
   }, [selectedAgent]);
 
   const toggleModel = (model: TextModel) => {
@@ -68,6 +98,9 @@ export default function TestUsagePage() {
     }
 
     setLoading(true);
+    setResults(null);
+    setEvalResults(null);
+
     try {
       const res = await testUsageAction(input, selectedAgent, selectedModels);
       setResults(res);
@@ -79,56 +112,81 @@ export default function TestUsagePage() {
     }
   };
 
-  return (
-    <div style={{ padding: '40px', maxWidth: '1400px', margin: '0 auto' }}>
-      <h1>Usage 구조 테스트</h1>
+  const handleEvaluate = async () => {
+    if (selectedModels.length === 0) {
+      alert('최소 하나의 모델을 선택해주세요.');
+      return;
+    }
 
-      <div style={{ marginTop: '20px' }}>
-        <label>
-          <div style={{ marginBottom: '8px', fontWeight: 'bold' }}>에이전트 선택:</div>
-          <select
+    setLoading(true);
+    setResults(null);
+    setEvalResults(null);
+
+    try {
+      const res = await evaluateAgentAction(selectedAgent, selectedModels);
+      setEvalResults(res);
+      console.log('평가 결과:', res);
+    } catch (error) {
+      console.error('에러:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Container maxWidth="xl" sx={{ py: 5 }}>
+      <Typography variant="h3" component="h1" gutterBottom>
+        Agent 테스트 & 평가
+      </Typography>
+
+      <Box sx={{ mt: 3, mb: 3 }}>
+        <Tabs value={mode} onChange={(_, value) => setMode(value)}>
+          <Tab label="단일 입력 테스트" value="single" />
+          <Tab label="전체 평가" value="evaluate" />
+        </Tabs>
+      </Box>
+
+      <Box sx={{ mt: 3 }}>
+        <FormControl fullWidth>
+          <InputLabel id="agent-select-label">에이전트 선택</InputLabel>
+          <Select
+            labelId="agent-select-label"
             value={selectedAgent}
+            label="에이전트 선택"
             onChange={(e) => setSelectedAgent(e.target.value as AgentName)}
-            style={{
-              width: '100%',
-              padding: '10px',
-              fontSize: '14px',
-              border: '1px solid #ccc',
-              borderRadius: '4px',
-              backgroundColor: 'white',
-              cursor: 'pointer',
-            }}
           >
             {AGENT_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value}>
+              <MenuItem key={option.value} value={option.value}>
                 {option.label} - {option.description}
-              </option>
+              </MenuItem>
             ))}
-          </select>
-        </label>
-      </div>
+          </Select>
+        </FormControl>
+      </Box>
 
-      <div style={{ marginTop: '20px' }}>
-        <div style={{ marginBottom: '8px', fontWeight: 'bold' }}>
-          모델 선택 ({selectedModels.length}개 선택됨):
+      <Box sx={{ mt: 3 }}>
+        <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+          모델 선택 ({selectedModels.length}개 선택됨)
           {supportedModels.length > 0 && (
-            <span style={{ fontSize: '12px', fontWeight: 'normal', color: '#666', marginLeft: '8px' }}>
+            <Typography component="span" variant="caption" color="text.secondary" sx={{ ml: 1 }}>
               (이 에이전트는 {supportedModels.length}개 모델을 지원합니다)
-            </span>
+            </Typography>
           )}
-        </div>
-        <div
-          style={{
-            border: '1px solid #ccc',
-            borderRadius: '4px',
-            padding: '15px',
-            backgroundColor: '#fafafa',
-            maxHeight: '300px',
+        </Typography>
+        <Paper
+          variant="outlined"
+          sx={{
+            p: 2,
+            backgroundColor: 'action.hover',
+            maxHeight: 300,
             overflowY: 'auto',
           }}
         >
           {supportedModels.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '20px', color: '#999' }}>지원하는 모델 정보를 불러오는 중...</div>
+            <Box sx={{ textAlign: 'center', py: 3, color: 'text.secondary' }}>
+              <CircularProgress size={24} sx={{ mb: 1 }} />
+              <Typography variant="body2">지원하는 모델 정보를 불러오는 중...</Typography>
+            </Box>
           ) : (
             MODEL_OPTIONS.reduce(
               (acc, option) => {
@@ -148,196 +206,621 @@ export default function TestUsagePage() {
               }))
               .filter((group) => group.options.length > 0)
               .map((group) => (
-                <div key={group.category} style={{ marginBottom: '15px' }}>
-                  <div
-                    style={{
-                      fontWeight: 'bold',
-                      fontSize: '13px',
-                      color: '#555',
-                      marginBottom: '8px',
-                      paddingBottom: '4px',
-                      borderBottom: '1px solid #ddd',
+                <Box key={group.category} sx={{ mb: 2 }}>
+                  <Typography
+                    variant="subtitle2"
+                    fontWeight="bold"
+                    color="text.secondary"
+                    sx={{
+                      mb: 1,
+                      pb: 0.5,
+                      borderBottom: 1,
+                      borderColor: 'divider',
                     }}
                   >
                     {group.category}
-                  </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '8px' }}>
+                  </Typography>
+                  <Box
+                    sx={{
+                      display: 'grid',
+                      gridTemplateColumns: {
+                        xs: 'repeat(1, 1fr)',
+                        sm: 'repeat(2, 1fr)',
+                        md: 'repeat(3, 1fr)',
+                        lg: 'repeat(4, 1fr)',
+                      },
+                      gap: 1,
+                    }}
+                  >
                     {group.options.map((option) => (
-                      <label
+                      <FormControlLabel
                         key={option.value}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          cursor: 'pointer',
-                          padding: '6px 8px',
-                          borderRadius: '4px',
-                          backgroundColor: selectedModels.includes(option.value) ? '#e0f2fe' : 'transparent',
+                        control={<Checkbox checked={selectedModels.includes(option.value)} onChange={() => toggleModel(option.value)} />}
+                        label={<Typography variant="body2">{option.label}</Typography>}
+                        sx={{
+                          m: 0,
+                          px: 1,
+                          py: 0.5,
+                          borderRadius: 1,
                           transition: 'background-color 0.2s',
+                          '&:hover': {
+                            backgroundColor: 'action.hover',
+                          },
                         }}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={selectedModels.includes(option.value)}
-                          onChange={() => toggleModel(option.value)}
-                          style={{ marginRight: '8px', cursor: 'pointer' }}
-                        />
-                        <span style={{ fontSize: '13px' }}>{option.label}</span>
-                      </label>
+                      />
                     ))}
-                  </div>
-                </div>
+                  </Box>
+                </Box>
               ))
           )}
-        </div>
-      </div>
+        </Paper>
+      </Box>
 
-      <div style={{ marginTop: '20px' }}>
-        <label>
-          <div style={{ marginBottom: '8px', fontWeight: 'bold' }}>테스트 입력:</div>
-          <textarea
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            rows={3}
-            style={{
-              width: '100%',
-              padding: '10px',
-              fontSize: '14px',
-              border: '1px solid #ccc',
-              borderRadius: '4px',
-            }}
-          />
-        </label>
-      </div>
+      {mode === 'single' && (
+        <>
+          <Box sx={{ mt: 3 }}>
+            <TextField fullWidth multiline rows={3} label="테스트 입력" value={input} onChange={(e) => setInput(e.target.value)} />
+          </Box>
 
-      <button
-        onClick={handleTest}
-        disabled={loading || selectedModels.length === 0}
-        style={{
-          marginTop: '20px',
-          padding: '12px 24px',
-          fontSize: '16px',
-          backgroundColor: loading || selectedModels.length === 0 ? '#ccc' : '#0070f3',
-          color: 'white',
-          border: 'none',
-          borderRadius: '6px',
-          cursor: loading || selectedModels.length === 0 ? 'not-allowed' : 'pointer',
-        }}
-      >
-        {loading ? `실행 중... (${selectedModels.length}개 모델)` : `Agent 실행하기 (${selectedModels.length}개 모델)`}
-      </button>
+          <Button variant="contained" size="large" onClick={handleTest} disabled={loading || selectedModels.length === 0} sx={{ mt: 3 }}>
+            {loading ? `실행 중... (${selectedModels.length}개 모델)` : `Agent 실행하기 (${selectedModels.length}개 모델)`}
+          </Button>
+        </>
+      )}
+
+      {mode === 'evaluate' && (
+        <>
+          <Alert severity="info" sx={{ mt: 3 }}>
+            <Typography variant="body2" fontWeight="bold">
+              전체 평가 모드
+            </Typography>
+            <Typography variant="body2">
+              {testCases.length}개의 테스트 케이스로 선택한 모델들을 평가합니다. 정확도, 토큰 사용량, 비용을 확인할 수 있습니다.
+            </Typography>
+          </Alert>
+
+          <Button
+            variant="contained"
+            size="large"
+            onClick={handleEvaluate}
+            disabled={loading || selectedModels.length === 0}
+            sx={{ mt: 3 }}
+          >
+            {loading ? `평가 중... (${selectedModels.length}개 모델)` : `평가 시작 (${testCases.length}개 케이스)`}
+          </Button>
+        </>
+      )}
 
       {results && (
-        <div style={{ marginTop: '30px' }}>
-          <h2>결과 비교 ({results.length}개 모델)</h2>
+        <Box sx={{ mt: 4 }}>
+          <Typography variant="h4" component="h2" gutterBottom>
+            결과 비교 ({results.length}개 모델)
+          </Typography>
 
-          <div style={{ marginTop: '20px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '20px' }}>
+          <Box
+            sx={{
+              mt: 2,
+              display: 'grid',
+              gridTemplateColumns: {
+                xs: '1fr',
+                md: 'repeat(2, 1fr)',
+                lg: 'repeat(3, 1fr)',
+              },
+              gap: 3,
+            }}
+          >
             {results.map((result) => (
-              <div
+              <Paper
                 key={result.model}
-                style={{
-                  border: '2px solid #e5e7eb',
-                  borderRadius: '8px',
-                  padding: '20px',
-                  backgroundColor: '#fff',
+                elevation={2}
+                sx={{
+                  p: 3,
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
                 }}
               >
-                <h3
-                  style={{
-                    margin: '0 0 15px 0',
-                    padding: '10px',
-                    backgroundColor: '#0070f3',
-                    color: 'white',
-                    borderRadius: '6px',
-                    fontSize: '16px',
+                <Box
+                  sx={{
+                    mb: 2,
+                    p: 1.5,
+                    backgroundColor: 'primary.main',
+                    color: 'primary.contrastText',
+                    borderRadius: 1,
                   }}
                 >
-                  📊 {result.model}
-                </h3>
+                  <Typography variant="h6" component="h3">
+                    📊 {result.model}
+                  </Typography>
+                </Box>
 
-                <div style={{ marginTop: '15px' }}>
-                  <h4 style={{ fontSize: '14px', marginBottom: '8px', color: '#374151' }}>Agent 출력:</h4>
-                  <pre
-                    style={{
-                      background: '#f5f5f5',
-                      padding: '12px',
-                      borderRadius: '6px',
-                      overflow: 'auto',
-                      fontSize: '12px',
-                      maxHeight: '200px',
+                <Box sx={{ mt: 2 }}>
+                  <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                    Agent 출력:
+                  </Typography>
+                  <Paper
+                    variant="outlined"
+                    sx={{
+                      p: 1.5,
+                      backgroundColor: 'grey.50',
+                      maxHeight: 200,
+                      overflowY: 'auto',
                     }}
                   >
-                    {JSON.stringify(result.result, null, 2)}
-                  </pre>
-                </div>
+                    <Typography
+                      component="pre"
+                      variant="body2"
+                      sx={{
+                        fontFamily: 'monospace',
+                        fontSize: '0.75rem',
+                        whiteSpace: 'pre-wrap',
+                        wordBreak: 'break-word',
+                        m: 0,
+                      }}
+                    >
+                      {JSON.stringify(result.result, null, 2)}
+                    </Typography>
+                  </Paper>
+                </Box>
 
                 {result.priceBreakdown && (
-                  <div style={{ marginTop: '15px' }}>
-                    <h4 style={{ fontSize: '14px', marginBottom: '8px', color: '#374151' }}>💰 비용 분석:</h4>
-                    <div style={{ background: '#f0f9ff', padding: '15px', borderRadius: '6px' }}>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', fontSize: '13px' }}>
-                        <div>
-                          <p style={{ margin: '3px 0', color: '#666' }}>일반 입력:</p>
-                          <p style={{ margin: '3px 0', fontSize: '15px', fontWeight: 'bold' }}>
+                  <Box sx={{ mt: 2 }}>
+                    <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                      💰 비용 분석:
+                    </Typography>
+                    <Paper
+                      variant="outlined"
+                      sx={{
+                        p: 2,
+                        backgroundColor: 'info.lighter',
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          display: 'grid',
+                          gridTemplateColumns: 'repeat(2, 1fr)',
+                          gap: 1.5,
+                        }}
+                      >
+                        <Box>
+                          <Typography variant="caption" color="text.secondary">
+                            일반 입력:
+                          </Typography>
+                          <Typography variant="body1" fontWeight="bold">
                             {result.priceBreakdown.regularInputTokens.toLocaleString()}
-                          </p>
-                        </div>
-                        <div>
-                          <p style={{ margin: '3px 0', color: '#666' }}>캐시 입력:</p>
-                          <p style={{ margin: '3px 0', fontSize: '15px', fontWeight: 'bold', color: '#10b981' }}>
+                          </Typography>
+                        </Box>
+                        <Box>
+                          <Typography variant="caption" color="text.secondary">
+                            캐시 입력:
+                          </Typography>
+                          <Typography variant="body1" fontWeight="bold" color="success.main">
                             {result.priceBreakdown.cachedInputTokens.toLocaleString()}
-                          </p>
-                        </div>
-                        <div>
-                          <p style={{ margin: '3px 0', color: '#666' }}>출력:</p>
-                          <p style={{ margin: '3px 0', fontSize: '15px', fontWeight: 'bold' }}>
+                          </Typography>
+                        </Box>
+                        <Box>
+                          <Typography variant="caption" color="text.secondary">
+                            출력:
+                          </Typography>
+                          <Typography variant="body1" fontWeight="bold">
                             {result.priceBreakdown.outputTokens.toLocaleString()}
-                          </p>
-                        </div>
-                        <div>
-                          <p style={{ margin: '3px 0', color: '#666' }}>총 비용:</p>
-                          <p style={{ margin: '3px 0', fontSize: '15px', fontWeight: 'bold', color: '#0070f3' }}>
+                          </Typography>
+                        </Box>
+                        <Box>
+                          <Typography variant="caption" color="text.secondary">
+                            총 비용:
+                          </Typography>
+                          <Typography variant="body1" fontWeight="bold" color="primary.main">
                             ${result.priceBreakdown.totalCost.toFixed(6)}
-                          </p>
-                        </div>
-                      </div>
+                          </Typography>
+                        </Box>
+                      </Box>
                       {result.priceBreakdown.savedByCaching > 0 && (
-                        <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid #ddd' }}>
-                          <p style={{ margin: '0', color: '#10b981', fontWeight: 'bold', fontSize: '12px' }}>
+                        <>
+                          <Divider sx={{ my: 1.5 }} />
+                          <Typography variant="caption" color="success.main" fontWeight="bold">
                             💡 캐싱 절약: ${result.priceBreakdown.savedByCaching.toFixed(6)}
-                          </p>
-                        </div>
+                          </Typography>
+                        </>
                       )}
-                    </div>
-                  </div>
+                    </Paper>
+                  </Box>
                 )}
 
-                <div style={{ marginTop: '15px' }}>
-                  <h4 style={{ fontSize: '14px', marginBottom: '8px', color: '#374151' }}>📈 Usage 정보:</h4>
-                  <pre
-                    style={{
-                      background: '#f5f5f5',
-                      padding: '12px',
-                      borderRadius: '6px',
-                      overflow: 'auto',
-                      fontSize: '11px',
-                      maxHeight: '150px',
+                <Box sx={{ mt: 2 }}>
+                  <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                    📈 Usage 정보:
+                  </Typography>
+                  <Paper
+                    variant="outlined"
+                    sx={{
+                      p: 1.5,
+                      backgroundColor: 'grey.50',
+                      maxHeight: 150,
+                      overflowY: 'auto',
                     }}
                   >
-                    {JSON.stringify(result.usage, null, 2)}
-                  </pre>
-                </div>
-              </div>
+                    <Typography
+                      component="pre"
+                      variant="body2"
+                      sx={{
+                        fontFamily: 'monospace',
+                        fontSize: '0.7rem',
+                        whiteSpace: 'pre-wrap',
+                        wordBreak: 'break-word',
+                        m: 0,
+                      }}
+                    >
+                      {JSON.stringify(result.usage, null, 2)}
+                    </Typography>
+                  </Paper>
+                </Box>
+              </Paper>
             ))}
-          </div>
+          </Box>
 
-          <div style={{ marginTop: '20px', padding: '15px', background: '#fffbea', borderRadius: '6px' }}>
-            <p>
-              <strong>💡 서버 콘솔을 확인하세요!</strong>
-            </p>
-            <p>터미널에서 각 모델별 상세한 Usage 구조가 출력됩니다.</p>
-          </div>
-        </div>
+          <Alert severity="info" sx={{ mt: 3 }}>
+            <Typography variant="body2" fontWeight="bold">
+              💡 서버 콘솔을 확인하세요!
+            </Typography>
+            <Typography variant="body2">터미널에서 각 모델별 상세한 Usage 구조가 출력됩니다.</Typography>
+          </Alert>
+        </Box>
       )}
-    </div>
+
+      {evalResults && (
+        <Box sx={{ mt: 4 }}>
+          <Typography variant="h4" component="h2" gutterBottom>
+            평가 결과 ({evalResults.length}개 모델)
+          </Typography>
+
+          {/* 필터 영역 */}
+          <Paper variant="outlined" sx={{ p: 3, mt: 3, mb: 3, backgroundColor: 'action.hover' }}>
+            <Typography variant="h6" gutterBottom>
+              🔍 필터
+            </Typography>
+
+            {/* 모델 선택 필터 */}
+            <Box sx={{ mb: 3 }}>
+              <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
+                모델 필터 {filterModels.length > 0 && `(${filterModels.length}개 선택됨)`}
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mt: 1 }}>
+                {evalResults.map((result) => (
+                  <Chip
+                    key={result.model}
+                    label={result.model}
+                    onClick={() => {
+                      setFilterModels((prev) =>
+                        prev.includes(result.model) ? prev.filter((m) => m !== result.model) : [...prev, result.model],
+                      );
+                    }}
+                    color={filterModels.includes(result.model) ? 'primary' : 'default'}
+                    variant={filterModels.includes(result.model) ? 'filled' : 'outlined'}
+                    sx={{ cursor: 'pointer' }}
+                  />
+                ))}
+                {filterModels.length > 0 && (
+                  <Chip
+                    label="전체 선택 해제"
+                    onClick={() => setFilterModels([])}
+                    color="error"
+                    variant="outlined"
+                    size="small"
+                    sx={{ cursor: 'pointer' }}
+                  />
+                )}
+              </Box>
+            </Box>
+
+            {/* 정답 여부 필터 */}
+            <Box>
+              <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
+                정답 여부 필터
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
+                <Chip
+                  label="전체"
+                  onClick={() => setFilterResult('all')}
+                  color={filterResult === 'all' ? 'primary' : 'default'}
+                  variant={filterResult === 'all' ? 'filled' : 'outlined'}
+                  sx={{ cursor: 'pointer' }}
+                />
+                <Chip
+                  label="✅ 통과만"
+                  onClick={() => setFilterResult('passed')}
+                  color={filterResult === 'passed' ? 'success' : 'default'}
+                  variant={filterResult === 'passed' ? 'filled' : 'outlined'}
+                  sx={{ cursor: 'pointer' }}
+                />
+                <Chip
+                  label="❌ 실패만"
+                  onClick={() => setFilterResult('failed')}
+                  color={filterResult === 'failed' ? 'error' : 'default'}
+                  variant={filterResult === 'failed' ? 'filled' : 'outlined'}
+                  sx={{ cursor: 'pointer' }}
+                />
+              </Box>
+            </Box>
+          </Paper>
+
+          {/* 모델별 요약 */}
+          {(() => {
+            const filteredResults = evalResults.filter((result) => filterModels.length === 0 || filterModels.includes(result.model));
+
+            if (filteredResults.length === 0) {
+              return (
+                <Alert severity="warning" sx={{ mt: 3 }}>
+                  <Typography variant="body2">선택한 필터에 해당하는 결과가 없습니다. 필터를 조정해주세요.</Typography>
+                </Alert>
+              );
+            }
+
+            return (
+              <Box
+                sx={{
+                  mt: 3,
+                  display: 'grid',
+                  gridTemplateColumns: {
+                    xs: '1fr',
+                    md: 'repeat(2, 1fr)',
+                    lg: 'repeat(3, 1fr)',
+                  },
+                  gap: 3,
+                }}
+              >
+                {filteredResults.map((result) => (
+                  <Paper
+                    key={result.model}
+                    elevation={3}
+                    sx={{
+                      p: 3,
+                      borderLeft: 4,
+                      borderColor: result.accuracy >= 80 ? 'success.main' : result.accuracy >= 60 ? 'warning.main' : 'error.main',
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                      <Typography variant="h6" component="h3">
+                        {result.model}
+                      </Typography>
+                      <Chip
+                        label={`${result.accuracy.toFixed(1)}%`}
+                        color={result.accuracy >= 80 ? 'success' : result.accuracy >= 60 ? 'warning' : 'error'}
+                        sx={{ fontWeight: 'bold', fontSize: '0.9rem' }}
+                      />
+                    </Box>
+
+                    <Divider sx={{ my: 2 }} />
+
+                    <Box sx={{ mb: 2 }}>
+                      <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                        📊 정확도
+                      </Typography>
+                      <Typography variant="h5" fontWeight="bold" color={result.accuracy >= 80 ? 'success.main' : 'text.primary'}>
+                        {result.passedCount} / {result.totalCount}
+                      </Typography>
+                    </Box>
+
+                    {result.priceBreakdown && (
+                      <Box sx={{ mb: 2 }}>
+                        <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                          💰 비용
+                        </Typography>
+                        <Box sx={{ display: 'flex', gap: 3 }}>
+                          <Box>
+                            <Typography variant="caption" color="text.secondary">
+                              케이스당 (평균)
+                            </Typography>
+                            <Typography variant="body1" fontWeight="bold" color="primary.main">
+                              ${result.priceBreakdown.avg.totalCost.toFixed(6)}
+                            </Typography>
+                          </Box>
+                          <Box>
+                            <Typography variant="caption" color="text.secondary">
+                              전체 총합
+                            </Typography>
+                            <Typography variant="body1" fontWeight="bold" color="secondary.main">
+                              ${result.priceBreakdown.total.totalCost.toFixed(6)}
+                            </Typography>
+                          </Box>
+                        </Box>
+                      </Box>
+                    )}
+
+                    <Box>
+                      <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                        🔢 토큰 사용량
+                      </Typography>
+                      <Box sx={{ mb: 2 }}>
+                        <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 0.5 }}>
+                          평균 (케이스당)
+                        </Typography>
+                        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                          <Box>
+                            <Typography variant="caption" color="text.secondary">
+                              입력
+                            </Typography>
+                            <Typography variant="body2" fontWeight="bold">
+                              {result.usage.avg.inputTokens}
+                            </Typography>
+                          </Box>
+                          <Box>
+                            <Typography variant="caption" color="text.secondary">
+                              출력
+                            </Typography>
+                            <Typography variant="body2" fontWeight="bold">
+                              {result.usage.avg.outputTokens}
+                            </Typography>
+                          </Box>
+                          <Box>
+                            <Typography variant="caption" color="text.secondary">
+                              총
+                            </Typography>
+                            <Typography variant="body2" fontWeight="bold">
+                              {result.usage.avg.totalTokens}
+                            </Typography>
+                          </Box>
+                        </Box>
+                      </Box>
+                      <Box>
+                        <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 0.5 }}>
+                          총합 (전체)
+                        </Typography>
+                        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                          <Box>
+                            <Typography variant="caption" color="text.secondary">
+                              입력
+                            </Typography>
+                            <Typography variant="body2" fontWeight="bold" color="secondary.main">
+                              {result.usage.total.inputTokens.toLocaleString()}
+                            </Typography>
+                          </Box>
+                          <Box>
+                            <Typography variant="caption" color="text.secondary">
+                              출력
+                            </Typography>
+                            <Typography variant="body2" fontWeight="bold" color="secondary.main">
+                              {result.usage.total.outputTokens.toLocaleString()}
+                            </Typography>
+                          </Box>
+                          <Box>
+                            <Typography variant="caption" color="text.secondary">
+                              총
+                            </Typography>
+                            <Typography variant="body2" fontWeight="bold" color="secondary.main">
+                              {result.usage.total.totalTokens.toLocaleString()}
+                            </Typography>
+                          </Box>
+                        </Box>
+                      </Box>
+                    </Box>
+                  </Paper>
+                ))}
+              </Box>
+            );
+          })()}
+
+          {/* 상세 결과 */}
+          {evalResults
+            .filter((result) => filterModels.length === 0 || filterModels.includes(result.model))
+            .map((result) => {
+              // 정답 여부 필터링
+              const filteredEvaluations = result.evaluations.filter((evaluation) => {
+                if (filterResult === 'passed') return evaluation.passed;
+                if (filterResult === 'failed') return !evaluation.passed;
+                return true; // 'all'
+              });
+
+              // 필터링 결과가 없으면 모델 자체를 표시하지 않음
+              if (filteredEvaluations.length === 0) return null;
+
+              return (
+                <Box key={`detail-${result.model}`} sx={{ mt: 4 }}>
+                  <Typography variant="h5" component="h3" gutterBottom>
+                    {result.model} - 상세 결과
+                    {filterResult !== 'all' && (
+                      <Chip label={`${filteredEvaluations.length}개 표시 중`} size="small" color="primary" sx={{ ml: 2 }} />
+                    )}
+                  </Typography>
+
+                  <Box sx={{ mt: 2 }}>
+                    {filteredEvaluations.map((evaluation, idx) => (
+                      <Paper
+                        key={idx}
+                        variant="outlined"
+                        sx={{
+                          p: 2,
+                          mb: 2,
+                          borderLeft: 4,
+                          borderColor: evaluation.passed ? 'success.main' : 'error.main',
+                        }}
+                      >
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                          <Typography variant="subtitle1" fontWeight="bold">
+                            {evaluation.passed ? '✅' : '❌'} {evaluation.description || `테스트 ${idx + 1}`}
+                          </Typography>
+                          <Chip label={evaluation.passed ? '통과' : '실패'} size="small" color={evaluation.passed ? 'success' : 'error'} />
+                        </Box>
+
+                        <Box sx={{ mt: 2 }}>
+                          <Typography variant="caption" color="text.secondary" display="block" gutterBottom>
+                            입력:
+                          </Typography>
+                          <Paper variant="outlined" sx={{ p: 1.5, backgroundColor: 'grey.50', mb: 2 }}>
+                            <Typography variant="body2">{evaluation.input}</Typography>
+                          </Paper>
+
+                          <Box
+                            sx={{
+                              display: 'grid',
+                              gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+                              gap: 2,
+                            }}
+                          >
+                            <Box>
+                              <Typography variant="caption" color="text.secondary" display="block" gutterBottom>
+                                기대 출력:
+                              </Typography>
+                              <Paper variant="outlined" sx={{ p: 1.5, backgroundColor: 'success.lighter' }}>
+                                <Typography
+                                  component="pre"
+                                  variant="body2"
+                                  sx={{
+                                    fontFamily: 'monospace',
+                                    fontSize: '0.75rem',
+                                    whiteSpace: 'pre-wrap',
+                                    wordBreak: 'break-word',
+                                    m: 0,
+                                  }}
+                                >
+                                  {JSON.stringify(evaluation.expectedOutput, null, 2)}
+                                </Typography>
+                              </Paper>
+                            </Box>
+
+                            <Box>
+                              <Typography variant="caption" color="text.secondary" display="block" gutterBottom>
+                                실제 출력:
+                              </Typography>
+                              <Paper
+                                variant="outlined"
+                                sx={{
+                                  p: 1.5,
+                                  backgroundColor: evaluation.passed ? 'success.lighter' : 'error.lighter',
+                                }}
+                              >
+                                <Typography
+                                  component="pre"
+                                  variant="body2"
+                                  sx={{
+                                    fontFamily: 'monospace',
+                                    fontSize: '0.75rem',
+                                    whiteSpace: 'pre-wrap',
+                                    wordBreak: 'break-word',
+                                    m: 0,
+                                  }}
+                                >
+                                  {evaluation.actualOutput ? JSON.stringify(evaluation.actualOutput, null, 2) : evaluation.error || 'null'}
+                                </Typography>
+                              </Paper>
+                            </Box>
+                          </Box>
+                        </Box>
+                      </Paper>
+                    ))}
+                  </Box>
+                </Box>
+              );
+            })}
+
+          <Alert severity="info" sx={{ mt: 3 }}>
+            <Typography variant="body2" fontWeight="bold">
+              💡 서버 콘솔을 확인하세요!
+            </Typography>
+            <Typography variant="body2">터미널에서 각 모델별 평가 요약 정보가 출력됩니다.</Typography>
+          </Alert>
+        </Box>
+      )}
+    </Container>
   );
 }
