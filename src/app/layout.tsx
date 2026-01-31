@@ -1,3 +1,4 @@
+import { LanguageProvider } from '@/features/language';
 import ThemeProvider from '@/styles/ThemeProvider';
 import type { Metadata } from 'next';
 import { ReactNode } from 'react';
@@ -15,7 +16,9 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body>
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <LanguageProvider>{children}</LanguageProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
