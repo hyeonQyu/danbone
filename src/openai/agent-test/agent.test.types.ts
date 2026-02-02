@@ -1,11 +1,11 @@
-export type TestCase<TOutput, TInput = string> = {
-  input: TInput;
+export type TestCase<TOutput> = {
+  input: string;
   expectedOutput: TOutput;
   description?: string;
 };
 
-export type EvaluationResult<TOutput, TInput = string> = {
-  input: TInput;
+export type EvaluationResult<TOutput> = {
+  input: string;
   expectedOutput: TOutput;
   actualOutput: TOutput;
   passed: boolean;

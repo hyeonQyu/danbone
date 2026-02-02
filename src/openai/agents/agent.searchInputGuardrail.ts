@@ -1,10 +1,10 @@
 import { buildAgentFactory } from '@/openai/agent.utils';
-import { validatorSchema } from '@/openai/schemes';
+import { guardrailOutputSchema } from '@/openai/schemes';
 
 export const searchInputGuardrailAgentFactory = buildAgentFactory(
   {
     name: 'Search input guardrail',
-    outputType: validatorSchema,
+    outputType: guardrailOutputSchema,
   },
   {
     'gpt-5-nano': {

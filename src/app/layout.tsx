@@ -1,4 +1,4 @@
-import { LanguageProvider } from '@/language';
+import { LanguageProvider } from '@/features/language';
 import ThemeProvider from '@/styles/ThemeProvider';
 import type { Metadata } from 'next';
 import { ReactNode } from 'react';

@@ -1,7 +1,7 @@
 'use client';
 
-import { LanguageContext } from '@/language/LanguageContext';
-import { SourceLanguage, TargetLanguage } from '@/language/language.types';
+import { SourceLanguage, TargetLanguage } from '@/features/language/language.types';
+import { LanguageContext } from '@/features/language/LanguageContext';
 import { ReactNode, useMemo, useState } from 'react';
 
 interface LanguageProviderProps {

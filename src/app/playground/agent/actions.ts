@@ -1,25 +1,18 @@
 'use server';
 
-import {
-  inputValidatorTestCases,
-  queryClassifierTestCases,
-  searchInputGuardrailTestCases,
-  type EvaluationResult,
-} from '@/openai/agent-test';
-import { inputValidatorAgentFactory, queryClassifierAgentFactory, searchInputGuardrailAgentFactory } from '@/openai/agents';
+import { queryClassifierTestCases, searchInputGuardrailTestCases, type EvaluationResult } from '@/openai/agent-test';
+import { queryClassifierAgentFactory, searchInputGuardrailAgentFactory } from '@/openai/agents';
 import { TextModel } from '@/openai/model.types';
 import { createRunner } from '@/openai/runner.utils';
 
 const agentCreators = {
   searchInputGuardrail: searchInputGuardrailAgentFactory,
   queryClassifier: queryClassifierAgentFactory,
-  inputValidator: inputValidatorAgentFactory,
 } as const;
 
 const testCases = {
   searchInputGuardrail: searchInputGuardrailTestCases,
   queryClassifier: queryClassifierTestCases,
-  inputValidator: inputValidatorTestCases,
 } as const;
 
 export type AgentName = keyof typeof agentCreators;
@@ -117,9 +110,7 @@ export async function evaluateAgentAction(agentName: AgentName, models: TextMode
       const evaluationsWithMetrics = await Promise.all(
         cases.map(async (testCase) => {
           try {
-            // input이 객체인 경우 JSON 문자열로 변환
-            const inputStr = typeof testCase.input === 'string' ? testCase.input : JSON.stringify(testCase.input);
-            const result = await runner.run(agent, inputStr);
+            const result = await runner.run(agent, testCase.input);
             const actualOutput = result.finalOutput;
 
             // 출력 비교 (유연한 비교)
@@ -132,7 +123,7 @@ export async function evaluateAgentAction(agentName: AgentName, models: TextMode
                 actualOutput,
                 passed,
                 description: testCase.description,
-              } as EvaluationResult<unknown, unknown>,
+              } as EvaluationResult<unknown>,
               usage: result.state.usage,
               priceBreakdown: result.priceBreakdown,
             };
@@ -145,7 +136,7 @@ export async function evaluateAgentAction(agentName: AgentName, models: TextMode
                 passed: false,
                 description: testCase.description,
                 error: error instanceof Error ? error.message : String(error),
-              } as EvaluationResult<unknown, unknown>,
+              } as EvaluationResult<unknown>,
               usage: null,
               priceBreakdown: null,
             };

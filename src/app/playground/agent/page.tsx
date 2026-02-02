@@ -27,7 +27,6 @@ import { evaluateAgentAction, getSupportedModels, getTestCases, testUsageAction,
 const AGENT_OPTIONS = [
   { value: 'searchInputGuardrail', label: 'Search Input Guardrail', description: '입력 문장 수 검증' },
   { value: 'queryClassifier', label: 'Query Classifier', description: '쿼리 타입 분류' },
-  { value: 'inputValidator', label: 'Input Validator', description: '입력 검증' },
 ] as const;
 
 const MODEL_OPTIONS: { value: TextModel; label: string; category: string }[] = [
@@ -748,9 +747,7 @@ export default function TestUsagePage() {
                             입력:
                           </Typography>
                           <Paper variant="outlined" sx={{ p: 1.5, backgroundColor: 'grey.50', mb: 2 }}>
-                            <Typography variant="body2">
-                              {typeof evaluation.input === 'string' ? evaluation.input : JSON.stringify(evaluation.input, null, 2)}
-                            </Typography>
+                            <Typography variant="body2">{evaluation.input}</Typography>
                           </Paper>
 
                           <Box
