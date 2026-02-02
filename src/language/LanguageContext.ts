@@ -1,6 +1,6 @@
 'use client';
 
-import { SourceLanguage, TargetLanguage } from '@/features/language/language.types';
+import { SourceLanguage, TargetLanguage } from '@/language/language.types';
 import { createContext, useContext } from 'react';
 
 export const LanguageContext = createContext<

@@ -1,8 +1,8 @@
-import { guardrailOutputSchema } from '@/openai/schemes';
+import { validatorSchema } from '@/openai/schemes';
 import z from 'zod';
 import { TestCase } from './agent.test.types';
 
-type GuardrailOutput = z.infer<typeof guardrailOutputSchema>;
+type GuardrailOutput = z.infer<typeof validatorSchema>;
 
 export const searchInputGuardrailTestCases: TestCase<GuardrailOutput>[] = [
   // ===== VALID CASES (Korean) =====
