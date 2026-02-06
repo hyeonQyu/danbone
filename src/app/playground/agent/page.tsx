@@ -27,6 +27,7 @@ import { evaluateAgentAction, getSupportedModels, getTestCases, testUsageAction,
 const AGENT_OPTIONS = [
   { value: 'queryNormalizer', label: 'Query Normalizer', description: '쿼리 정규화' },
   { value: 'inputValidator', label: 'Input Validator', description: '입력 검증' },
+  { value: 'translator', label: 'Translator', description: '번역' },
 ] as const;
 
 const MODEL_OPTIONS: { value: TextModel; label: string; category: string }[] = [
@@ -260,6 +261,16 @@ export default function TestUsagePage() {
         <>
           <Box sx={{ mt: 3 }}>
             <TextField fullWidth multiline rows={3} label="테스트 입력" value={input} onChange={(e) => setInput(e.target.value)} />
+            {selectedAgent === 'translator' && (
+              <Alert severity="info" sx={{ mt: 1 }}>
+                <Typography variant="body2">
+                  <strong>Translator 입력 형식:</strong> JSON 형식으로 입력해주세요.
+                </Typography>
+                <Typography variant="body2" component="pre" sx={{ fontFamily: 'monospace', fontSize: '0.75rem', mt: 1 }}>
+                  {`{ "text": "조금", "sourceLanguage": "ko", "targetLanguage": "ja" }`}
+                </Typography>
+              </Alert>
+            )}
           </Box>
 
           <Button variant="contained" size="large" onClick={handleTest} disabled={loading || selectedModels.length === 0} sx={{ mt: 3 }}>
