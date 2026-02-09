@@ -1,3 +1,4 @@
-export * from './agent.inputValidator';
-export * from './agent.queryNormalizer';
-export * from './agent.translator';
+export * from './inputValidator.agent';
+export * from './morphAnalyzer.ja.agent';
+export * from './queryNormalizer.agent';
+export * from './translator.agent';

@@ -1,8 +1,8 @@
-import { localizedTextSchema } from '@/openai/schemes';
+import { LocalizedTextSchema } from '@/openai/schemes';
 import z from 'zod';
 import { TestCase } from './agent.test.types';
 
-type LocalizedText = z.infer<typeof localizedTextSchema>;
+type LocalizedText = z.infer<typeof LocalizedTextSchema>;
 
 type QueryNormalizerTestCase = Omit<TestCase<LocalizedText>, 'input'> & {
   input: LocalizedText;

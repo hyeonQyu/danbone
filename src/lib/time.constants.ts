@@ -1,4 +1,4 @@
-import { TimeUnitType } from '@/time/time.types';
+import { TimeUnitType } from '@/lib/time.types';
 
 export const TIME_UNIT: Record<`unitOf${TimeUnitType}`, Record<`as${TimeUnitType}`, number>> = {
   unitOfMs: {

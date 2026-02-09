@@ -1,9 +1,9 @@
-import { localizedTextSchema, validatorSchema } from '@/openai/schemes';
+import { LocalizedTextSchema, ValidatorSchema } from '@/openai/schemes';
 import z from 'zod';
 import { TestCase } from './agent.test.types';
 
-type ValidatorInput = z.infer<typeof localizedTextSchema>;
-type ValidatorOutput = z.infer<typeof validatorSchema>;
+type ValidatorInput = z.infer<typeof LocalizedTextSchema>;
+type ValidatorOutput = z.infer<typeof ValidatorSchema>;
 
 type InputValidatorTestCase = Omit<TestCase<ValidatorOutput>, 'input'> & {
   input: ValidatorInput;

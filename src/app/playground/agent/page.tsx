@@ -28,6 +28,7 @@ const AGENT_OPTIONS = [
   { value: 'queryNormalizer', label: 'Query Normalizer', description: '쿼리 정규화' },
   { value: 'inputValidator', label: 'Input Validator', description: '입력 검증' },
   { value: 'translator', label: 'Translator', description: '번역' },
+  { value: 'morphAnalyzer', label: 'Japanese Morph Analyzer', description: '일본어 형태소 분석' },
 ] as const;
 
 const MODEL_OPTIONS: { value: TextModel; label: string; category: string }[] = [

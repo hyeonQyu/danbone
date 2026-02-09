@@ -1,9 +1,9 @@
-import { localizedTextsSchema, translationSourceSchema } from '@/openai/schemes';
+import { LocalizedTextsSchema, TranslationSourceSchema } from '@/openai/schemes';
 import z from 'zod';
 import { TestCase } from './agent.test.types';
 
-type TranslationInput = z.infer<typeof translationSourceSchema>;
-type TranslationOutput = z.infer<typeof localizedTextsSchema>;
+type TranslationInput = z.infer<typeof TranslationSourceSchema>;
+type TranslationOutput = z.infer<typeof LocalizedTextsSchema>;
 
 type TranslatorTestCase = Omit<TestCase<TranslationOutput>, 'input'> & {
   input: TranslationInput;
