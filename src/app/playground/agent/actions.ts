@@ -1,6 +1,7 @@
 'use server';
 
 import {
+  dictionaryJaTestCases,
   inputValidatorTestCases,
   morphAnalyzerJaTestCases,
   queryNormalizerTestCases,
@@ -9,7 +10,8 @@ import {
 } from '@/openai/agent-test';
 import {
   inputValidatorAgentFactory,
-  jaMorphAnalyzerAgentFactory,
+  jaDictionaryAgentFactory,
+  jaMorphologicalAnalyzerAgentFactory,
   queryNormalizerAgentFactory,
   translatorAgentFactory,
 } from '@/openai/agents';
@@ -20,7 +22,8 @@ const agentCreators = {
   queryNormalizer: queryNormalizerAgentFactory,
   inputValidator: inputValidatorAgentFactory,
   translator: translatorAgentFactory,
-  morphAnalyzer: jaMorphAnalyzerAgentFactory,
+  morphAnalyzer: jaMorphologicalAnalyzerAgentFactory,
+  dictionaryJa: jaDictionaryAgentFactory,
 } as const;
 
 const testCases = {
@@ -28,6 +31,7 @@ const testCases = {
   inputValidator: inputValidatorTestCases,
   translator: translatorTestCases,
   morphAnalyzer: morphAnalyzerJaTestCases,
+  dictionaryJa: dictionaryJaTestCases,
 } as const;
 
 export type AgentName = keyof typeof agentCreators;
