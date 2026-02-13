@@ -16,7 +16,7 @@ import {
   translatorAgentFactory,
 } from '@/openai/agents';
 import { TextModel } from '@/openai/model.types';
-import { createRunner } from '@/openai/runner.utils';
+import { getRunner } from '@/openai/runner.utils';
 
 const agentCreators = {
   queryNormalizer: queryNormalizerAgentFactory,
@@ -43,14 +43,15 @@ export async function getSupportedModels(agentName: AgentName): Promise<TextMode
 }
 
 export async function testUsageAction(input: string, agentName: AgentName, models: TextModel[]) {
-  const runner = createRunner();
+  const runner = getRunner();
   const agentCreator = agentCreators[agentName];
 
   // 모든 모델에 대해 병렬로 실행
   const results = await Promise.all(
     models.map(async (model) => {
       const agent = agentCreator.createAgent(model);
-      const result = await runner.run(agent, input);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const result = await runner.run(agent as any, input);
       const usage = result.state.usage;
 
       // 콘솔에 출력
@@ -116,7 +117,7 @@ export async function getTestCases(agentName: AgentName) {
 
 // 테스트 평가 실행
 export async function evaluateAgentAction(agentName: AgentName, models: TextModel[]) {
-  const runner = createRunner();
+  const runner = getRunner();
   const agentCreator = agentCreators[agentName];
   const cases = testCases[agentName];
 
@@ -131,7 +132,8 @@ export async function evaluateAgentAction(agentName: AgentName, models: TextMode
           try {
             // input이 객체인 경우 JSON 문자열로 변환
             const inputStr = typeof testCase.input === 'string' ? testCase.input : JSON.stringify(testCase.input);
-            const result = await runner.run(agent, inputStr);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const result = await runner.run(agent as any, inputStr);
             const actualOutput = result.finalOutput;
 
             // 출력 비교 (유연한 비교)
