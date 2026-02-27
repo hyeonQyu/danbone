@@ -32,7 +32,7 @@ function ThemeProvider({ children }: ThemeProviderProps) {
     return createTheme({
       palette: baseTheme.palette,
       shape: {
-        borderRadius: 8,
+        borderRadius: pxToRem(8),
       },
       shadows: [
         'none',

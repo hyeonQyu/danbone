@@ -80,4 +80,8 @@ const { resultSchemas, outputSchemas } = createDictionarySchemasForLanguage(Dict
 export const DictionaryResultSchemaByLanguage = resultSchemas;
 export const DictionaryOutputSchemaByLanguage = outputSchemas;
 
+export type DictionaryEntryByLanguage = {
+  [K in keyof typeof DictionaryResultSchemaByLanguage]: z.infer<(typeof DictionaryResultSchemaByLanguage)[K]>;
+};
+
 export type DictionaryInput = z.infer<typeof DictionaryInputSchema>;

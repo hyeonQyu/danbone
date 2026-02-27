@@ -39,7 +39,7 @@ export const paletteLight: PaletteOptions = {
     contrastText: '#ffffff',
   },
   background: {
-    default: '#ffffff',
+    default: '#fafafa',
     paper: '#ffffff',
   },
   text: {

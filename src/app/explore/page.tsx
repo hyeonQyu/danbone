@@ -1,14 +1,14 @@
 'use client';
 
 import { PageViewContainer } from '@/components/PageViewContainer';
-import { LoginView } from '@/features/users';
+import { ExploreView } from '@/features/explore';
 
-function LoginPage() {
+function ExplorePage() {
   return (
     <PageViewContainer>
-      <LoginView />
+      <ExploreView />
     </PageViewContainer>
   );
 }
 
-export default LoginPage;
+export default ExplorePage;
