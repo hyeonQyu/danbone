@@ -1,3 +1,4 @@
+import { useGetJAPartOfSpeechLabel } from '@/features/dictionary';
 import { DictionaryEntryByLanguage } from '@/openai';
 import { usePxToRem } from '@/styles';
 import { Box, Chip, Typography, useTheme } from '@mui/material';
@@ -11,6 +12,8 @@ function DictionaryJAEntryResultCard({ result }: DictionaryJAEntryResultCardProp
 
   const { spacing, palette, transitions, shadows } = useTheme();
   const pxToRem = usePxToRem();
+
+  const getPartOfSpeechLabel = useGetJAPartOfSpeechLabel();
 
   return (
     <Box
@@ -49,7 +52,7 @@ function DictionaryJAEntryResultCard({ result }: DictionaryJAEntryResultCardProp
         <Typography variant="body2" color="text.secondary" component="span">
           [{pronunciation}]
         </Typography>
-        <Chip label={pos} size="small" sx={{ ml: 'auto' }} />
+        <Chip label={getPartOfSpeechLabel(pos)} size="small" sx={{ ml: 'auto' }} variant="filled" />
       </Box>
 
       <Box>
