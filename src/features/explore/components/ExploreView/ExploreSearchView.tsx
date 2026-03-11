@@ -6,17 +6,17 @@ import { useQueryExploreSearchJA } from '@/features/explore/hooks';
 import { useExploreStore } from '@/features/explore/stores';
 import { ExploreSearchOption, ExploreSearchResult } from '@/features/explore/types';
 import { Language, useSourceLanguage, useTargetLanguage } from '@/language';
-import { DictionaryEntryByLanguage } from '@/openai';
+import { DictionaryWordByLanguage } from '@/openai';
 import { useState } from 'react';
 
 // 더미 데이터
-const DUMMY_JA_RESULTS: Array<ExploreSearchResult<DictionaryEntryByLanguage['ja']>> = [
+const DUMMY_JA_RESULTS: Array<ExploreSearchResult<DictionaryWordByLanguage['ja']>> = [
   {
     text: '上手 元気',
-    entries: [
+    words: [
       {
         keyword: '上手',
-        results: [
+        entries: [
           {
             notation: '上手',
             pronunciation: 'じょうず',
@@ -35,7 +35,7 @@ const DUMMY_JA_RESULTS: Array<ExploreSearchResult<DictionaryEntryByLanguage['ja'
       },
       {
         keyword: '元気',
-        results: [
+        entries: [
           {
             notation: '元気',
             pronunciation: 'げんき',
@@ -56,10 +56,10 @@ const DUMMY_JA_RESULTS: Array<ExploreSearchResult<DictionaryEntryByLanguage['ja'
   },
   {
     text: '元気',
-    entries: [
+    words: [
       {
         keyword: '元気',
-        results: [
+        entries: [
           {
             notation: '元気',
             pronunciation: 'げんき',

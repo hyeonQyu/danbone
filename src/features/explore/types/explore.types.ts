@@ -8,7 +8,7 @@ export type ExploreSearchOption = {
 
 export type ExploreSearchResult<T extends object> = {
   text: string;
-  entries: T[];
+  words: T[];
 };
 
 export type ExploreSearchHandler<T extends object> = (option: ExploreSearchOption) => Promise<Array<ExploreSearchResult<T>>>;

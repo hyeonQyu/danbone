@@ -9,10 +9,10 @@ export const dictionaryJaTestCases: TestCase<DictionaryOutput, Record<string, un
   {
     input: { sourceLanguage: 'ko', words: ['猫'] },
     expectedOutput: {
-      entries: [
+      words: [
         {
           keyword: '猫',
-          results: [
+          entries: [
             {
               notation: '猫',
               pronunciation: 'ねこ',
@@ -29,10 +29,10 @@ export const dictionaryJaTestCases: TestCase<DictionaryOutput, Record<string, un
   {
     input: { sourceLanguage: 'ko', words: ['走る'] },
     expectedOutput: {
-      entries: [
+      words: [
         {
           keyword: '走る',
-          results: [
+          entries: [
             {
               notation: '走る',
               pronunciation: 'はしる',
@@ -49,10 +49,10 @@ export const dictionaryJaTestCases: TestCase<DictionaryOutput, Record<string, un
   {
     input: { sourceLanguage: 'ko', words: ['静か'] },
     expectedOutput: {
-      entries: [
+      words: [
         {
           keyword: '静か',
-          results: [
+          entries: [
             {
               notation: '静か',
               pronunciation: 'しずか',
@@ -71,10 +71,10 @@ export const dictionaryJaTestCases: TestCase<DictionaryOutput, Record<string, un
   {
     input: { sourceLanguage: 'ko', words: ['つまらない'] },
     expectedOutput: {
-      entries: [
+      words: [
         {
           keyword: 'つまらない',
-          results: [
+          entries: [
             {
               notation: 'つまらない',
               pronunciation: 'つまらない',
@@ -91,10 +91,10 @@ export const dictionaryJaTestCases: TestCase<DictionaryOutput, Record<string, un
   {
     input: { sourceLanguage: 'ko', words: ['嬉しい'] },
     expectedOutput: {
-      entries: [
+      words: [
         {
           keyword: '嬉しい',
-          results: [
+          entries: [
             {
               notation: '嬉しい',
               pronunciation: 'うれしい',
@@ -111,10 +111,10 @@ export const dictionaryJaTestCases: TestCase<DictionaryOutput, Record<string, un
   {
     input: { sourceLanguage: 'ko', words: ['広い'] },
     expectedOutput: {
-      entries: [
+      words: [
         {
           keyword: '広い',
-          results: [
+          entries: [
             {
               notation: '広い',
               pronunciation: 'ひろい',
@@ -133,10 +133,10 @@ export const dictionaryJaTestCases: TestCase<DictionaryOutput, Record<string, un
   {
     input: { sourceLanguage: 'ko', words: ['立つ'] },
     expectedOutput: {
-      entries: [
+      words: [
         {
           keyword: '立つ',
-          results: [
+          entries: [
             {
               notation: '立つ',
               pronunciation: 'たつ',
@@ -160,10 +160,10 @@ export const dictionaryJaTestCases: TestCase<DictionaryOutput, Record<string, un
   {
     input: { sourceLanguage: 'ko', words: ['切る'] },
     expectedOutput: {
-      entries: [
+      words: [
         {
           keyword: '切る',
-          results: [
+          entries: [
             {
               notation: '切る',
               pronunciation: 'きる',
@@ -187,10 +187,10 @@ export const dictionaryJaTestCases: TestCase<DictionaryOutput, Record<string, un
   {
     input: { sourceLanguage: 'ko', words: ['取る'] },
     expectedOutput: {
-      entries: [
+      words: [
         {
           keyword: '取る',
-          results: [
+          entries: [
             {
               notation: '取る',
               pronunciation: 'とる',
@@ -216,10 +216,10 @@ export const dictionaryJaTestCases: TestCase<DictionaryOutput, Record<string, un
   {
     input: { sourceLanguage: 'ko', words: ['上手'] },
     expectedOutput: {
-      entries: [
+      words: [
         {
           keyword: '上手',
-          results: [
+          entries: [
             {
               notation: '上手',
               pronunciation: 'じょうず',
@@ -243,10 +243,10 @@ export const dictionaryJaTestCases: TestCase<DictionaryOutput, Record<string, un
   {
     input: { sourceLanguage: 'ko', words: ['元気'] },
     expectedOutput: {
-      entries: [
+      words: [
         {
           keyword: '元気',
-          results: [
+          entries: [
             {
               notation: '元気',
               pronunciation: 'げんき',
@@ -270,10 +270,10 @@ export const dictionaryJaTestCases: TestCase<DictionaryOutput, Record<string, un
   {
     input: { sourceLanguage: 'ko', words: ['大切'] },
     expectedOutput: {
-      entries: [
+      words: [
         {
           keyword: '大切',
-          results: [
+          entries: [
             {
               notation: '大切',
               pronunciation: 'たいせつ',
@@ -299,10 +299,10 @@ export const dictionaryJaTestCases: TestCase<DictionaryOutput, Record<string, un
   {
     input: { sourceLanguage: 'ko', words: ['かける'] },
     expectedOutput: {
-      entries: [
+      words: [
         {
           keyword: 'かける',
-          results: [
+          entries: [
             {
               notation: '掛ける',
               pronunciation: 'かける',
@@ -326,10 +326,10 @@ export const dictionaryJaTestCases: TestCase<DictionaryOutput, Record<string, un
   {
     input: { sourceLanguage: 'ko', words: ['きる'] },
     expectedOutput: {
-      entries: [
+      words: [
         {
           keyword: 'きる',
-          results: [
+          entries: [
             {
               notation: '着る',
               pronunciation: 'きる',
@@ -353,10 +353,10 @@ export const dictionaryJaTestCases: TestCase<DictionaryOutput, Record<string, un
   {
     input: { sourceLanguage: 'ko', words: ['あける'] },
     expectedOutput: {
-      entries: [
+      words: [
         {
           keyword: 'あける',
-          results: [
+          entries: [
             {
               notation: '開ける',
               pronunciation: 'あける',
@@ -382,10 +382,10 @@ export const dictionaryJaTestCases: TestCase<DictionaryOutput, Record<string, un
   {
     input: { sourceLanguage: 'ko', words: ['カフェ'] },
     expectedOutput: {
-      entries: [
+      words: [
         {
           keyword: 'カフェ',
-          results: [
+          entries: [
             {
               notation: 'カフェ',
               pronunciation: 'かふぇ',
@@ -402,10 +402,10 @@ export const dictionaryJaTestCases: TestCase<DictionaryOutput, Record<string, un
   {
     input: { sourceLanguage: 'ko', words: ['コーヒー'] },
     expectedOutput: {
-      entries: [
+      words: [
         {
           keyword: 'コーヒー',
-          results: [
+          entries: [
             {
               notation: 'コーヒー',
               pronunciation: 'こーひー',
@@ -422,10 +422,10 @@ export const dictionaryJaTestCases: TestCase<DictionaryOutput, Record<string, un
   {
     input: { sourceLanguage: 'ko', words: ['パソコン'] },
     expectedOutput: {
-      entries: [
+      words: [
         {
           keyword: 'パソコン',
-          results: [
+          entries: [
             {
               notation: 'パソコン',
               pronunciation: 'ぱそこん',
@@ -444,10 +444,10 @@ export const dictionaryJaTestCases: TestCase<DictionaryOutput, Record<string, un
   {
     input: { sourceLanguage: 'ko', words: ['する'] },
     expectedOutput: {
-      entries: [
+      words: [
         {
           keyword: 'する',
-          results: [
+          entries: [
             {
               notation: 'する',
               pronunciation: 'する',
@@ -464,10 +464,10 @@ export const dictionaryJaTestCases: TestCase<DictionaryOutput, Record<string, un
   {
     input: { sourceLanguage: 'ko', words: ['来る'] },
     expectedOutput: {
-      entries: [
+      words: [
         {
           keyword: '来る',
-          results: [
+          entries: [
             {
               notation: '来る',
               pronunciation: 'くる',
@@ -484,10 +484,10 @@ export const dictionaryJaTestCases: TestCase<DictionaryOutput, Record<string, un
   {
     input: { sourceLanguage: 'ko', words: ['勉強する'] },
     expectedOutput: {
-      entries: [
+      words: [
         {
           keyword: '勉強する',
-          results: [
+          entries: [
             {
               notation: '勉強する',
               pronunciation: 'べんきょうする',
@@ -506,10 +506,10 @@ export const dictionaryJaTestCases: TestCase<DictionaryOutput, Record<string, un
   {
     input: { sourceLanguage: 'ko', words: ['猫', '犬'] },
     expectedOutput: {
-      entries: [
+      words: [
         {
           keyword: '猫',
-          results: [
+          entries: [
             {
               notation: '猫',
               pronunciation: 'ねこ',
@@ -521,7 +521,7 @@ export const dictionaryJaTestCases: TestCase<DictionaryOutput, Record<string, un
         },
         {
           keyword: '犬',
-          results: [
+          entries: [
             {
               notation: '犬',
               pronunciation: 'いぬ',
@@ -538,10 +538,10 @@ export const dictionaryJaTestCases: TestCase<DictionaryOutput, Record<string, un
   {
     input: { sourceLanguage: 'ko', words: ['食べる', '飲む', '寝る'] },
     expectedOutput: {
-      entries: [
+      words: [
         {
           keyword: '食べる',
-          results: [
+          entries: [
             {
               notation: '食べる',
               pronunciation: 'たべる',
@@ -553,7 +553,7 @@ export const dictionaryJaTestCases: TestCase<DictionaryOutput, Record<string, un
         },
         {
           keyword: '飲む',
-          results: [
+          entries: [
             {
               notation: '飲む',
               pronunciation: 'のむ',
@@ -565,7 +565,7 @@ export const dictionaryJaTestCases: TestCase<DictionaryOutput, Record<string, un
         },
         {
           keyword: '寝る',
-          results: [
+          entries: [
             {
               notation: '寝る',
               pronunciation: 'ねる',
@@ -582,10 +582,10 @@ export const dictionaryJaTestCases: TestCase<DictionaryOutput, Record<string, un
   {
     input: { sourceLanguage: 'ko', words: ['上手', '元気'] },
     expectedOutput: {
-      entries: [
+      words: [
         {
           keyword: '上手',
-          results: [
+          entries: [
             {
               notation: '上手',
               pronunciation: 'じょうず',
@@ -604,7 +604,7 @@ export const dictionaryJaTestCases: TestCase<DictionaryOutput, Record<string, un
         },
         {
           keyword: '元気',
-          results: [
+          entries: [
             {
               notation: '元気',
               pronunciation: 'げんき',

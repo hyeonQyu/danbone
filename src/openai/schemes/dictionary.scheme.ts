@@ -1,4 +1,4 @@
-import { DictionaryFormatSchemaByLanguage } from '@/features/dictionary';
+import { DictionaryEntrySchemaByLanguage } from '@/features/dictionary';
 import { LanguageSchema } from '@/openai/schemes';
 import z from 'zod';
 
@@ -7,49 +7,49 @@ export const DictionaryInputSchema = z.object({
   words: z.array(z.string()),
 });
 
-const createDictionarySchemasForLanguage = <T extends Record<string, z.ZodTypeAny>>(formatSchemas: T) => {
-  type ResultSchemas = {
+const createDictionarySchemasForLanguage = <T extends Record<string, z.ZodTypeAny>>(entrySchemas: T) => {
+  type WordSchemas = {
     [K in keyof T]: z.ZodObject<{
       keyword: z.ZodString;
-      results: z.ZodArray<T[K]>;
+      entries: z.ZodArray<T[K]>;
     }>;
   };
 
   type OutputSchemas = {
-    [K in keyof ResultSchemas]: z.ZodObject<{
-      entries: z.ZodArray<ResultSchemas[K]>;
+    [K in keyof WordSchemas]: z.ZodObject<{
+      words: z.ZodArray<WordSchemas[K]>;
     }>;
   };
 
-  const resultSchemas = Object.fromEntries(
-    Object.entries(formatSchemas).map(([lang, schema]) => [
+  const wordSchemas = Object.fromEntries(
+    Object.entries(entrySchemas).map(([lang, schema]) => [
       lang,
       z.object({
         keyword: z.string(),
-        results: z.array(schema),
+        entries: z.array(schema),
       }),
     ]),
-  ) as ResultSchemas;
+  ) as WordSchemas;
 
   const outputSchemas = Object.fromEntries(
-    Object.entries(resultSchemas).map(([lang, schema]) => [
+    Object.entries(wordSchemas).map(([lang, schema]) => [
       lang,
       z.object({
-        entries: z.array(schema),
+        words: z.array(schema),
       }),
     ]),
   ) as OutputSchemas;
 
-  return { resultSchemas, outputSchemas };
+  return { wordSchemas, outputSchemas };
 };
 
-const { resultSchemas, outputSchemas } = createDictionarySchemasForLanguage(DictionaryFormatSchemaByLanguage);
+const { wordSchemas, outputSchemas } = createDictionarySchemasForLanguage(DictionaryEntrySchemaByLanguage);
 
-export const DictionaryResultSchemaByLanguage = resultSchemas;
+export const DictionaryWordSchemaByLanguage = wordSchemas;
 export const DictionaryOutputSchemaByLanguage = outputSchemas;
 
-export type DictionaryEntryByLanguage = {
-  [K in keyof typeof DictionaryResultSchemaByLanguage]: z.infer<(typeof DictionaryResultSchemaByLanguage)[K]>;
+export type DictionaryWordByLanguage = {
+  [K in keyof typeof DictionaryWordSchemaByLanguage]: z.infer<(typeof DictionaryWordSchemaByLanguage)[K]>;
 };
 
 export type DictionaryInput = z.infer<typeof DictionaryInputSchema>;

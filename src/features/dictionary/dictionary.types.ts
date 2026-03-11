@@ -16,7 +16,7 @@ export const PartOfSpeechSchemaByLanguage = {
   ]),
 } as const;
 
-export const DictionaryFormatSchemaByLanguage = {
+export const DictionaryEntrySchemaByLanguage = {
   ko: z.object({
     notation: z.string(),
     pronunciation: z.string(),
@@ -35,4 +35,8 @@ export const DictionaryFormatSchemaByLanguage = {
 
 export type PartOfSpeechByLanguage = {
   [K in keyof typeof PartOfSpeechSchemaByLanguage]: z.infer<(typeof PartOfSpeechSchemaByLanguage)[K]>;
+};
+
+export type DictionaryEntryByLanguage = {
+  [K in keyof typeof DictionaryEntrySchemaByLanguage]: z.infer<(typeof DictionaryEntrySchemaByLanguage)[K]>;
 };
