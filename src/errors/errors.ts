@@ -15,3 +15,9 @@ export class InvalidValueError extends Error {
     super(message);
   }
 }
+
+export class AuthError extends Error {
+  constructor(message: string) {
+    super(message);
+  }
+}

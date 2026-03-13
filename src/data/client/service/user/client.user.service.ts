@@ -3,6 +3,8 @@
 import { getClientServiceCreator } from '@/data/client/service/client.service.utils';
 import { UserClientService, UserClientServiceDependencies } from '@/data/client/service/user/client.user.service.types';
 import { InvalidValueError, NotFoundError } from '@/errors';
+import { TIME_UNIT } from '@/lib';
+import { deleteCookie, setCookie } from '@/lib/cookie.utils';
 import { AuthError, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 
 export const createUserClientService = getClientServiceCreator<UserClientService, UserClientServiceDependencies>(
@@ -13,7 +15,7 @@ export const createUserClientService = getClientServiceCreator<UserClientService
           const userCredential = await signInWithEmailAndPassword(auth, data.email, data.password);
           const [idToken, idTokenResult] = await Promise.all([userCredential.user.getIdToken(), userCredential.user.getIdTokenResult()]);
 
-          return {
+          const result = {
             user: {
               id: userCredential.user.uid,
               email: userCredential.user.email ?? '',
@@ -23,6 +25,15 @@ export const createUserClientService = getClientServiceCreator<UserClientService
             refreshToken: userCredential.user.refreshToken,
             expiresIn: idTokenResult.expirationTime,
           };
+
+          const expiresAt = new Date(idTokenResult.expirationTime).getTime();
+          const now = Date.now();
+          const maxAgeInSeconds = Math.floor((expiresAt - now) / TIME_UNIT.unitOfMs.asSecond);
+
+          setCookie('idToken', idToken, { maxAge: maxAgeInSeconds });
+          setCookie('refreshToken', userCredential.user.refreshToken, { maxAge: maxAgeInSeconds });
+
+          return result;
         } catch (error: unknown) {
           switch ((error as AuthError).code) {
             case 'auth/invalid-email':
@@ -43,6 +54,8 @@ export const createUserClientService = getClientServiceCreator<UserClientService
 
       logout: async () => {
         await signOut(auth);
+        deleteCookie('idToken');
+        deleteCookie('refreshToken');
       },
 
       getCurrentUser: () => usersRepository.getCurrentUser(),

@@ -4,6 +4,7 @@ import { type Unsubscribe, type User } from 'firebase/auth';
 export interface UsersServerRepository {
   createUser: (user: CreateUserData) => Promise<UserEntity>;
   getUserByEmail: (email: string) => Promise<UserEntity | null>;
+  getUserById: (id: string) => Promise<UserEntity | null>;
 }
 
 export interface UsersClientRepository {
