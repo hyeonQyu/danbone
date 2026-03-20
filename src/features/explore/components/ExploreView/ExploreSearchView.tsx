@@ -106,7 +106,7 @@ function ExploreSearchView() {
   const isError = isJAError;
 
   const handleSearch = (value: string) => {
-    // setQuery(value);
+    setQuery(value);
   };
 
   return (
@@ -120,7 +120,7 @@ function ExploreSearchView() {
           return <ExploreSearchErrorResult error={error} />;
         }
 
-        const results = jaResults ?? DUMMY_JA_RESULTS;
+        const results = jaResults;
 
         if (results) {
           return <ExploreSearchJAResults results={results} />;
