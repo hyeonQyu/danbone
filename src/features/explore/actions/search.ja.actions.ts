@@ -20,7 +20,7 @@ const MAX_QUERY_LENGTH = 50;
 const runner = getRunner();
 
 const inputValidatorAgent = inputValidatorAgentFactory.createAgent('gpt-4.1-mini');
-const queryNormalizerAgent = queryNormalizerAgentFactory.createAgent('gpt-5-nano');
+const queryNormalizerAgent = queryNormalizerAgentFactory.createAgent('gpt-4.1-mini');
 const translatorAgent = translatorAgentFactory.createAgent('gpt-5-nano');
 const jaMorphologicalAnalyzerAgent = jaMorphologicalAnalyzerAgentFactory.createAgent('gpt-5-mini');
 const jaDictionaryAgent = jaDictionaryAgentFactory.createAgent('gpt-5-nano');
