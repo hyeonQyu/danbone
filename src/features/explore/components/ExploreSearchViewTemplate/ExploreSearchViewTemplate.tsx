@@ -1,10 +1,10 @@
 import { Loading } from '@/components/Loading';
+import { SlideInContainer } from '@/components/SlideInContainer';
 import { ExploreSearchInputField } from '@/features/explore/components/ExploreSearchInputField';
 import { Language } from '@/language';
 import { useTypedRouter } from '@/routes/routes';
 import { ArrowBack } from '@mui/icons-material';
 import { Box, IconButton, useTheme } from '@mui/material';
-import { motion } from 'framer-motion';
 import { ReactNode } from 'react';
 
 interface ExploreSearchViewTemplateProps {
@@ -22,28 +22,7 @@ function ExploreSearchViewTemplate({ queryLanguage, isSearching, query, onSearch
   const handleToExplore = () => router.push('/explore');
 
   return (
-    <Box
-      component={motion.div}
-      initial={{ x: '100%' }}
-      animate={{ x: 0 }}
-      transition={{
-        type: 'spring',
-        stiffness: 500,
-        damping: 30,
-      }}
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        width: '100%',
-        height: '100vh',
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        zIndex: 1000,
-        backgroundColor: palette.background.default,
-        transform: 'translateX(100%)',
-      }}
-    >
+    <SlideInContainer>
       <Box
         sx={{
           display: 'flex',
@@ -72,7 +51,7 @@ function ExploreSearchViewTemplate({ queryLanguage, isSearching, query, onSearch
       >
         {isSearching ? <Loading messages={[`${query} 검색 중...`, '잠시만 기다려 주세요...', '처리 중입니다...']} /> : renderResults()}
       </Box>
-    </Box>
+    </SlideInContainer>
   );
 }
 
