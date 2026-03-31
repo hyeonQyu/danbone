@@ -18,7 +18,7 @@ function SlideInContainer({ children }: SlideInContainerProps) {
       animate={{ x: 0 }}
       transition={{
         type: 'spring',
-        stiffness: 500,
+        stiffness: 400,
         damping: 30,
       }}
       sx={{
