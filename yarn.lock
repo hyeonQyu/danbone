@@ -1147,15 +1147,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hyeonqyu/typed-router-next@npm:^1.0.8":
-  version: 1.0.8
-  resolution: "@hyeonqyu/typed-router-next@npm:1.0.8"
+"@hyeonqyu/typed-router-next@npm:^1.0.9":
+  version: 1.0.9
+  resolution: "@hyeonqyu/typed-router-next@npm:1.0.9"
   dependencies:
     "@hyeonqyu/typed-router-core": "npm:^1.0.5"
   peerDependencies:
     next: ^13.0.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
     react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
-  checksum: 10c0/eb46d506df60a6eaf925fc348325cf7051fc723aa995eb9dfff179ba2870b04b2e3c980fcb70a421963fa3ec0b859059d545b71c93650c2bb99b20b5259b7858
+  checksum: 10c0/bc3a652eacdb9093c9e58fa04a15c83e7377cf0973d0801b89c62645e18ccd1d5c6b92184889e10b4988794b36061938ba14431e9387c466cac3a12a98f5221c
   languageName: node
   linkType: hard
 
@@ -3117,7 +3117,7 @@ __metadata:
   dependencies:
     "@emotion/react": "npm:^11.14.0"
     "@emotion/styled": "npm:^11.14.1"
-    "@hyeonqyu/typed-router-next": "npm:^1.0.8"
+    "@hyeonqyu/typed-router-next": "npm:^1.0.9"
     "@mui/icons-material": "npm:^7.3.6"
     "@mui/material": "npm:^7.3.6"
     "@openai/agents": "npm:^0.3.4"

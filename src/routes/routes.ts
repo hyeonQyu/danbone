@@ -1,5 +1,6 @@
 import { DictionaryEntryWithLanguageSchema } from '@/features/dictionary/dictionary.types';
 import { BaseMetadata, createAppRoutes } from '@hyeonqyu/typed-router-next';
+import z from 'zod';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const { AppRoutesProvider, TypedLink, useAppRoutes, useCurrentRouteNode, useTypedPathname, useTypedRouter, useTypedSearchParams, _types } =
@@ -8,7 +9,13 @@ const { AppRoutesProvider, TypedLink, useAppRoutes, useCurrentRouteNode, useType
       _metadata: {},
     },
     login: {
-      _metadata: {},
+      _metadata: {
+        searchParamsSchema: z
+          .object({
+            email: z.string().email().optional(),
+          })
+          .optional(),
+      },
     },
     explore: {
       _metadata: {},
