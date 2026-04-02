@@ -1,3 +1,5 @@
+'use client';
+
 import { DictionaryEntryWithLanguageSchema } from '@/features/dictionary/dictionary.types';
 import { BaseMetadata, createAppRoutes } from '@hyeonqyu/typed-router-next';
 import z from 'zod';
