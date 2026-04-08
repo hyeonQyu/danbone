@@ -1,62 +1,47 @@
 'use client';
 
 import { onAuthStateChanged, syncTokenToCookie } from '@/auth';
-import { AppRoutesPathname, useTypedRouter, useTypedSearchParams } from '@/routes';
-import { Box, CircularProgress, Typography } from '@mui/material';
+import { Loading } from '@/components/Loading';
+import { useRedirect, useTypedRouter, useTypedSearchParams } from '@/routes';
+import { Box } from '@mui/material';
+import { User } from 'firebase/auth';
 import { useEffect, useState } from 'react';
 
 function AuthenticationPage() {
   const router = useTypedRouter();
   const searchParams = useTypedSearchParams('/authentication');
-  const [error, setError] = useState<string | null>(null);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
+  const [authUser, setAuthUser] = useState<User | null>(null);
+  const redirect = useRedirect(searchParams?.redirect);
 
   useEffect(() => {
-    const checkAndSync = async () => {
-      try {
-        const user = await new Promise((resolve) => {
-          const unsubscribe = onAuthStateChanged((user) => {
-            unsubscribe();
-            resolve(user);
-          });
-        });
+    const unsubscribe = onAuthStateChanged((user) => {
+      setAuthUser(user);
+      setIsAuthLoading(false);
+    });
 
-        if (!user) {
-          router.replace('/login');
-          return;
-        }
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
-        const success = await syncTokenToCookie();
+  useEffect(() => {
+    if (isAuthLoading) {
+      return;
+    }
 
-        if (success) {
-          const redirect = searchParams?.redirect || '/';
-          router.replace(redirect as AppRoutesPathname);
-        } else {
-          router.replace('/login');
-        }
-      } catch {
-        setError('인증 처리 중 오류가 발생했습니다.');
-      }
+    if (!authUser) {
+      router.replace('/login', { searchParams });
+      return;
+    }
+
+    const syncAndRedirect = async () => {
+      await syncTokenToCookie();
+      redirect();
     };
 
-    checkAndSync();
-  }, [router, searchParams]);
-
-  if (error) {
-    return (
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          minHeight: '100vh',
-          gap: 2,
-        }}
-      >
-        <Typography color="error">{error}</Typography>
-      </Box>
-    );
-  }
+    syncAndRedirect();
+  }, [isAuthLoading, authUser, router, searchParams, redirect]);
 
   return (
     <Box
@@ -69,8 +54,7 @@ function AuthenticationPage() {
         gap: 2,
       }}
     >
-      <CircularProgress />
-      <Typography>인증 확인 중...</Typography>
+      <Loading messages={['인증 확인 중...', '잠시만 기다려주세요...']} />
     </Box>
   );
 }

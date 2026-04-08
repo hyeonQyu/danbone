@@ -18,11 +18,9 @@ export const appRoutes = {
   login: {
     _metadata: {
       accessible: accessibleOnLoggedOut,
-      searchParamsSchema: z
-        .object({
-          email: z.string().email().optional(),
-        })
-        .optional(),
+      searchParamsSchema: RedirectSearchParamsSchema.extend({
+        email: z.string().email().optional(),
+      }).optional(),
     },
   },
   explore: {
