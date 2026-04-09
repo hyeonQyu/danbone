@@ -1,8 +1,8 @@
-import { TokenRefresher } from '@/auth/TokenRefresher';
+import { TokenRefresher } from '@/auth';
 import { LanguageProvider } from '@/language';
 import { ReactQueryClientProvider } from '@/react-query';
 import { AppRoutesProvider } from '@/routes';
-import ThemeProvider from '@/styles/ThemeProvider';
+import { EmotionCacheProvider, ThemeProvider } from '@/styles';
 import type { Metadata } from 'next';
 import { ReactNode } from 'react';
 
@@ -20,13 +20,15 @@ export default function RootLayout({
     <html lang="ko">
       <body>
         <AppRoutesProvider>
-          <ThemeProvider>
-            <LanguageProvider>
-              <ReactQueryClientProvider>
-                <TokenRefresher>{children}</TokenRefresher>
-              </ReactQueryClientProvider>
-            </LanguageProvider>
-          </ThemeProvider>
+          <EmotionCacheProvider>
+            <ThemeProvider>
+              <LanguageProvider>
+                <ReactQueryClientProvider>
+                  <TokenRefresher>{children}</TokenRefresher>
+                </ReactQueryClientProvider>
+              </LanguageProvider>
+            </ThemeProvider>
+          </EmotionCacheProvider>
         </AppRoutesProvider>
       </body>
     </html>

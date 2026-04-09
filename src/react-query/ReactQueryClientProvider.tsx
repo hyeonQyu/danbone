@@ -2,10 +2,11 @@
 
 import { syncTokenToCookie } from '@/auth/token.utils';
 import { ERROR_NAME } from '@/errors';
+import { useMounted } from '@/hooks';
+import { ReactQueryDevtools } from '@/react-query/ReactQueryDevtools';
 import { useTypedRouter } from '@/routes';
 import { enqueueClosableSnackbar } from '@/styles';
 import { MutationCache, QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { ReactNode, useState } from 'react';
 
 export interface ReactQueryClientProviderProps {
@@ -16,6 +17,7 @@ function ReactQueryClientProvider(props: ReactQueryClientProviderProps) {
   const { children } = props;
 
   const router = useTypedRouter();
+  const mounted = useMounted();
 
   const handleAuthError = async (error: unknown): Promise<boolean> => {
     if (error instanceof Error) {
@@ -71,7 +73,7 @@ function ReactQueryClientProvider(props: ReactQueryClientProviderProps) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ReactQueryDevtools initialIsOpen={false} />
+      {mounted && <ReactQueryDevtools initialIsOpen={false} />}
       {children}
     </QueryClientProvider>
   );
