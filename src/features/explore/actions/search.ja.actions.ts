@@ -22,7 +22,7 @@ const runner = getRunner();
 const inputValidatorAgent = inputValidatorAgentFactory.createAgent('gpt-4.1-mini');
 const queryNormalizerAgent = queryNormalizerAgentFactory.createAgent('gpt-4.1-mini');
 const translatorAgent = translatorAgentFactory.createAgent('gpt-4o-mini');
-const jaMorphologicalAnalyzerAgent = jaMorphologicalAnalyzerAgentFactory.createAgent('gpt-5-mini');
+const jaMorphologicalAnalyzerAgent = jaMorphologicalAnalyzerAgentFactory.createAgent('gpt-4o-mini');
 const jaDictionaryAgent = jaDictionaryAgentFactory.createAgent('gpt-5-nano');
 
 const checkQueryLength = (query: string) => {
