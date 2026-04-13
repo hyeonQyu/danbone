@@ -68,7 +68,9 @@ function LoginView({ defaultEmail, redirectTo }: LoginViewProps) {
         gap: spacing(3),
       }}
     >
-      <Logo />
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 4 }}>
+        <Logo width={110} />
+      </Box>
 
       {error && <Alert severity="error">{error}</Alert>}
 
