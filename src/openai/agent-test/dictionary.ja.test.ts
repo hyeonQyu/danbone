@@ -7,44 +7,44 @@ type DictionaryOutput = z.infer<typeof DictionaryOutputSchemaByLanguage.ja>;
 export const dictionaryJaTestCases: TestCase<DictionaryOutput, Record<string, unknown>>[] = [
   // ===== 1. 단일 품사, 단일 의미 (3개) =====
   {
-    input: { sourceLanguage: 'ko', words: ['猫'] },
+    input: { sourceLanguage: 'ko', words: ['鳥'] },
     expectedOutput: {
       words: [
         {
-          keyword: '猫',
+          keyword: '鳥',
           entries: [
             {
-              notation: '猫',
-              pronunciation: 'ねこ',
-              meanings: ['고양이'],
+              notation: '鳥',
+              pronunciation: 'とり',
+              meanings: ['새'],
               pos: 'noun',
-              examples: ['猫を飼う', '猫が好きです'],
+              examples: ['鳥が飛ぶ', '鳥の声'],
             },
           ],
         },
       ],
     },
-    description: '단일 품사, 단일 의미: 猫 (명사, 고양이)',
+    description: '단일 품사, 단일 의미: 鳥 (명사, 새)',
   },
   {
-    input: { sourceLanguage: 'ko', words: ['走る'] },
+    input: { sourceLanguage: 'ko', words: ['笑う'] },
     expectedOutput: {
       words: [
         {
-          keyword: '走る',
+          keyword: '笑う',
           entries: [
             {
-              notation: '走る',
-              pronunciation: 'はしる',
-              meanings: ['달리다'],
+              notation: '笑う',
+              pronunciation: 'わらう',
+              meanings: ['웃다'],
               pos: 'godanVerb',
-              examples: ['速く走る', '毎朝走ります'],
+              examples: ['大きく笑う', '彼女は笑っています'],
             },
           ],
         },
       ],
     },
-    description: '단일 품사, 단일 의미: 走る (오단동사, 달리다)',
+    description: '단일 품사, 단일 의미: 笑う (오단동사, 웃다)',
   },
   {
     input: { sourceLanguage: 'ko', words: ['静か'] },
@@ -89,24 +89,24 @@ export const dictionaryJaTestCases: TestCase<DictionaryOutput, Record<string, un
     description: '단일 품사, 복수 유사 의미: つまらない (い형용사, 지루하다/재미없다/따분하다)',
   },
   {
-    input: { sourceLanguage: 'ko', words: ['嬉しい'] },
+    input: { sourceLanguage: 'ko', words: ['美しい'] },
     expectedOutput: {
       words: [
         {
-          keyword: '嬉しい',
+          keyword: '美しい',
           entries: [
             {
-              notation: '嬉しい',
-              pronunciation: 'うれしい',
-              meanings: ['기쁘다', '즐겁다'],
+              notation: '美しい',
+              pronunciation: 'うつくしい',
+              meanings: ['아름답다', '예쁘다'],
               pos: 'iAdjective',
-              examples: ['嬉しいニュース', 'とても嬉しいです'],
+              examples: ['美しい景色', '美しい花'],
             },
           ],
         },
       ],
     },
-    description: '단일 품사, 복수 유사 의미: 嬉しい (い형용사, 기쁘다/즐겁다)',
+    description: '단일 품사, 복수 유사 의미: 美しい (い형용사, 아름답다/예쁘다)',
   },
   {
     input: { sourceLanguage: 'ko', words: ['広い'] },
@@ -131,58 +131,58 @@ export const dictionaryJaTestCases: TestCase<DictionaryOutput, Record<string, un
 
   // ===== 3. 동일 품사, 완전히 다른 의미 (3개) =====
   {
-    input: { sourceLanguage: 'ko', words: ['立つ'] },
+    input: { sourceLanguage: 'ko', words: ['開く'] },
     expectedOutput: {
       words: [
         {
-          keyword: '立つ',
+          keyword: '開く',
           entries: [
             {
-              notation: '立つ',
-              pronunciation: 'たつ',
-              meanings: ['서다'],
+              notation: '開く',
+              pronunciation: 'ひらく',
+              meanings: ['열리다', '펼치다'],
               pos: 'godanVerb',
-              examples: ['そこに立つ', '立って話す'],
+              examples: ['本を開く', '花が開く'],
             },
             {
-              notation: '立つ',
-              pronunciation: 'たつ',
-              meanings: ['출발하다', '떠나다'],
+              notation: '開く',
+              pronunciation: 'ひらく',
+              meanings: ['개최하다', '시작하다'],
               pos: 'godanVerb',
-              examples: ['電車が立つ', '駅を立つ'],
+              examples: ['会議を開く', 'パーティーを開く'],
             },
           ],
         },
       ],
     },
-    description: '동일 품사, 완전히 다른 의미: 立つ (오단동사, 서다 / 출발하다)',
+    description: '동일 품사, 완전히 다른 의미: 開く (오단동사, 열리다 / 개최하다)',
   },
   {
-    input: { sourceLanguage: 'ko', words: ['切る'] },
+    input: { sourceLanguage: 'ko', words: ['打つ'] },
     expectedOutput: {
       words: [
         {
-          keyword: '切る',
+          keyword: '打つ',
           entries: [
             {
-              notation: '切る',
-              pronunciation: 'きる',
-              meanings: ['자르다'],
+              notation: '打つ',
+              pronunciation: 'うつ',
+              meanings: ['치다', '때리다'],
               pos: 'godanVerb',
-              examples: ['紙を切る', '野菜を切る'],
+              examples: ['ボールを打つ', '太鼓を打つ'],
             },
             {
-              notation: '切る',
-              pronunciation: 'きる',
-              meanings: ['끊다', '끝내다'],
+              notation: '打つ',
+              pronunciation: 'うつ',
+              meanings: ['(문자를) 입력하다', '타이핑하다'],
               pos: 'godanVerb',
-              examples: ['電話を切る', '電源を切る'],
+              examples: ['メールを打つ', 'キーボードを打つ'],
             },
           ],
         },
       ],
     },
-    description: '동일 품사, 완전히 다른 의미: 切る (오단동사, 자르다 / 끊다)',
+    description: '동일 품사, 완전히 다른 의미: 打つ (오단동사, 치다 / 타이핑하다)',
   },
   {
     input: { sourceLanguage: 'ko', words: ['取る'] },
@@ -214,31 +214,31 @@ export const dictionaryJaTestCases: TestCase<DictionaryOutput, Record<string, un
 
   // ===== 4. 복수 품사, 각기 다른 의미 (3개) =====
   {
-    input: { sourceLanguage: 'ko', words: ['上手'] },
+    input: { sourceLanguage: 'ko', words: ['安全'] },
     expectedOutput: {
       words: [
         {
-          keyword: '上手',
+          keyword: '安全',
           entries: [
             {
-              notation: '上手',
-              pronunciation: 'じょうず',
-              meanings: ['능숙한', '잘하는'],
+              notation: '安全',
+              pronunciation: 'あんぜん',
+              meanings: ['안전한'],
               pos: 'naAdjective',
-              examples: ['日本語が上手です', '料理が上手だ'],
+              examples: ['安全な場所', '安全に運転する'],
             },
             {
-              notation: '上手',
-              pronunciation: 'じょうず',
-              meanings: ['고수', '능숙한 사람'],
+              notation: '安全',
+              pronunciation: 'あんぜん',
+              meanings: ['안전'],
               pos: 'noun',
-              examples: ['彼はピアノの上手だ'],
+              examples: ['安全を確認する', '安全が第一だ'],
             },
           ],
         },
       ],
     },
-    description: '복수 품사, 각기 다른 의미: 上手 (な형용사=능숙한 / 명사=고수)',
+    description: '복수 품사, 각기 다른 의미: 安全 (な형용사=안전한 / 명사=안전)',
   },
   {
     input: { sourceLanguage: 'ko', words: ['元気'] },
@@ -324,31 +324,31 @@ export const dictionaryJaTestCases: TestCase<DictionaryOutput, Record<string, un
     description: '복잡한 케이스: かける (일단동사, 걸다 / 곱하다 등)',
   },
   {
-    input: { sourceLanguage: 'ko', words: ['きる'] },
+    input: { sourceLanguage: 'ko', words: ['はかる'] },
     expectedOutput: {
       words: [
         {
-          keyword: 'きる',
+          keyword: 'はかる',
           entries: [
             {
-              notation: '着る',
-              pronunciation: 'きる',
-              meanings: ['입다'],
-              pos: 'ichidanVerb',
-              examples: ['服を着る', 'コートを着る'],
+              notation: '測る',
+              pronunciation: 'はかる',
+              meanings: ['재다', '측정하다'],
+              pos: 'godanVerb',
+              examples: ['長さを測る', '体重を測る'],
             },
             {
-              notation: '切る',
-              pronunciation: 'きる',
-              meanings: ['자르다'],
+              notation: '図る',
+              pronunciation: 'はかる',
+              meanings: ['꾀하다', '도모하다'],
               pos: 'godanVerb',
-              examples: ['髪を切る', 'ケーキを切る'],
+              examples: ['成功を図る', '解決を図る'],
             },
           ],
         },
       ],
     },
-    description: '복잡한 케이스: きる (착る=일단동사 입다 / 키루=오단동사 자르다)',
+    description: '복잡한 케이스: はかる (측정하다 / 도모하다)',
   },
   {
     input: { sourceLanguage: 'ko', words: ['あける'] },
@@ -380,44 +380,44 @@ export const dictionaryJaTestCases: TestCase<DictionaryOutput, Record<string, un
 
   // ===== 6. 외래어 (3개) =====
   {
-    input: { sourceLanguage: 'ko', words: ['カフェ'] },
+    input: { sourceLanguage: 'ko', words: ['レストラン'] },
     expectedOutput: {
       words: [
         {
-          keyword: 'カフェ',
+          keyword: 'レストラン',
           entries: [
             {
-              notation: 'カフェ',
-              pronunciation: 'かふぇ',
-              meanings: ['카페'],
+              notation: 'レストラン',
+              pronunciation: 'れすとらん',
+              meanings: ['레스토랑', '식당'],
               pos: 'noun',
-              examples: ['カフェに行く', 'カフェでコーヒーを飲む'],
+              examples: ['レストランで食事する', 'イタリアンレストラン'],
             },
           ],
         },
       ],
     },
-    description: '외래어: カフェ (명사, 카페)',
+    description: '외래어: レストラン (명사, 레스토랑)',
   },
   {
-    input: { sourceLanguage: 'ko', words: ['コーヒー'] },
+    input: { sourceLanguage: 'ko', words: ['ホテル'] },
     expectedOutput: {
       words: [
         {
-          keyword: 'コーヒー',
+          keyword: 'ホテル',
           entries: [
             {
-              notation: 'コーヒー',
-              pronunciation: 'こーひー',
-              meanings: ['커피'],
+              notation: 'ホテル',
+              pronunciation: 'ほてる',
+              meanings: ['호텔'],
               pos: 'noun',
-              examples: ['コーヒーを飲む', 'コーヒーが好きです'],
+              examples: ['ホテルに泊まる', 'ホテルを予約する'],
             },
           ],
         },
       ],
     },
-    description: '외래어: コーヒー (명사, 커피)',
+    description: '외래어: ホテル (명사, 호텔)',
   },
   {
     input: { sourceLanguage: 'ko', words: ['パソコン'] },
@@ -504,18 +504,18 @@ export const dictionaryJaTestCases: TestCase<DictionaryOutput, Record<string, un
 
   // ===== 8. 여러 단어 동시 입력 (3개) =====
   {
-    input: { sourceLanguage: 'ko', words: ['猫', '犬'] },
+    input: { sourceLanguage: 'ko', words: ['鳥', '犬'] },
     expectedOutput: {
       words: [
         {
-          keyword: '猫',
+          keyword: '鳥',
           entries: [
             {
-              notation: '猫',
-              pronunciation: 'ねこ',
-              meanings: ['고양이'],
+              notation: '鳥',
+              pronunciation: 'とり',
+              meanings: ['새'],
               pos: 'noun',
-              examples: ['猫を飼う', '猫が好きです'],
+              examples: ['鳥が飛ぶ', '鳥の声'],
             },
           ],
         },
@@ -533,33 +533,33 @@ export const dictionaryJaTestCases: TestCase<DictionaryOutput, Record<string, un
         },
       ],
     },
-    description: '여러 단어 동시 입력: 猫, 犬 (2개 명사)',
+    description: '여러 단어 동시 입력: 鳥, 犬 (2개 명사)',
   },
   {
-    input: { sourceLanguage: 'ko', words: ['食べる', '飲む', '寝る'] },
+    input: { sourceLanguage: 'ko', words: ['読む', '聞く', '寝る'] },
     expectedOutput: {
       words: [
         {
-          keyword: '食べる',
+          keyword: '読む',
           entries: [
             {
-              notation: '食べる',
-              pronunciation: 'たべる',
-              meanings: ['먹다'],
-              pos: 'ichidanVerb',
-              examples: ['ご飯を食べる', '朝ごはんを食べる'],
+              notation: '読む',
+              pronunciation: 'よむ',
+              meanings: ['읽다'],
+              pos: 'godanVerb',
+              examples: ['本を読む', '新聞を読む'],
             },
           ],
         },
         {
-          keyword: '飲む',
+          keyword: '聞く',
           entries: [
             {
-              notation: '飲む',
-              pronunciation: 'のむ',
-              meanings: ['마시다'],
+              notation: '聞く',
+              pronunciation: 'きく',
+              meanings: ['듣다', '묻다'],
               pos: 'godanVerb',
-              examples: ['水を飲む', 'お茶を飲む'],
+              examples: ['音楽を聞く', '質問を聞く'],
             },
           ],
         },
@@ -577,28 +577,28 @@ export const dictionaryJaTestCases: TestCase<DictionaryOutput, Record<string, un
         },
       ],
     },
-    description: '여러 단어 동시 입력: 食べる, 飲む, 寝る (3개 동사)',
+    description: '여러 단어 동시 입력: 読む, 聞く, 寝る (3개 동사)',
   },
   {
-    input: { sourceLanguage: 'ko', words: ['上手', '元気'] },
+    input: { sourceLanguage: 'ko', words: ['安全', '元気'] },
     expectedOutput: {
       words: [
         {
-          keyword: '上手',
+          keyword: '安全',
           entries: [
             {
-              notation: '上手',
-              pronunciation: 'じょうず',
-              meanings: ['능숙한', '잘하는'],
+              notation: '安全',
+              pronunciation: 'あんぜん',
+              meanings: ['안전한'],
               pos: 'naAdjective',
-              examples: ['日本語が上手です', '料理が上手だ'],
+              examples: ['安全な場所', '安全に運転する'],
             },
             {
-              notation: '上手',
-              pronunciation: 'じょうず',
-              meanings: ['고수', '능숙한 사람'],
+              notation: '安全',
+              pronunciation: 'あんぜん',
+              meanings: ['안전'],
               pos: 'noun',
-              examples: ['彼はピアノの上手だ'],
+              examples: ['安全を確認する', '安全が第一だ'],
             },
           ],
         },
@@ -623,6 +623,6 @@ export const dictionaryJaTestCases: TestCase<DictionaryOutput, Record<string, un
         },
       ],
     },
-    description: '여러 단어 동시 입력: 上手, 元気 (복수 품사 단어 2개)',
+    description: '여러 단어 동시 입력: 安全, 元気 (복수 품사 단어 2개)',
   },
 ];
