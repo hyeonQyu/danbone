@@ -26,7 +26,35 @@ function IndexedDBProvider({ children, config = INDEXED_DB_CONFIG, migration }: 
         const dbInstance = await openDB(config.name, config.version, {
           upgrade(dbUpgrade, oldVersion, newVersion, transaction) {
             config.stores.forEach((storeConfig) => {
-              if (!dbUpgrade.objectStoreNames.contains(storeConfig.name)) {
+              if (dbUpgrade.objectStoreNames.contains(storeConfig.name)) {
+                const existingStore = transaction.objectStore(storeConfig.name);
+                const needsRecreation = existingStore.keyPath !== storeConfig.keyPath;
+
+                if (needsRecreation) {
+                  dbUpgrade.deleteObjectStore(storeConfig.name);
+
+                  const objectStore = dbUpgrade.createObjectStore(storeConfig.name, {
+                    keyPath: storeConfig.keyPath,
+                    autoIncrement: storeConfig.autoIncrement,
+                  });
+
+                  if (storeConfig.indexes) {
+                    storeConfig.indexes.forEach((indexConfig) => {
+                      objectStore.createIndex(indexConfig.name, indexConfig.keyPath, indexConfig.options);
+                    });
+                  }
+                } else {
+                  const objectStore = transaction.objectStore(storeConfig.name);
+
+                  if (storeConfig.indexes) {
+                    storeConfig.indexes.forEach((indexConfig) => {
+                      if (!objectStore.indexNames.contains(indexConfig.name)) {
+                        objectStore.createIndex(indexConfig.name, indexConfig.keyPath, indexConfig.options);
+                      }
+                    });
+                  }
+                }
+              } else {
                 const objectStore = dbUpgrade.createObjectStore(storeConfig.name, {
                   keyPath: storeConfig.keyPath,
                   autoIncrement: storeConfig.autoIncrement,
@@ -35,16 +63,6 @@ function IndexedDBProvider({ children, config = INDEXED_DB_CONFIG, migration }: 
                 if (storeConfig.indexes) {
                   storeConfig.indexes.forEach((indexConfig) => {
                     objectStore.createIndex(indexConfig.name, indexConfig.keyPath, indexConfig.options);
-                  });
-                }
-              } else {
-                const objectStore = transaction.objectStore(storeConfig.name);
-
-                if (storeConfig.indexes) {
-                  storeConfig.indexes.forEach((indexConfig) => {
-                    if (!objectStore.indexNames.contains(indexConfig.name)) {
-                      objectStore.createIndex(indexConfig.name, indexConfig.keyPath, indexConfig.options);
-                    }
                   });
                 }
               }

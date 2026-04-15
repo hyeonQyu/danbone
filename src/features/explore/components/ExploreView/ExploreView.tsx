@@ -1,7 +1,7 @@
 'use client';
 
 import { ExploreSearchInputField } from '@/features/explore/components/ExploreSearchInputField';
-import { useExploreStore } from '@/features/explore/stores';
+import { useExploreQueryLanguage } from '@/features/explore/hooks';
 import { useGetLanguageLabel } from '@/language';
 import { Language } from '@/language/language.types';
 import { useSourceLanguage, useTargetLanguage } from '@/language/LanguageContext';
@@ -20,8 +20,7 @@ function ExploreView() {
 
   const router = useTypedRouter();
 
-  const queryLanguage = useExploreStore((store) => store.queryLanguage);
-  const setQueryLanguage = useExploreStore((store) => store.setQueryLanguage);
+  const { queryLanguage, setQueryLanguage } = useExploreQueryLanguage();
 
   const handleLanguageChange = (event: SelectChangeEvent<Language>) => {
     setQueryLanguage(event.target.value as Language);

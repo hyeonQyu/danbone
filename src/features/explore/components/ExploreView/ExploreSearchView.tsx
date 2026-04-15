@@ -3,13 +3,13 @@
 import ExploreSearchErrorResult from '@/features/explore/components/ExploreSearchErrorResult/ExploreSearchErrorResult';
 import { ExploreSearchJAResults } from '@/features/explore/components/ExploreSearchResult';
 import { ExploreSearchViewTemplate } from '@/features/explore/components/ExploreSearchViewTemplate';
-import { useQueryExploreSearch } from '@/features/explore/hooks';
+import { useExploreQueryLanguage, useQueryExploreSearch } from '@/features/explore/hooks';
 import { useExploreStore } from '@/features/explore/stores';
 
 function ExploreSearchView() {
   const query = useExploreStore((store) => store.query);
   const setQuery = useExploreStore((store) => store.setQuery);
-  const queryLanguage = useExploreStore((store) => store.queryLanguage);
+  const { queryLanguage } = useExploreQueryLanguage();
 
   const { jaResults, isSearching, error, isError } = useQueryExploreSearch();
 
