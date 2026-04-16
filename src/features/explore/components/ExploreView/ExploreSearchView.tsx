@@ -8,13 +8,13 @@ import { useExploreStore } from '@/features/explore/stores';
 
 function ExploreSearchView() {
   const query = useExploreStore((store) => store.query);
-  const setQuery = useExploreStore((store) => store.setQuery);
+  const startSearch = useExploreStore((store) => store.startSearch);
   const { queryLanguage } = useExploreQueryLanguage();
 
   const { jaResults, isSearching, error, isError } = useQueryExploreSearch();
 
   const handleSearch = (value: string) => {
-    setQuery(value);
+    startSearch(value);
   };
 
   return (
