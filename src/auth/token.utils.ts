@@ -1,7 +1,7 @@
 'use client';
 
 import { userServiceClient } from '@/data/client';
-import { deleteCookie, setCookie, TIME_UNIT } from '@/lib';
+import { COOKIE, deleteCookie, setCookie, TIME_UNIT } from '@/lib';
 import { User } from 'firebase/auth';
 
 export const getCurrentUser = () => userServiceClient.getCurrentUser();
@@ -14,11 +14,11 @@ export const setIdTokenCookie = async (user: User): Promise<void> => {
   const now = Date.now();
   const maxAgeInSeconds = Math.floor((expiresAt - now) / TIME_UNIT.unitOfMs.asSecond);
 
-  setCookie('idToken', idToken, { maxAge: maxAgeInSeconds });
+  setCookie(COOKIE.idToken, idToken, { maxAge: maxAgeInSeconds });
 };
 
 export const deleteIdTokenCookie = (): void => {
-  deleteCookie('idToken');
+  deleteCookie(COOKIE.idToken);
 };
 
 export const syncTokenToCookie = async (): Promise<boolean> => {

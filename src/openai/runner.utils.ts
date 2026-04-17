@@ -1,8 +1,9 @@
 import { TextModel } from '@/openai/model.types';
 import { TEXT_STANDARD_USD_PRICE, TEXT_TOKEN_UNIT } from '@/openai/pricing.constants';
+import { accumulatePriceBreakdown, checkIsTracking } from '@/openai/tracking';
 import { Agent, AgentOutputType, Runner, Usage } from '@openai/agents';
 
-interface PriceBreakdown {
+export interface PriceBreakdown {
   regularInputTokens: number;
   cachedInputTokens: number;
   outputTokens: number;
@@ -53,7 +54,12 @@ const createRunner = () => {
     let priceBreakdown: PriceBreakdown | undefined;
 
     if (typeof agentModel === 'string' && agentModel in TEXT_STANDARD_USD_PRICE) {
-      priceBreakdown = calculatePrice(result.state.usage, agentModel as TextModel);
+      const model = agentModel as TextModel;
+      priceBreakdown = calculatePrice(result.state.usage, model);
+
+      if (checkIsTracking() && priceBreakdown) {
+        accumulatePriceBreakdown(priceBreakdown, model);
+      }
     }
 
     return Object.assign(result, { priceBreakdown });

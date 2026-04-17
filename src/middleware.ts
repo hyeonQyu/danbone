@@ -1,3 +1,4 @@
+import { COOKIE } from '@/lib';
 import { AppRoutesPathname } from '@/routes';
 import { appRoutes } from '@/routes/routes.config';
 import { MinimalUser } from '@/routes/routes.types';
@@ -48,7 +49,7 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (pathname === '/') {
-    const idToken = request.cookies.get('idToken')?.value;
+    const idToken = request.cookies.get(COOKIE.idToken)?.value;
     const redirectUrl = idToken ? '/explore' : '/login';
     return NextResponse.redirect(new URL(redirectUrl, request.url));
   }
@@ -65,7 +66,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const idToken = request.cookies.get('idToken')?.value;
+  const idToken = request.cookies.get(COOKIE.idToken)?.value;
   const user = getUserFromToken(idToken);
 
   const context = { user };

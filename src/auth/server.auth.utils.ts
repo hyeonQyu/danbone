@@ -1,5 +1,6 @@
 import { firebaseAdmin } from '@/data/server/firebaseAdmin.config';
 import { AuthError, ExpiredTokenError } from '@/errors';
+import { COOKIE } from '@/lib';
 import { cookies } from 'next/headers';
 
 export interface AuthData {
@@ -9,7 +10,7 @@ export interface AuthData {
 
 export const verifyAuth = async (): Promise<AuthData> => {
   const cookieStore = await cookies();
-  const idToken = cookieStore.get('idToken')?.value;
+  const idToken = cookieStore.get(COOKIE.idToken)?.value;
 
   if (!idToken) {
     throw new ExpiredTokenError('토큰이 존재하지 않습니다.');

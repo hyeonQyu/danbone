@@ -14,6 +14,8 @@ import {
   queryNormalizerAgentFactory,
   translatorAgentFactory,
 } from '@/openai';
+import { withUsageTracking } from '@/openai/tracking';
+import { identity } from 'es-toolkit';
 
 const MAX_QUERY_LENGTH = 50;
 
@@ -49,7 +51,7 @@ const getDictionaryWordsJA = async (input: DictionaryInput) => {
   return runner.run(jaDictionaryAgent, JSON.stringify(input));
 };
 
-export const searchJA: ExploreSearchHandler<DictionaryWordByLanguage['ja']> = async ({ query, queryLanguage, sourceLanguage }) => {
+const _searchJA: ExploreSearchHandler<DictionaryWordByLanguage['ja']> = async ({ query, queryLanguage, sourceLanguage }) => {
   const TARGET_LANGUAGE: TargetLanguage = 'ja' as const;
 
   const getTranslatedTexts = async (normalizedQuery: string) => {
@@ -117,3 +119,7 @@ export const searchJA: ExploreSearchHandler<DictionaryWordByLanguage['ja']> = as
 
   return dictionaryWordsByNormalizedJAText;
 };
+
+export const searchJA = withUsageTracking('searchJA', _searchJA, {
+  extractMetadata: identity,
+});
