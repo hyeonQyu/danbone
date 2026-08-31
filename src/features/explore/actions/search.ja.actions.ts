@@ -3,6 +3,7 @@
 import { InvalidValueError } from '@/errors';
 import { ExploreSearchHandler } from '@/features/explore/types';
 import { TargetLanguage } from '@/language';
+import { devLogTap } from '@/lib';
 import {
   DictionaryInput,
   DictionaryWordByLanguage,
@@ -12,6 +13,7 @@ import {
   jaMorphologicalAnalyzerAgentFactory,
   LocalizedText,
   queryNormalizerAgentFactory,
+  TranslationSource,
   translatorAgentFactory,
 } from '@/openai';
 import { withUsageTracking } from '@/openai/tracking';
@@ -39,7 +41,7 @@ const normalizeQuery = async (input: LocalizedText) => {
   return runner.run(queryNormalizerAgent, JSON.stringify(input));
 };
 
-const translateQuery = async (input: LocalizedText) => {
+const translateQuery = async (input: TranslationSource) => {
   return runner.run(translatorAgent, JSON.stringify(input));
 };
 
@@ -59,8 +61,13 @@ const _searchJA: ExploreSearchHandler<DictionaryWordByLanguage['ja']> = async ({
       return [normalizedQuery];
     }
 
-    const translatedTexts = await translateQuery({ language: queryLanguage, text: normalizedQuery });
-    return translatedTexts.finalOutput?.texts ?? [];
+    const translatedTextsResult = await translateQuery({
+      sourceLanguage,
+      targetLanguage: TARGET_LANGUAGE,
+      text: normalizedQuery,
+    });
+
+    return devLogTap(translatedTextsResult.finalOutput?.texts, '번역된 문자열') ?? [];
   };
 
   const getNormalizedJATexts = async () => {
@@ -75,7 +82,7 @@ const _searchJA: ExploreSearchHandler<DictionaryWordByLanguage['ja']> = async ({
     }
 
     const queryNormalizedResult = await normalizeQuery({ language: queryLanguage, text: query });
-    const normalizedQuery = queryNormalizedResult.finalOutput?.text;
+    const normalizedQuery = devLogTap(queryNormalizedResult.finalOutput?.text, '정규화된 검색어');
 
     if (!normalizedQuery) {
       throw new InvalidValueError('적절하지 않은 검색어입니다.\n다시 입력해주세요.\n(정규화 실패)');
@@ -92,7 +99,7 @@ const _searchJA: ExploreSearchHandler<DictionaryWordByLanguage['ja']> = async ({
 
   const getDictionaryWords = async (normalizedJAText: string) => {
     const morphologicalAnalysisResult = await morphologicalAnalysisJA(normalizedJAText);
-    const tokens = morphologicalAnalysisResult.finalOutput?.tokens;
+    const tokens = devLogTap(morphologicalAnalysisResult.finalOutput?.tokens, '형태소 분리된 토큰');
 
     if (!tokens?.length) {
       throw new InvalidValueError('형태소 분석에 실패했습니다.\n다시 입력해주세요.');
@@ -108,14 +115,23 @@ const _searchJA: ExploreSearchHandler<DictionaryWordByLanguage['ja']> = async ({
     return words;
   };
 
-  const normalizedJATexts = await getNormalizedJATexts();
+  const normalizedJATexts = devLogTap(await getNormalizedJATexts(), '정규화된 일본어 문자열');
 
-  const dictionaryWordsByNormalizedJAText = await Promise.all(
+  const results = await Promise.allSettled(
     normalizedJATexts.map(async (text) => {
       const words = await getDictionaryWords(text);
       return { text, words };
     }),
   );
+
+  const dictionaryWordsByNormalizedJAText = results
+    .filter((result) => result.status === 'fulfilled')
+    .map((result) => (result as PromiseFulfilledResult<{ text: string; words: DictionaryWordByLanguage['ja'][] }>).value);
+
+  if (!dictionaryWordsByNormalizedJAText.length) {
+    const firstRejection = results.find((result) => result.status === 'rejected') as PromiseRejectedResult;
+    throw firstRejection.reason;
+  }
 
   return dictionaryWordsByNormalizedJAText;
 };
