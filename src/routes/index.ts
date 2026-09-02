@@ -1,4 +1,4 @@
+export { default as MetadataTitle } from './MetadataTitle';
 export * from './routes';
-export { RedirectSearchParamsSchema } from './routes.types';
-export type { MinimalUser, RoutesContext } from './routes.types';
+export * from './routes.types';
 export { useRedirect } from './useRedirect';

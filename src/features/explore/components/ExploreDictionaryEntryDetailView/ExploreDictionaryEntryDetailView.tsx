@@ -1,8 +1,9 @@
 import { BackButton } from '@/components/BackButton';
 import { PageViewContainer } from '@/components/PageViewContainer';
 import { SlideInContainer } from '@/components/SlideInContainer';
-import { DictionaryEntryByLanguage } from '@/features/dictionary';
+import { DictionaryEntryByLanguage, DictionaryEntrySchemaByLanguage } from '@/features/dictionary';
 import { DictionaryJAEntryDetail } from '@/features/dictionary/components/DictionaryEntryDetail';
+import { normalizeToSchema } from '@/lib';
 import { useTypedRouter, useTypedSearchParams } from '@/routes';
 import { Z_INDEX } from '@/styles/zIndex.constants';
 import { Box, useTheme } from '@mui/material';
@@ -11,13 +12,8 @@ function ExploreDictionaryEntryDetailView() {
   const { spacing } = useTheme();
 
   const searchParams = useTypedSearchParams('/explore/search/detail');
-  const { language, ...entry } = searchParams;
-
-  const normalizedEntry = {
-    ...entry,
-    meanings: Array.isArray(entry.meanings) ? entry.meanings : [entry.meanings],
-    examples: Array.isArray(entry.examples) ? entry.examples : [entry.examples],
-  };
+  const { language, ...rawEntry } = searchParams;
+  const entry = normalizeToSchema(DictionaryEntrySchemaByLanguage[language], rawEntry);
 
   const router = useTypedRouter();
 
@@ -25,7 +21,7 @@ function ExploreDictionaryEntryDetailView() {
 
   const renderContent = () => {
     if (language === 'ja') {
-      return <DictionaryJAEntryDetail entry={normalizedEntry as DictionaryEntryByLanguage['ja']} />;
+      return <DictionaryJAEntryDetail entry={entry as DictionaryEntryByLanguage['ja']} />;
     }
 
     if (language === 'ko') {

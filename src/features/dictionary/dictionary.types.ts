@@ -52,16 +52,11 @@ export type DictionaryEntryWithLanguageByLanguage<L extends keyof typeof Diction
   language: L;
 } & z.infer<(typeof DictionaryEntrySchemaByLanguage)[L]>;
 
-export const DictionaryEntryWithLanguageSchema = z.custom<DictionaryEntryWithLanguage>((data) => {
-  if (!data || typeof data !== 'object') return false;
-  const { language, ...entry } = data as DictionaryEntryWithLanguageByLanguage<Language>;
+const getDictionaryEntryWithLanguageSchemaOption = (language: Language) => {
+  return z.object({ language: z.literal(language) }).merge(DictionaryEntrySchemaByLanguage[language]);
+};
 
-  if (!(language in DictionaryEntrySchemaByLanguage)) return false;
-
-  try {
-    DictionaryEntrySchemaByLanguage[language as keyof typeof DictionaryEntrySchemaByLanguage].parse(entry);
-    return true;
-  } catch {
-    return false;
-  }
-});
+export const DictionaryEntryWithLanguageSchema = z.discriminatedUnion('language', [
+  getDictionaryEntryWithLanguageSchemaOption('ko'),
+  getDictionaryEntryWithLanguageSchemaOption('ja'),
+]);

@@ -13,3 +13,8 @@ export const getObjectAtPath = <T>(obj: T, path: string, splitter = '.') => {
 
   return value;
 };
+
+export const convertIterableToObject = (iterable: Iterable<readonly [string, string]> | null | undefined): Record<string, string> => {
+  if (!iterable) return {};
+  return Object.fromEntries(Array.from(iterable));
+};
